@@ -1,9 +1,9 @@
 devtools::load_all()
-for (j in 1:10) {
+for (j in 36:42) {
   writeLines(paste0("Now is running ", j, "th sample!"))
   data <- simJMdata(N = 200, lambda1 = 0.05, lambda2 = 0.1,
                          tau = c(0.5, 0.5, -0.2, 0.2, 0.05),
-                         CL = 4, CU = 8, seed = 10 + j,
+                         CL = 4, CU = 8, seed = 100 + j,
                          increment = 0.25)
   ydata <- data$ydata
   cdata <- data$cdata
