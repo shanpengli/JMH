@@ -1,0 +1,13 @@
+Package: JMH
+Type: Package
+Title: Joint models of longituinal and competing risks data with the presence of heterogeneous variance
+Version: 1.0
+Date: 2021-05-28
+Author: Shanpeng Li
+Maintainer: Who to complain to <yourfault@somewhere.net>
+Description: More about what it does (maybe more than one line)
+License: What license is it under?
+Imports: Rcpp (>= 1.0.6)
+LinkingTo: Rcpp, RcppEigen
+Depends: R (>= 3.0.0), statmod, survival
+RoxygenNote: 7.1.1
