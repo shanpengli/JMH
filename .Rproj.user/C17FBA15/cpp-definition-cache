@@ -90,10 +90,10 @@
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getEC.cpp",
-        "file_last_write": 1623940619.0,
+        "file_last_write": 1624082389.0,
         "definitions": [
             {
-                "usr": "c:@F@getEC#&1I#S0_#S0_#S0_#S0_#S0_#1d#1d#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#",
+                "usr": "c:@F@getEC#&1$@N@Eigen@S@Matrix>#d#VI-1#VI1#VI0#VI-1#VI1#S0_#S0_#S0_#S0_#S0_#1d#1d#&1$@N@Eigen@S@Matrix>#d#VI-1#VI-1#VI0#VI-1#VI-1#S2_#S2_#S2_#S2_#S2_#S0_#S2_#S0_#S0_#S0_#S0_#S2_#S2_#S0_#S0_#S0_#S0_#",
                 "kind": 6,
                 "parent_name": "",
                 "name": "getEC(const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const double, const double, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &)",
