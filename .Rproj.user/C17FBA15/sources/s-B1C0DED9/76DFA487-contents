@@ -6,13 +6,12 @@ simfit <- function(sim = 100, N = 200, lambda1 = 0.05, lambda2 = 0.1,
                    CL = 4, CU = 8, seed = 10, maxiter = 1000,
                    increment = 0.25, quadpoint = 15, ncores = 10) {
   
-  cl <- parallel::makeCluster(ncores)
-  ParaMatrixRaw <- parallel::parLapply(cl, 1:sim, bootsfit,
-                                       N = N, lambda1 = lambda1, lambda2 = lambda2,
-                                       tau = tau,
-                                       CL = CL, CU = CU, seed = seed, maxiter = maxiter,
-                                       increment = increment, quadpoint = quadpoint)
-  parallel::stopCluster(cl)
+  ParaMatrixRaw <- parallel::mclapply(1:sim, bootsfit,
+                                                N = N, lambda1 = lambda1, lambda2 = lambda2,
+                                                tau = tau,
+                                                CL = CL, CU = CU, seed = seed, maxiter = maxiter,
+                                                increment = increment, quadpoint = quadpoint,
+                                                mc.cores = ncores)
   
   paramatrix <- as.data.frame(matrix(0, nrow = sim, ncol = 29))
   for (i in 1:sim) {

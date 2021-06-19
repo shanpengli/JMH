@@ -26,10 +26,10 @@ bootsfit <- function(i, N = 200, lambda1 = 0.05, lambda2 = 0.1,
   coef <- vector()
   count <- 1
   if (is.null(fit$beta)) {
-    coef <- rep(0, 29)
+    coef <- rep(NA, 29)
     return(coef)
   } else if (fit$iter == maxiter) {
-    coef <- rep(0, 29)
+    coef <- rep(NA, 29)
     return(coef)
   } else {
     for (j in 1:length(fit$beta)) {

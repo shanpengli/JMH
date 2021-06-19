@@ -21,10 +21,13 @@ for (j in 36:42) {
 }
 
 
-a <- JMH::simfit(sim = 50, N = 200, lambda1 = 0.05, lambda2 = 0.1,
+N200q15 <- JMH::simfit(sim = 100, N = 200, lambda1 = 0.05, lambda2 = 0.1,
                  tau = c(0.5, 0.5, -0.2, 0.2, 0.05),
                  CL = 4, CU = 8, seed = 100, maxiter = 1000,
-                 increment = 0.25, quadpoint = 15, ncores = 8)
+                 increment = 0.25, quadpoint = 15, ncores = 10)
+
+
+
 
 beta = c(5, 1.5, 2, 1, 2)
 tau = c(0.5, 0.5, -0.2, 0.2, 0.05)
@@ -56,4 +59,16 @@ ParaMatrixRaw <- parallel::parLapply(cl, 36:42, bootsfit,
                                      CL = CL, CU = CU, seed = seed, maxiter = maxiter,
                                      increment = increment, quadpoint = quadpoint)
 parallel::stopCluster(cl)
+
+ParaMatrixRaw <- parallel::mclapply(36:42, bootsfit,
+                                     N = N, lambda1 = lambda1, lambda2 = lambda2,
+                                     tau = tau,
+                                     CL = CL, CU = CU, seed = seed, maxiter = maxiter,
+                                     increment = increment, quadpoint = quadpoint,
+                                     mc.cores = ncores)
+
+paramatrix <- as.data.frame(matrix(0, nrow = 7, ncol = 29))
+for (i in 1:7) {
+  paramatrix[i, ] <- ParaMatrixRaw[[i]]
+}
 
