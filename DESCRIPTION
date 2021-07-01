@@ -9,5 +9,5 @@ Description: More about what it does (maybe more than one line)
 License: What license is it under?
 Imports: Rcpp (>= 1.0.6)
 LinkingTo: Rcpp, RcppEigen
-Depends: R (>= 3.0.0), statmod, survival
+Depends: R (>= 3.0.0), statmod, survival, parallel, dplyr, MASS, stats
 RoxygenNote: 7.1.1

@@ -532,7 +532,7 @@ Rcpp::List getMC(Eigen::VectorXd & beta, Eigen::VectorXd & tau,
     else continue;
   }
   
-  TN = Eigen::VectorXd::Zero(p2);
+  TN = Eigen::VectorXd::Zero(p1a);
   
   for (j=0;j<k;j++)
   {
@@ -651,7 +651,7 @@ Rcpp::List getMC(Eigen::VectorXd & beta, Eigen::VectorXd & tau,
     else continue;
   }
   
-  TN = Eigen::VectorXd::Zero(p2);
+  TN = Eigen::VectorXd::Zero(p1a);
   
   for (j=0;j<k;j++)
   {

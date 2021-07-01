@@ -13,9 +13,11 @@ simfit <- function(sim = 100, N = 200, lambda1 = 0.05, lambda2 = 0.1,
                                                 increment = increment, quadpoint = quadpoint,
                                                 mc.cores = ncores)
   
-  paramatrix <- as.data.frame(matrix(0, nrow = sim, ncol = 29))
+  paramatrix <- as.data.frame(matrix(0, nrow = sim, ncol = 30))
+  paramatrixSE <- as.data.frame(matrix(0, nrow = sim, ncol = 28))
   for (i in 1:sim) {
-    paramatrix[i, ] <- ParaMatrixRaw[[i]]
+    paramatrix[i, ] <- ParaMatrixRaw[[i]]$coef
+    paramatrixSE[i, ] <- ParaMatrixRaw[[i]]$coefSE
   }
   
   count <- 1
@@ -67,7 +69,15 @@ simfit <- function(sim = 100, N = 200, lambda1 = 0.05, lambda2 = 0.1,
   colnames(paramatrix)[count] <- paste0("Sig_13")
   count <- count + 1
   colnames(paramatrix)[count] <- paste0("Time")
+  count <- count + 1
+  colnames(paramatrix)[count] <- paste0("Iter")
   
-  return(paramatrix)
+  name <- colnames(paramatrix)[-(29:30)]
+  colnames(paramatrixSE) <- paste0("se", name)
+  
+  result <- list(paramatrix, paramatrixSE)
+  names(result) <- c("paramatrix", "paramatrixSE")
+  
+  return(result)
   
 }
