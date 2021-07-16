@@ -131,13 +131,16 @@ Rcpp::List getEC(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
         FUNBSENW(i,j)+=temp*exp(-wi)*pow(bi(i),2);
         }
       
-      for(i=1;i<p1a;i++)
-      {
-        for(t=0;t<p1a-i;t++) {
-          FUNBS(p1a+t+(i-1)*(p1a-1),j) += temp*bi(t)*bi(t+i);
-          FUNBSENW(p1a+t+(i-1)*(p1a-1),j) += temp*exp(-wi)*bi(t)*bi(t+i);
+      if (p1a == 2) {
+        for(i=1;i<p1a;i++)
+        {
+          for(t=0;t<p1a-i;t++) {
+            FUNBS(p1a+t+(i-1)*(p1a-1),j) += temp*bi(t)*bi(t+i);
+            FUNBSENW(p1a+t+(i-1)*(p1a-1),j) += temp*exp(-wi)*bi(t)*bi(t+i);
           }   
+        }
       }
+      
       FUNBW.col(j)+=wi*temp*bi;
       FUNWS(j)+=pow(wi,2)*temp;
       
@@ -154,14 +157,18 @@ Rcpp::List getEC(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
         FUNBSEC(p1a*(p1a+1)/2+i,j)+=temp*exp(MultVV(alpha2,bi)+vee2*wi)*pow(bi(i),2);
         }
       
-      for(i=1;i<p1a;i++)
-      {
-        for(t=0;t<p1a-i;t++)
+      if (p1a == 2) {
+        for(i=1;i<p1a;i++)
         {
-          FUNBSEC(p1a+t+(i-1)*(p1a-1),j)+=temp*exp(MultVV(alpha1,bi)+vee1*wi)*bi(t)*bi(t+i);
-          FUNBSEC(p1a*(p1a+1)/2+p1a+t+(i-1)*(p1a-1),j)+=temp*exp(MultVV(alpha2,bi)+vee2*wi)*bi(t)*bi(t+i);
+          for(t=0;t<p1a-i;t++)
+          {
+            FUNBSEC(p1a+t+(i-1)*(p1a-1),j)+=temp*exp(MultVV(alpha1,bi)+vee1*wi)*bi(t)*bi(t+i);
+            FUNBSEC(p1a*(p1a+1)/2+p1a+t+(i-1)*(p1a-1),j)+=temp*exp(MultVV(alpha2,bi)+vee2*wi)*bi(t)*bi(t+i);
+          }
         }
       }
+      
+
       
       FUNWEC(0,j)+=temp*wi*exp(MultVV(alpha1,bi)+vee1*wi);
       FUNWEC(1,j)+=temp*wi*exp(MultVV(alpha2,bi)+vee2*wi);

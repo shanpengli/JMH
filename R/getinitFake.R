@@ -66,6 +66,7 @@ GetinitFake <- function(cdata, ydata, long.formula, surv.formula, variance.var,
     p1a <- 1
     Z <- rep(1, ydim[1])
     Z <- as.data.frame(Z)
+    Z <- as.matrix(Z)
   } else {
     stop("model should be one of the following options: interslope or intercept.")
   }
@@ -77,24 +78,64 @@ GetinitFake <- function(cdata, ydata, long.formula, surv.formula, variance.var,
   survtime <- as.vector(cdata[, survival[1]])
   cmprsk <- as.vector(cdata[, survival[2]])
   
-  beta = c(5, 1.5, 2, 1, 2)
-  tau = c(0.5, 0.5, -0.2, 0.2, 0.05)
-  gamma1 = c(1, 0.5, 0.5)
-  gamma2 = c(-0.5, 0.5, 0.25)
-  alpha1 = c(1, 0.7)
-  alpha2 = c(-1, -0.5)
-  vee1 = 0.5
-  vee2 = -0.5
-  Sig <- matrix(c(0.5, 0.25, 0.25, 0.25, 0.5, 0.25, 0.25, 0.25, 0.5), nrow = 3, ncol = 3)
+  if (sum(unique(cmprsk)) <= 3) {
+    if (prod(c(0, 1, 2) %in% unique(cmprsk))) {
+      beta = c(5, 1.5, 2, 1, 2)
+      tau = c(0.5, 0.5, -0.2, 0.2, 0.05)
+      gamma1 = c(1, 0.5, 0.5)
+      gamma2 = c(-0.5, 0.5, 0.25)
+      vee1 = 0.5
+      vee2 = -0.5
+      alpha1 = c(1, 0.7)
+      alpha2 = c(-1, -0.5)
+      Sig <- matrix(c(0.5, 0.25, 0.25, 0.25, 0.5, 0.25, 0.25, 0.25, 0.5), nrow = 3, ncol = 3)
+      
+      a <- list(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, Sig, 
+                Z, X, W, Y, X2, survtime, cmprsk, cdata, mdata)
+      
+      names(a) <- c("beta", "tau", "gamma1", "gamma2", "alpha1", "alpha2", "vee1", "vee2", "Sig",
+                    "Z", "X1", "W", "Y", "X2", "survtime", "cmprsk",
+                    "cdata", "mdata")
+      
+      return(a)
+      
+    } 
+    
+    if (prod(c(0, 1) %in% unique(cmprsk))) {
+      beta = c(5, 1.5, 2, 1, 2)
+      tau = c(0.5, 0.5, -0.2, 0.2, 0.05)
+      gamma1 = c(1, 0.5, 0.5)
+      vee1 = 0.5
+      alpha1 = c(1, 0.7)
+      Sig <- matrix(c(0.5, 0.25, 0.25, 0.25, 0.5, 0.25, 0.25, 0.25, 0.5), nrow = 3, ncol = 3)
+      
+      a <- list(beta, tau, gamma1, alpha1, vee1, Sig, 
+                Z, X, W, Y, X2, survtime, cmprsk, cdata, mdata)
+      
+      names(a) <- c("beta", "tau", "gamma1", "alpha1", "vee1", "Sig",
+                    "Z", "X1", "W", "Y", "X2", "survtime", "cmprsk",
+                    "cdata", "mdata")
+      
+      return(a)
+      
+    }
+  } else {
+    stop(paste0("The ", survival[2], " variable is specified incorrectly! Program stops."))
+  }
   
-  a <- list(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, Sig, 
-            Z, X, W, Y, X2, survtime, cmprsk, cdata, mdata)
+
   
-  names(a) <- c("beta", "tau", "gamma1", "gamma2", "alpha1", "alpha2", "vee1", "vee2", "Sig",
-                "Z", "X1", "W", "Y", "X2", "survtime", "cmprsk",
-                "cdata", "mdata")
   
-  return(a)
+  # beta = c(5, 1.5, 2, 1, 2)
+  # tau = c(0.5, 0.5, -0.2, 0.2, 0.05)
+  # gamma1 = c(1, 0.5, 0.5)
+  # gamma2 = c(-0.5, 0.5, 0.25)
+  # vee1 = 0.5
+  # vee2 = -0.5
+  # alpha1 = as.vector(1)
+  # alpha2 = as.vector(-1)
+  # Sig <- matrix(c(0.5, 0.25, 0.25, 0.5), nrow = 2, ncol = 2)
   
+
   
 }

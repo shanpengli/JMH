@@ -16,11 +16,12 @@ GetM <- function(GetEfun, beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2,
     FUNB <- as.matrix(GetEfun$FUNB)
     FUNW <- as.vector(GetEfun$FUNW)
     
+
     getMpara <- getMC(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, H01, 
                       H02, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS,
                       FUNENW, FUNBENW, FUNBS, FUNBW, FUNWS, FUNBSENW, FUNEC, FUNBEC,
                       FUNBSEC, FUNWEC, FUNWSEC,FUNB, FUNW)
-    
+      
     return(getMpara)
   
   } else {
