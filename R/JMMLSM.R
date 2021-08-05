@@ -1,23 +1,49 @@
+##' Joint modeling of longitudinal continuous data and competing risks
+##' @title Joint Modelling for Continuous outcomes
+##' @param ydata a longitudinal data frame in long format.
+##' @param cdata a survival data frame with competing risks or single failure.
+##' Each subject has one data entry.
+##' @param long.formula a formula object with the response variable and fixed effects covariates
+##' to be included in the longitudinal sub-model.
+##' @param surv.formula a formula object with the survival time, event indicator, and the covariates
+##' to be included in the survival sub-model.
+##' @param variance.formula an one-sided formula object with the fixed effects covariates to model the variance of longituidnal sub-model.
+##' @param random a one-sided formula object describing the random effects part of the longitudinal sub-model.
+##' For example, fitting a random intercept model takes the form ~ 1|ID.
+##' Alternatively. Fitting a random intercept and slope model takes the form ~ x1 + ... + xn|ID.
+##' @param maxiter the maximum number of iterations of the EM algorithm that the function will perform. Default is 10000.
+##' @param epsilon Tolerance parameter. Default is 0.0001.
+##' @param quadpoint the number of pseudo-adaptive Gauss-Hermite quadrature points
+##' to be chosen for numerical integration. Default is 6 which produces stable estimates in most dataframes.
+##' @param print.para Print detailed information of each iteration. Default is FALSE, i.e., not to print the iteration details.
 ##' @export
-##'
+##' 
 
 JMMLSM <- function(cdata, ydata,
                 long.formula,
                 surv.formula,
-                variance.var, maxiter = 1000, epsilon = 1e-04, 
-                quadpoint = 10, ID, RE = NULL,
-                model = "interslope", print.para = FALSE) {
+                variance.formula, 
+                random,
+                maxiter = 1000, epsilon = 1e-04, 
+                quadpoint = 10, print.para = FALSE) {
   
-  #mdata <- as.data.frame(table(ydata[, ID]))
-  #colnames(mdata) <- c(ID, "ni")
+  random.form <- all.vars(random)
+  ID <- random.form[length(random.form)]
+  if (length(random.form) == 1) {
+    RE <- NULL
+    model <- "intercept"
+  } else {
+    RE <- random.form[-length(random.form)]
+    model <- "interslope"
+  }
   
-  # getinit <- Getinit(cdata = cdata, ydata = ydata, long.formula = long.formula, 
-  #                    surv.formula = surv.formula, variance.var = variance.var,
+  # getinit <- Getinit(cdata = cdata, ydata = ydata, long.formula = long.formula,
+  #                    surv.formula = surv.formula, variance.formula = variance.formula,
   #                    model = model, ID = ID, RE = RE)
-  
-  getinit <- GetinitFake(cdata, ydata, long.formula, surv.formula, variance.var,
+
+  getinit <- GetinitFake(cdata, ydata, long.formula, surv.formula, variance.formula,
                          model, ID, RE)
-  
+
   cdata <- getinit$cdata
   
   survival <- all.vars(surv.formula)
@@ -28,8 +54,8 @@ JMMLSM <- function(cdata, ydata,
     getriskset <- Getriskset(cdata = cdata, surv.formula = surv.formula)
     
     ## number of distinct survival time
-    H01 <- as.matrix(getriskset$tablerisk1)
-    H02 <- as.matrix(getriskset$tablerisk2)
+    H01 <- getriskset$tablerisk1
+    H02 <- getriskset$tablerisk2
     
     ## initialize parameters
     beta <- getinit$beta
@@ -319,19 +345,42 @@ JMMLSM <- function(cdata, ydata,
       survival <- all.vars(surv.formula)
       
       names(beta) <- c("intercept", long[-1])
-      names(tau) <- paste0(c("intercept", variance.var), "_var")
+      variance.form <- all.vars(variance.formula)
+      names(tau) <- paste0(c("intercept", variance.form), "_var")
       
       names(gamma1) <- paste0(survival[-(1:2)], "_1")
       names(gamma2) <- paste0(survival[-(1:2)], "_2")
       
+      PropComp <- as.data.frame(table(cdata[, survival[2]]))
+      
+      LongOut <- long[1]
+      LongX <- paste0(long[-1], collapse = "+")
+      FunCall_long <- as.formula(paste(LongOut, LongX, sep = "~"))
+      
+      LongVarOut <- "log(sigma^2)"
+      LongVarX <- paste0(variance.form, collapse = "+") 
+      FunCall_longVar <- as.formula(paste(LongVarOut, LongVarX, sep = "~"))
+      
+      SurvOut <- paste0("Surv(", survival[1], ",", survival[2], ")")
+      SurvX <- paste0(survival[-(1:2)], collapse = "+")
+      FunCall_survival <- as.formula(paste(SurvOut, SurvX, sep = "~"))
+      
+      ## return the joint modelling result
+      mycall <- match.call()
+      
       result <- list(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, H01, 
                      H02, Sig, iter, convergence, vcov, sebeta, setau, segamma1,
-                     segamma2, sealpha1, sealpha2, sevee1, sevee2, seSig)
+                     segamma2, sealpha1, sealpha2, sevee1, sevee2, seSig, CompetingRisk,
+                     quadpoint, ydata, cdata, PropComp, FunCall_long, FunCall_longVar,
+                     FunCall_survival, random, mycall)
       
       names(result) <- c("beta", "tau", "gamma1", "gamma2", "alpha1", "alpha2", "vee1",
                          "vee2", "H01", "H02", "Sig", "iter", "convergence", "vcov",
                          "sebeta", "setau", "segamma1", "segamma2", "sealpha1", "sealpha2", 
-                         "sevee1", "sevee2", "seSig")
+                         "sevee1", "sevee2", "seSig", "CompetingRisk", "quadpoint",
+                         "ydata", "cdata", "PropEventType", "LongitudinalSubmodelmean",
+                         "LongitudinalSubmodelvariance", "Survivalsubmodel", "random",
+                         "call")
       
       class(result) <- "JMH"
       
@@ -461,16 +510,39 @@ JMMLSM <- function(cdata, ydata,
       survival <- all.vars(surv.formula)
       
       names(beta) <- c("intercept", long[-1])
-      names(tau) <- paste0(c("intercept", variance.var), "_var")
+      variance.form <- all.vars(variance.formula)
+      names(tau) <- paste0(c("intercept", variance.form), "_var")
       
       names(gamma1) <- paste0(survival[-(1:2)], "_1")
       
+      PropComp <- as.data.frame(table(cdata[, survival[2]]))
+      
+      LongOut <- long[1]
+      LongX <- paste0(long[-1], collapse = "+")
+      FunCall_long <- as.formula(paste(LongOut, LongX, sep = "~"))
+      
+      LongVarOut <- "log(sigma^2)"
+      LongVarX <- paste0(variance.form, collapse = "+") 
+      FunCall_longVar <- as.formula(paste(LongVarOut, LongVarX, sep = "~"))
+      
+      SurvOut <- paste0("Surv(", survival[1], ",", survival[2], ")")
+      SurvX <- paste0(survival[-(1:2)], collapse = "+")
+      FunCall_survival <- as.formula(paste(SurvOut, SurvX, sep = "~"))
+      
+      ## return the joint modelling result
+      mycall <- match.call()
+      
       result <- list(beta, tau, gamma1, alpha1, vee1, H01, Sig, iter, convergence, 
-                     vcov, sebeta, setau, segamma1, sealpha1, sevee1, seSig)
+                     vcov, sebeta, setau, segamma1, sealpha1, sevee1, seSig, CompetingRisk,
+                     quadpoint, ydata, cdata, PropComp, FunCall_long, FunCall_longVar,
+                     FunCall_survival, random, mycall)
       
       names(result) <- c("beta", "tau", "gamma1", "alpha1", "vee1", "H01", "Sig", 
                          "iter", "convergence", "vcov", "sebeta", "setau", "segamma1", 
-                         "sealpha1", "sevee1", "seSig")
+                         "sealpha1", "sevee1", "seSig", "CompetingRisk", "quadpoint",
+                         "ydata", "cdata", "PropEventType", "LongitudinalSubmodelmean",
+                         "LongitudinalSubmodelvariance", "Survivalsubmodel", "random",
+                         "call")
       
       class(result) <- "JMH"
       

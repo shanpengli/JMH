@@ -16,9 +16,8 @@ bootsfitSF <- function(i, N = 200, lambda1 = 0.05,
   fit <- JMMLSM(cdata = cdata, ydata = ydata, 
                 long.formula = Y ~ Z1 + Z2 + Z3 + time,
                 surv.formula = Surv(survtime, status) ~ var1 + var2 + var3,
-                variance.var = c("Z1", "Z2", "Z3", "time"), maxiter = maxiter, epsilon = 1e-04, 
-                quadpoint = quadpoint, ID = "ID", RE = "time",
-                model = "interslope")
+                variance.formula = ~ Z1 + Z2 + Z3 + time, maxiter = maxiter, epsilon = 1e-04, 
+                quadpoint = quadpoint, random = ~ time|ID)
   b <- proc.time()
   time <- (b - a)[3]
   

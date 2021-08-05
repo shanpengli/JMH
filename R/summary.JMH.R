@@ -69,6 +69,7 @@ summary.JMH <- function(object, coeff = c("longitudinal", "survival"), digits = 
     ##alpha
     Estimate <- object$alpha1
     if (length(Estimate) == 2) names(Estimate) <- c("alpha1_1", "alpha1_2")
+    if (length(Estimate) == 1) names(Estimate) <- c("alpha1_1")
     SE <- object$sealpha1
     LowerLimit <- Estimate - 1.96 * SE
     UpperLimit <- Estimate + 1.96 * SE
@@ -81,6 +82,7 @@ summary.JMH <- function(object, coeff = c("longitudinal", "survival"), digits = 
     
     Estimate <- object$alpha2
     if (length(Estimate) == 2) names(Estimate) <- c("alpha2_1", "alpha2_2")
+    if (length(Estimate) == 1) names(Estimate) <- c("alpha2_1")
     SE <- object$sealpha2
     LowerLimit <- Estimate - 1.96 * SE
     UpperLimit <- Estimate + 1.96 * SE

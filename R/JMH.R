@@ -8,4 +8,5 @@
 #' @importFrom parallel mclapply parLapply makeCluster stopCluster
 #' @importFrom dplyr left_join
 #' @importFrom MASS mvrnorm
+#' @importFrom lme4 lmer fixef VarCorr 
 NULL

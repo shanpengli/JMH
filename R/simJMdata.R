@@ -2,7 +2,7 @@
 ##'
 
 simJMdata <- function(seed = 100, N = 200, increment = 0.7, beta = c(5, 1.5, 2, 1, 2),
-                      tau = c(1, 0.5, -0.2, 0.2, 0.05),
+                      tau = c(0.5, 0.5, -0.2, 0.2, 0.05),
                       gamma1 = c(1, 0.5, 0.5),
                       gamma2 = c(-0.5, 0.5, 0.25),
                       alpha1 = c(1, 0.7),

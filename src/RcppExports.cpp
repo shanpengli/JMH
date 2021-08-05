@@ -6,6 +6,28 @@
 
 using namespace Rcpp;
 
+// GetrisksetC
+Rcpp::List GetrisksetC(const Eigen::MatrixXd& cdata);
+RcppExport SEXP _JMH_GetrisksetC(SEXP cdataSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type cdata(cdataSEXP);
+    rcpp_result_gen = Rcpp::wrap(GetrisksetC(cdata));
+    return rcpp_result_gen;
+END_RCPP
+}
+// GetrisksetCSF
+Rcpp::List GetrisksetCSF(const Eigen::MatrixXd& cdata);
+RcppExport SEXP _JMH_GetrisksetCSF(SEXP cdataSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type cdata(cdataSEXP);
+    rcpp_result_gen = Rcpp::wrap(GetrisksetCSF(cdata));
+    return rcpp_result_gen;
+END_RCPP
+}
 // OLS
 Rcpp::List OLS(const Eigen::MatrixXd& X, const Eigen::VectorXd& Y);
 RcppExport SEXP _JMH_OLS(SEXP XSEXP, SEXP YSEXP) {
@@ -368,6 +390,8 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_JMH_GetrisksetC", (DL_FUNC) &_JMH_GetrisksetC, 1},
+    {"_JMH_GetrisksetCSF", (DL_FUNC) &_JMH_GetrisksetCSF, 1},
     {"_JMH_OLS", (DL_FUNC) &_JMH_OLS, 2},
     {"_JMH_MultVV", (DL_FUNC) &_JMH_MultVV, 2},
     {"_JMH_MultVVoutprod", (DL_FUNC) &_JMH_MultVVoutprod, 1},

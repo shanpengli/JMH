@@ -1,9 +1,10 @@
-GetinitFake <- function(cdata, ydata, long.formula, surv.formula, variance.var,
+GetinitFake <- function(cdata, ydata, long.formula, surv.formula, variance.formula,
                     model, ID, RE)
 {
   
   long <- all.vars(long.formula)
   survival <- all.vars(surv.formula)
+  variance.formula <- all.vars(variance.formula)
   cnames <- colnames(cdata)
   ynames <- colnames(ydata)
   
@@ -25,8 +26,8 @@ GetinitFake <- function(cdata, ydata, long.formula, surv.formula, variance.var,
   if (is.null(RE) & model == "interslope") {
     stop("Random effects covariates must be specified.")
   }
-  if (prod(variance.var %in% ynames) == 0) {
-    Fakename <- which(variance.var %in% ynames == FALSE)
+  if (prod(variance.formula %in% ynames) == 0) {
+    Fakename <- which(variance.formula %in% ynames == FALSE)
     stop(paste0("The WS variables ", long[Fakename], " not found"))
   }
   yID <- unique(as.character(ydata[, ID]))
@@ -71,7 +72,7 @@ GetinitFake <- function(cdata, ydata, long.formula, surv.formula, variance.var,
     stop("model should be one of the following options: interslope or intercept.")
   }
   
-  W <- ydata[, variance.var]
+  W <- ydata[, variance.formula]
   W <- as.matrix(cbind(1, W))
   Y <- as.vector(ydata[, long[1]])
   X2 <- as.matrix(cdata[, survival[3:length(survival)]])
@@ -86,9 +87,16 @@ GetinitFake <- function(cdata, ydata, long.formula, surv.formula, variance.var,
       gamma2 = c(-0.5, 0.5, 0.25)
       vee1 = 0.5
       vee2 = -0.5
-      alpha1 = c(1, 0.7)
-      alpha2 = c(-1, -0.5)
-      Sig <- matrix(c(0.5, 0.25, 0.25, 0.25, 0.5, 0.25, 0.25, 0.25, 0.5), nrow = 3, ncol = 3)
+
+      if (model == "intercept") {
+        alpha1 = as.vector(1)
+        alpha2 = as.vector(-1)
+        Sig <- matrix(c(0.5, 0.25, 0.25, 0.5), nrow = 2, ncol = 2)
+      } else {
+        alpha1 = c(1, 0.7)
+        alpha2 = c(-1, -0.5)
+        Sig <- matrix(c(0.5, 0.25, 0.25, 0.25, 0.5, 0.25, 0.25, 0.25, 0.5), nrow = 3, ncol = 3)
+      }
       
       a <- list(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, Sig, 
                 Z, X, W, Y, X2, survtime, cmprsk, cdata, mdata)
@@ -106,8 +114,14 @@ GetinitFake <- function(cdata, ydata, long.formula, surv.formula, variance.var,
       tau = c(0.5, 0.5, -0.2, 0.2, 0.05)
       gamma1 = c(1, 0.5, 0.5)
       vee1 = 0.5
-      alpha1 = c(1, 0.7)
-      Sig <- matrix(c(0.5, 0.25, 0.25, 0.25, 0.5, 0.25, 0.25, 0.25, 0.5), nrow = 3, ncol = 3)
+      
+      if (model == "intercept") {
+        alpha1 = as.vector(1)
+        Sig <- matrix(c(0.5, 0.25, 0.25, 0.5), nrow = 2, ncol = 2)
+      } else {
+        alpha1 = c(1, 0.7)
+        Sig <- matrix(c(0.5, 0.25, 0.25, 0.25, 0.5, 0.25, 0.25, 0.25, 0.5), nrow = 3, ncol = 3)
+      }
       
       a <- list(beta, tau, gamma1, alpha1, vee1, Sig, 
                 Z, X, W, Y, X2, survtime, cmprsk, cdata, mdata)
@@ -122,20 +136,5 @@ GetinitFake <- function(cdata, ydata, long.formula, surv.formula, variance.var,
   } else {
     stop(paste0("The ", survival[2], " variable is specified incorrectly! Program stops."))
   }
-  
-
-  
-  
-  # beta = c(5, 1.5, 2, 1, 2)
-  # tau = c(0.5, 0.5, -0.2, 0.2, 0.05)
-  # gamma1 = c(1, 0.5, 0.5)
-  # gamma2 = c(-0.5, 0.5, 0.25)
-  # vee1 = 0.5
-  # vee2 = -0.5
-  # alpha1 = as.vector(1)
-  # alpha2 = as.vector(-1)
-  # Sig <- matrix(c(0.5, 0.25, 0.25, 0.5), nrow = 2, ncol = 2)
-  
-
   
 }
