@@ -11,3 +11,5 @@ double MultVVinprod(const Eigen::VectorXd & x);
 double CH(const Eigen::MatrixXd & H, double t);
 
 double HAZ(const Eigen::MatrixXd & H, double t);
+
+Eigen::MatrixXd MultVV2outprod(const Eigen::VectorXd & x, const Eigen::VectorXd & y);

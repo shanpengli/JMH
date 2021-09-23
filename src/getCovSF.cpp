@@ -68,6 +68,8 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
   int p2 = gamma1.size();
   
   Eigen::VectorXd SZ = Eigen::VectorXd::Zero(p1);
+  Eigen::VectorXd SZ1 = Eigen::VectorXd::Zero(p1);
+  Eigen::MatrixXd SZZ = Eigen::MatrixXd::Zero(p1, p1a);
   Eigen::VectorXd SZtau = Eigen::VectorXd::Zero(p1b);
   Eigen::MatrixXd bbT  = Eigen::MatrixXd::Zero(p1a, p1a);
   Eigen::MatrixXd bbT2  = Eigen::MatrixXd::Zero(p1a, p1a);
@@ -112,14 +114,20 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
     
     /* calculate score for beta */
     SZ = Eigen::VectorXd::Zero(p1);
+    SZ1 = Eigen::VectorXd::Zero(p1);
     for (i=0;i<q;i++) {
       
-      epsilon = Y(mdataS(j)-1+i) - MultVV(X1.row(mdataS(j)-1+i), beta) - 
-        MultVV(Z.row(mdataS(j)-1+i), FUNB.col(j));
-      SZ += epsilon*exp(-MultVV(W.row(mdataS(j)-1+i),tau))*X1.row(mdataS(j)-1+i);
+      SZ1 += (Y(mdataS(j)-1+i) - MultVV(X1.row(mdataS(j)-1+i), beta))*
+        exp(-MultVV(W.row(mdataS(j)-1+i),tau))*FUNENW(j)*X1.row(mdataS(j)-1+i);
+      //SZZ = exp(-MultVV(W.row(mdataS(j)-1+i),tau))*
+        //MultVV2outprod(X1.row(mdataS(j)-1+i), Z.row(mdataS(j)-1+i));
+      //SZ += SZZ*FUNBENW.col(j);
+      
+      SZ += exp(-MultVV(W.row(mdataS(j)-1+i),tau))*
+        MultVV(Z.row(mdataS(j)-1+i), FUNBENW.col(j))*X1.row(mdataS(j)-1+i);
       
     }
-    for (i=0;i<p1;i++) S(i) = SZ(i);
+    for (i=0;i<p1;i++) S(i) = SZ1(i) - SZ(i);
     
     /* calculate score for tau */
     SZtau = Eigen::VectorXd::Zero(p1b);
@@ -675,9 +683,8 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
     bsw(p1a,p1a) = FUNWS(j);
     
     bsw2 = Sig.inverse()*bsw*Sig.inverse() - Sig.inverse();
-    bsw2 *= 0.5;
     
-    for (t=0;t<(p1a+1);t++) S(p1+p1b+p2+p1a+1+t) = bsw2(t,t);
+    for (t=0;t<(p1a+1);t++) S(p1+p1b+p2+p1a+1+t) = 0.5*bsw2(t,t);
     
     for(q=1;q<(p1a+1);q++)
     {

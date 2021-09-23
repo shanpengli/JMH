@@ -16,7 +16,7 @@ Diff <- function(beta, prebeta, tau, pretau, gamma1, pregamma1, gamma2, pregamma
   
   if ((betaAbsdiff > epsilon) || (tauAbsdiff > epsilon) || (gamma1Absdiff > epsilon)
       || (gamma2Absdiff > epsilon) || (alpha1Absdiff > epsilon) || (alpha2Absdiff > epsilon)
-      || (vee1Absdiff > epsilon) || (vee2Absdiff > epsilon) || (SigAbsdiff  > epsilon)
+      || (vee1Absdiff > epsilon) || (vee2Absdiff > epsilon) || (SigAbsdiff  > 10*epsilon)
       || (H01Absdiff > 10*epsilon) || (H02Absdiff > 10*epsilon)) {
     return(1)
   } else {

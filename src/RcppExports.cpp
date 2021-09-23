@@ -63,6 +63,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// MultVV2outprod
+Eigen::MatrixXd MultVV2outprod(const Eigen::VectorXd& x, const Eigen::VectorXd& y);
+RcppExport SEXP _JMH_MultVV2outprod(SEXP xSEXP, SEXP ySEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type x(xSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type y(ySEXP);
+    rcpp_result_gen = Rcpp::wrap(MultVV2outprod(x, y));
+    return rcpp_result_gen;
+END_RCPP
+}
 // MultVVinprod
 double MultVVinprod(const Eigen::VectorXd& x);
 RcppExport SEXP _JMH_MultVVinprod(SEXP xSEXP) {
@@ -395,6 +407,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_JMH_OLS", (DL_FUNC) &_JMH_OLS, 2},
     {"_JMH_MultVV", (DL_FUNC) &_JMH_MultVV, 2},
     {"_JMH_MultVVoutprod", (DL_FUNC) &_JMH_MultVVoutprod, 1},
+    {"_JMH_MultVV2outprod", (DL_FUNC) &_JMH_MultVV2outprod, 2},
     {"_JMH_MultVVinprod", (DL_FUNC) &_JMH_MultVVinprod, 1},
     {"_JMH_CH", (DL_FUNC) &_JMH_CH, 2},
     {"_JMH_HAZ", (DL_FUNC) &_JMH_HAZ, 2},

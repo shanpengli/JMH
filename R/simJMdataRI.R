@@ -2,7 +2,7 @@
 ##'
 
 simJMdataRI <- function(seed = 100, N = 200, increment = 0.7, beta = c(5, 1.5, 2, 1, 2),
-                      tau = c(1, 0.5, -0.2, 0.2, 0.05),
+                      tau = c(0.5, 0.5, -0.2, 0.2, 0.05),
                       gamma1 = c(1, 0.5, 0.5),
                       gamma2 = c(-0.5, 0.5, 0.25),
                       alpha1 = 1,
@@ -17,7 +17,7 @@ simJMdataRI <- function(seed = 100, N = 200, increment = 0.7, beta = c(5, 1.5, 2
   
   set.seed(seed)
   
-  covbw <- matrix(c(0.5, 0.25, 0.25, 0.5), nrow = 2, ncol = 2)
+  covbw <- matrix(c(0.5, 0.025, 0.025, 0.5), nrow = 2, ncol = 2)
   
   bwi <- MASS::mvrnorm(n = N, c(0, 0), covbw, tol = 1e-6, empirical = FALSE)
   

@@ -91,7 +91,7 @@ GetinitFake <- function(cdata, ydata, long.formula, surv.formula, variance.formu
       if (model == "intercept") {
         alpha1 = as.vector(1)
         alpha2 = as.vector(-1)
-        Sig <- matrix(c(0.5, 0.25, 0.25, 0.5), nrow = 2, ncol = 2)
+        Sig <- matrix(c(0.5, 0.025, 0.025, 0.5), nrow = 2, ncol = 2)
       } else {
         alpha1 = c(1, 0.7)
         alpha2 = c(-1, -0.5)

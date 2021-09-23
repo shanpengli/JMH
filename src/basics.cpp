@@ -31,6 +31,12 @@ Eigen::MatrixXd MultVVoutprod(const Eigen::VectorXd & x) {
     return m;
 }
 
+// [[Rcpp::export]]
+Eigen::MatrixXd MultVV2outprod(const Eigen::VectorXd & x, const Eigen::VectorXd & y) {
+    Eigen::MatrixXd m = x * y.transpose();
+    return m;
+}
+
 // and the inner product returns a scalar
 //
 // [[Rcpp::export]]

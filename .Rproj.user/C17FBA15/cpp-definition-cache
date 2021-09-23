@@ -46,7 +46,7 @@
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/basics.cpp",
-        "file_last_write": 1623869095.0,
+        "file_last_write": 1629940229.0,
         "definitions": [
             {
                 "usr": "c:@F@MultVV#&1I#S0_#",
@@ -67,12 +67,21 @@
                 "column": 17
             },
             {
+                "usr": "c:@F@MultVV2outprod#&1I#S0_#",
+                "kind": 6,
+                "parent_name": "",
+                "name": "MultVV2outprod(const Eigen::VectorXd &, const Eigen::VectorXd &)",
+                "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/basics.cpp",
+                "line": 35,
+                "column": 17
+            },
+            {
                 "usr": "c:@F@MultVVinprod#&1I#",
                 "kind": 6,
                 "parent_name": "",
                 "name": "MultVVinprod(const Eigen::VectorXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/basics.cpp",
-                "line": 37,
+                "line": 43,
                 "column": 9
             },
             {
@@ -81,7 +90,7 @@
                 "parent_name": "",
                 "name": "CH(const Eigen::MatrixXd &, double)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/basics.cpp",
-                "line": 43,
+                "line": 49,
                 "column": 9
             },
             {
@@ -90,7 +99,7 @@
                 "parent_name": "",
                 "name": "HAZ(const Eigen::MatrixXd &, double)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/basics.cpp",
-                "line": 64,
+                "line": 70,
                 "column": 8
             },
             {
@@ -99,7 +108,7 @@
                 "parent_name": "",
                 "name": "MultMM(const Eigen::MatrixXd &, const Eigen::MatrixXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/basics.cpp",
-                "line": 78,
+                "line": 84,
                 "column": 17
             },
             {
@@ -108,19 +117,19 @@
                 "parent_name": "",
                 "name": "haha(const Eigen::VectorXd &, const Eigen::MatrixXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/basics.cpp",
-                "line": 86,
+                "line": 92,
                 "column": 12
             }
         ]
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/basics.h",
-        "file_last_write": 1623869132.0,
+        "file_last_write": 1629940240.0,
         "definitions": []
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getCov.cpp",
-        "file_last_write": 1625099981.0,
+        "file_last_write": 1630037893.0,
         "definitions": [
             {
                 "usr": "c:@F@getCov#&1I#S0_#S0_#S0_#S0_#S0_#1d#1d#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#",
@@ -135,10 +144,10 @@
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getCovSF.cpp",
-        "file_last_write": 1626393730.0,
+        "file_last_write": 1630037959.0,
         "definitions": [
             {
-                "usr": "c:@F@getCovSF#&1$@N@Eigen@S@Matrix>#d#VI-1#VI1#VI0#VI-1#VI1#S0_#S0_#S0_#1d#&1$@N@Eigen@S@Matrix>#d#VI-1#VI-1#VI0#VI-1#VI-1#S2_#S2_#S2_#S2_#S0_#S2_#S0_#S0_#S0_#S0_#S0_#S2_#S2_#S2_#S0_#S2_#S2_#S2_#S2_#S2_#S2_#S2_#S0_#",
+                "usr": "c:@F@getCovSF#&1I#S0_#S0_#S0_#1d#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#",
                 "kind": 6,
                 "parent_name": "",
                 "name": "getCovSF(const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const double, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &)",

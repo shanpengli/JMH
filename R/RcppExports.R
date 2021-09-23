@@ -21,6 +21,10 @@ MultVVoutprod <- function(x) {
     .Call(`_JMH_MultVVoutprod`, x)
 }
 
+MultVV2outprod <- function(x, y) {
+    .Call(`_JMH_MultVV2outprod`, x, y)
+}
+
 MultVVinprod <- function(x) {
     .Call(`_JMH_MultVVinprod`, x)
 }
