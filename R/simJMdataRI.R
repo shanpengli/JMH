@@ -17,7 +17,7 @@ simJMdataRI <- function(seed = 100, N = 200, increment = 0.7, beta = c(5, 1.5, 2
   
   set.seed(seed)
   
-  covbw <- matrix(c(0.5, 0.025, 0.025, 0.5), nrow = 2, ncol = 2)
+  covbw <- matrix(c(0.5, 0.375, 0.375, 0.5), nrow = 2, ncol = 2)
   
   bwi <- MASS::mvrnorm(n = N, c(0, 0), covbw, tol = 1e-6, empirical = FALSE)
   
