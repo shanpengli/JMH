@@ -39,12 +39,12 @@ JMMLSM <- function(cdata, ydata,
     model <- "interslope"
   }
   
-  getinit <- Getinit(cdata = cdata, ydata = ydata, long.formula = long.formula,
-                     surv.formula = surv.formula, variance.formula = variance.formula,
-                     model = model, ID = ID, RE = RE, survinitial = survinitial)
+  # getinit <- Getinit(cdata = cdata, ydata = ydata, long.formula = long.formula,
+  #                    surv.formula = surv.formula, variance.formula = variance.formula,
+  #                    model = model, ID = ID, RE = RE, survinitial = survinitial)
 
-  # getinit <- GetinitFake(cdata, ydata, long.formula, surv.formula, variance.formula,
-  #                        model, ID, RE)
+  getinit <- GetinitFakeSi(cdata, ydata, long.formula, surv.formula, variance.formula,
+                         model, ID, RE)
 
   cdata <- getinit$cdata
   
