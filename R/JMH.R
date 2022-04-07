@@ -1,6 +1,5 @@
 #' @useDynLib JMH, .registration = TRUE
 #' @importFrom Rcpp evalCpp
-#' @import RcppEigen
 #' @importFrom stats  as.formula  pnorm  pchisq complete.cases
 #' @importFrom statmod  gauss.quad
 #' @importFrom utils  read.table

@@ -1,6 +1,6 @@
 
 Getinit <- function(cdata, ydata, long.formula, surv.formula, variance.formula,
-                    model, ID, RE) {
+                    model, ID, RE, survinitial) {
   
   long <- all.vars(long.formula)
   survival <- all.vars(surv.formula)
@@ -99,22 +99,27 @@ Getinit <- function(cdata, ydata, long.formula, surv.formula, variance.formula,
   logResidsquare <- as.vector(log(resid^2))
   Tau <- OLS(W, logResidsquare)
   tau <- Tau$betahat
-  
+  print(tau)
   if (sum(unique(cmprsk)) <= 3) {
     if (prod(c(0, 1, 2) %in% unique(cmprsk))) {
-
-      ## get initial estimates of fixed effects in competing risks model
-      surv_xnam <- paste(survival[3:length(survival)], sep = "")
-      survfmla.fixed <- paste(surv_xnam, collapse= "+")
-      survfmla.out1 <- paste0("survival::Surv(", survival[1], ", ", survival[2], "==1)")
-      survfmla <- as.formula(paste(survfmla.out1, survfmla.fixed, sep = "~"))
-      fitSURV1 <- survival::coxph(formula = survfmla, data = cdata, x = TRUE)
-      gamma1 <- as.vector(fitSURV1$coefficients)
+      if (survinitial) {
+        ## get initial estimates of fixed effects in competing risks model
+        surv_xnam <- paste(survival[3:length(survival)], sep = "")
+        survfmla.fixed <- paste(surv_xnam, collapse= "+")
+        survfmla.out1 <- paste0("survival::Surv(", survival[1], ", ", survival[2], "==1)")
+        survfmla <- as.formula(paste(survfmla.out1, survfmla.fixed, sep = "~"))
+        fitSURV1 <- survival::coxph(formula = survfmla, data = cdata, x = TRUE)
+        gamma1 <- as.vector(fitSURV1$coefficients)
+        
+        survfmla.out2 <- paste0("survival::Surv(", survival[1], ", ", survival[2], "==2)")
+        survfmla <- as.formula(paste(survfmla.out2, survfmla.fixed, sep = "~"))
+        fitSURV2 <- survival::coxph(formula = survfmla, data = cdata, x = TRUE)
+        gamma2 <- as.vector(fitSURV2$coefficients)  
+      } else {
+        gamma1 = as.vector(rep(0, ncol(X2)))
+        gamma2 = as.vector(rep(0, ncol(X2)))
+      }
       
-      survfmla.out2 <- paste0("survival::Surv(", survival[1], ", ", survival[2], "==2)")
-      survfmla <- as.formula(paste(survfmla.out2, survfmla.fixed, sep = "~"))
-      fitSURV2 <- survival::coxph(formula = survfmla, data = cdata, x = TRUE)
-      gamma2 <- as.vector(fitSURV2$coefficients)
       
       vee1 = 0
       vee2 = 0
@@ -155,8 +160,9 @@ Getinit <- function(cdata, ydata, long.formula, surv.formula, variance.formula,
       ## get initial estimates of fixed effects in survival model
       surv_xnam <- paste(survival[3:length(survival)], sep = "")
       survfmla.fixed <- paste(surv_xnam, collapse= "+")
-      survfmla.out1 <- paste0("survival::Surv(", survival[1], ", ", survival[2])
+      survfmla.out1 <- paste0("survival::Surv(", survival[1], ", ", survival[2], ")")
       survfmla <- as.formula(paste(survfmla.out1, survfmla.fixed, sep = "~"))
+      print(survfmla)
       fitSURV1 <- survival::coxph(formula = survfmla, data = cdata, x = TRUE)
       gamma1 <- as.vector(fitSURV1$coefficients)
       

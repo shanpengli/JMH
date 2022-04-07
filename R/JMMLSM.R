@@ -16,6 +16,7 @@
 ##' @param quadpoint the number of pseudo-adaptive Gauss-Hermite quadrature points
 ##' to be chosen for numerical integration. Default is 6 which produces stable estimates in most dataframes.
 ##' @param print.para Print detailed information of each iteration. Default is FALSE, i.e., not to print the iteration details.
+##' @param survinitial Fit a Cox model to obtain initial values of the parameter estimates. Default is TRUE.
 ##' @export
 ##' 
 
@@ -25,7 +26,8 @@ JMMLSM <- function(cdata, ydata,
                 variance.formula, 
                 random,
                 maxiter = 1000, epsilon = 1e-04, 
-                quadpoint = 10, print.para = FALSE) {
+                quadpoint = 10, print.para = FALSE,
+                survinitial = TRUE) {
   
   random.form <- all.vars(random)
   ID <- random.form[length(random.form)]
@@ -39,7 +41,7 @@ JMMLSM <- function(cdata, ydata,
   
   getinit <- Getinit(cdata = cdata, ydata = ydata, long.formula = long.formula,
                      surv.formula = surv.formula, variance.formula = variance.formula,
-                     model = model, ID = ID, RE = RE)
+                     model = model, ID = ID, RE = RE, survinitial = survinitial)
 
   # getinit <- GetinitFake(cdata, ydata, long.formula, surv.formula, variance.formula,
   #                        model, ID, RE)

@@ -14,7 +14,8 @@ JMMLSM(
   maxiter = 1000,
   epsilon = 1e-04,
   quadpoint = 10,
-  print.para = FALSE
+  print.para = FALSE,
+  survinitial = TRUE
 )
 }
 \arguments{
@@ -43,6 +44,8 @@ Alternatively. Fitting a random intercept and slope model takes the form ~ x1 + 
 to be chosen for numerical integration. Default is 6 which produces stable estimates in most dataframes.}
 
 \item{print.para}{Print detailed information of each iteration. Default is FALSE, i.e., not to print the iteration details.}
+
+\item{survinitial}{Fit a Cox model to obtain initial values of the parameter estimates. Default is TRUE.}
 }
 \description{
 Joint modeling of longitudinal continuous data and competing risks
