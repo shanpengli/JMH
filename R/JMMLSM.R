@@ -29,8 +29,47 @@ JMMLSM <- function(cdata, ydata,
                 quadpoint = 10, print.para = FALSE,
                 survinitial = TRUE) {
   
+  
+  if (!inherits(long.formula, "formula") || length(long.formula) != 3) {
+    stop("\nMean sub-part of location scale model must be a formula of the form \"resp ~ pred\"")
+  }
+  if (!inherits(variance.formula, "formula") || length(variance.formula) != 2) {
+    stop("\nVariance sub-part of location scale model must be a formula of the form \" ~ pred\"")
+  }
+  
+  if (!inherits(surv.formula, "formula") || length(surv.formula) != 3) {
+    stop("\nCox proportional hazards model must be a formula of the form \"Surv(.,.) ~ pred\"")
+  }
+  
+  long <- all.vars(long.formula)
+  survival <- all.vars(surv.formula)
+  variance <- all.vars(variance.formula)
   random.form <- all.vars(random)
   ID <- random.form[length(random.form)]
+  cnames <- colnames(cdata)
+  ynames <- colnames(ydata)
+  
+  ##variable check
+  if (prod(long %in% ynames) == 0) {
+    Fakename <- which(long %in% ynames == FALSE)
+    stop(paste0("The variable ", long[Fakename], " not found"))
+  }
+  if (prod(survival %in% cnames) == 0) {
+    Fakename <- which(survival %in% cnames == FALSE)
+    stop(paste0("The variable ", survival[Fakename], " not found"))
+  }
+  if (prod(variance %in% ynames) == 0) {
+    Fakename <- which(variance %in% ynames == FALSE)
+    stop(paste0("The within-subject variables ", long[Fakename], " not found"))
+  }
+  if (!(ID %in% ynames)) {
+    stop(paste0("ID column ", ID, " not found in the longitudinal dataset!"))
+  }
+  if (!(ID %in% cnames)) {
+    stop(paste0("ID column ", ID, " not found in the survival dataset!"))
+  }
+
+  
   if (length(random.form) == 1) {
     RE <- NULL
     model <- "intercept"
@@ -39,12 +78,16 @@ JMMLSM <- function(cdata, ydata,
     model <- "interslope"
   }
   
-  # getinit <- Getinit(cdata = cdata, ydata = ydata, long.formula = long.formula,
-  #                    surv.formula = surv.formula, variance.formula = variance.formula,
-  #                    model = model, ID = ID, RE = RE, survinitial = survinitial)
+  longfmla <- long.formula
+  survfmla <- surv.formula
+  varformula <- variance.formula
+  rawydata <- ydata
+  rawcdata <- cdata
+  
+  getinit <- Getinit(cdata = cdata, ydata = ydata, long.formula = long.formula,
+                     surv.formula = surv.formula, variance.formula = variance.formula,
+                     model = model, ID = ID, RE = RE, random = random, survinitial = survinitial)
 
-  getinit <- GetinitFakeSi(cdata, ydata, long.formula, surv.formula, variance.formula,
-                         model, ID, RE)
 
   cdata <- getinit$cdata
   
@@ -61,8 +104,11 @@ JMMLSM <- function(cdata, ydata,
     
     ## initialize parameters
     beta <- getinit$beta
+    namesbeta <- names(beta)
     tau <- getinit$tau
+    namestau <- names(tau)
     gamma1 <- getinit$gamma1
+    namesgamma1 <- names(gamma1)
     gamma2 <- getinit$gamma2
     alpha1 <- getinit$alpha1
     alpha2 <- getinit$alpha2
@@ -84,8 +130,11 @@ JMMLSM <- function(cdata, ydata,
     
     ## initialize parameters
     beta <- getinit$beta
+    namesbeta <- names(beta)
     tau <- getinit$tau
+    namestau <- names(tau)
     gamma1 <- getinit$gamma1
+    namesgamma1 <- names(gamma1)
     alpha1 <- getinit$alpha1
     vee1 <- getinit$vee1
     Sig <- getinit$Sig
@@ -94,25 +143,6 @@ JMMLSM <- function(cdata, ydata,
     if (p1a == 1) Sigb <- as.matrix(Sig[1, 1])
     CompetingRisk <- FALSE
   }
-  
-  # beta <- getinit$Beta$betahat
-  # tau <- getinit$Tau$betahat
-  # gamma1 <- getinit$gamma1
-  # gamma2 <- getinit$gamma2
-  # alpha1 <- as.vector(rep(0, ncol(getinit$Z)))
-  # alpha2 <- alpha1
-  # vee1 <- 0
-  # vee2 <- vee1
-  # 
-  # Sigb <- matrix(c(1200, -21, -21, 0.38), nrow = 2, ncol = 2)
-  # Sigw <- 0.1
-  # Sig <- matrix(0, nrow = (nrow(Sigb)+1), ncol = (nrow(Sigb)+1))
-  # for (i in 1:(nrow(Sigb))) {
-  #   for (j in 1:(nrow(Sigb))) {
-  #     Sig[i, j] <- Sigb[i, j]
-  #   }
-  # }
-  # Sig[(nrow(Sigb)+1), (nrow(Sigb)+1)] <- Sigw
   
   gq_vals <- statmod::gauss.quad(n = quadpoint, kind = "hermite")
   xs <- gq_vals$nodes
@@ -265,6 +295,8 @@ JMMLSM <- function(cdata, ydata,
       names(result) <- c("beta", "tau", "gamma1", "gamma2", "alpha1", "alpha2", "vee1",
                          "vee2", "H01", "H02", "Sig", "iter", "convergence")
       
+      class(result) <- "JMMLSM"
+      
       return(result)
     } else if (!is.list(GetEfun)) {
       writeLines("Something wrong in the E steps")
@@ -285,6 +317,8 @@ JMMLSM <- function(cdata, ydata,
       names(result) <- c("beta", "tau", "gamma1", "gamma2", "alpha1", "alpha2", "vee1",
                          "vee2", "H01", "H02", "Sig", "iter")
       
+      class(result) <- "JMMLSM"
+      
       return(result)
     } else if (!is.list(GetMpara)) {
       writeLines("Something wrong in the M steps")
@@ -304,6 +338,8 @@ JMMLSM <- function(cdata, ydata,
                      H02, Sig, iter)
       names(result) <- c("beta", "tau", "gamma1", "gamma2", "alpha1", "alpha2", "vee1",
                          "vee2", "H01", "H02", "Sig", "iter")
+      
+      class(result) <- "JMMLSM"
       
       return(result)
     } else {
@@ -343,30 +379,20 @@ JMMLSM <- function(cdata, ydata,
       sevee2 <- getcov$sevee2
       seSig <- getcov$seSig
       
-      long <- all.vars(long.formula)
-      survival <- all.vars(surv.formula)
+      ### get loglike
       
-      names(beta) <- c("intercept", long[-1])
-      variance.form <- all.vars(variance.formula)
-      names(tau) <- paste0(c("intercept", variance.form), "_var")
       
-      names(gamma1) <- paste0(survival[-(1:2)], "_1")
-      names(gamma2) <- paste0(survival[-(1:2)], "_2")
+      names(beta) <- namesbeta
+      names(tau) <- namestau
+      names(gamma1) <- paste0(namesgamma1, "_1")
+      names(gamma2) <- paste0(namesgamma1, "_2")
+      
+      FunCall_long <- longfmla
+      FunCall_survival <- survfmla
+      FunCall_longVar <- as.formula(paste("log(sigma^2)", varformula[2], sep = "~"))
       
       PropComp <- as.data.frame(table(cdata[, survival[2]]))
-      
-      LongOut <- long[1]
-      LongX <- paste0(long[-1], collapse = "+")
-      FunCall_long <- as.formula(paste(LongOut, LongX, sep = "~"))
-      
-      LongVarOut <- "log(sigma^2)"
-      LongVarX <- paste0(variance.form, collapse = "+") 
-      FunCall_longVar <- as.formula(paste(LongVarOut, LongVarX, sep = "~"))
-      
-      SurvOut <- paste0("Surv(", survival[1], ",", survival[2], ")")
-      SurvX <- paste0(survival[-(1:2)], collapse = "+")
-      FunCall_survival <- as.formula(paste(SurvOut, SurvX, sep = "~"))
-      
+  
       ## return the joint modelling result
       mycall <- match.call()
       
@@ -381,10 +407,10 @@ JMMLSM <- function(cdata, ydata,
                          "sebeta", "setau", "segamma1", "segamma2", "sealpha1", "sealpha2", 
                          "sevee1", "sevee2", "seSig", "CompetingRisk", "quadpoint",
                          "ydata", "cdata", "PropEventType", "LongitudinalSubmodelmean",
-                         "LongitudinalSubmodelvariance", "Survivalsubmodel", "random",
+                         "LongitudinalSubmodelvariance", "SurvivalSubmodel", "random",
                          "call")
       
-      class(result) <- "JMH"
+      class(result) <- "JMMLSM"
       
       return(result)
     }
@@ -447,6 +473,8 @@ JMMLSM <- function(cdata, ydata,
       names(result) <- c("beta", "tau", "gamma1", "alpha1", "vee1", "H01", "Sig", 
                          "iter", "convergence")
       
+      class(result) <- "JMMLSM"
+      
       return(result)
     } else if (!is.list(GetEfun)) {
       writeLines("Something wrong in the E steps")
@@ -460,6 +488,7 @@ JMMLSM <- function(cdata, ydata,
       iter <- NULL
       result <- list(beta, tau, gamma1, alpha1, vee1, H01, Sig, iter)
       names(result) <- c("beta", "tau", "gamma1", "alpha1", "vee1", "H01", "Sig", "iter")
+      class(result) <- "JMMLSM"
       return(result)
     } else if (!is.list(GetMpara)) {
       writeLines("Something wrong in the M steps")
@@ -473,6 +502,7 @@ JMMLSM <- function(cdata, ydata,
       iter <- NULL
       result <- list(beta, tau, gamma1, alpha1, vee1, H01, Sig, iter)
       names(result) <- c("beta", "tau", "gamma1", "alpha1", "vee1", "H01", "Sig", "iter")
+      class(result) <- "JMMLSM"
       return(result)
     } else {
       
@@ -508,28 +538,15 @@ JMMLSM <- function(cdata, ydata,
       sevee1 <- getcov$sevee1
       seSig <- getcov$seSig
       
-      long <- all.vars(long.formula)
-      survival <- all.vars(surv.formula)
+      names(beta) <- namesbeta
+      names(tau) <- namestau
+      names(gamma1) <- paste0(namesgamma1, "_1")
       
-      names(beta) <- c("intercept", long[-1])
-      variance.form <- all.vars(variance.formula)
-      names(tau) <- paste0(c("intercept", variance.form), "_var")
-      
-      names(gamma1) <- paste0(survival[-(1:2)], "_1")
+      FunCall_long <- longfmla
+      FunCall_survival <- survfmla
+      FunCall_longVar <- as.formula(paste("log(sigma^2)", varformula[2], sep = "~"))
       
       PropComp <- as.data.frame(table(cdata[, survival[2]]))
-      
-      LongOut <- long[1]
-      LongX <- paste0(long[-1], collapse = "+")
-      FunCall_long <- as.formula(paste(LongOut, LongX, sep = "~"))
-      
-      LongVarOut <- "log(sigma^2)"
-      LongVarX <- paste0(variance.form, collapse = "+") 
-      FunCall_longVar <- as.formula(paste(LongVarOut, LongVarX, sep = "~"))
-      
-      SurvOut <- paste0("Surv(", survival[1], ",", survival[2], ")")
-      SurvX <- paste0(survival[-(1:2)], collapse = "+")
-      FunCall_survival <- as.formula(paste(SurvOut, SurvX, sep = "~"))
       
       ## return the joint modelling result
       mycall <- match.call()
@@ -543,10 +560,10 @@ JMMLSM <- function(cdata, ydata,
                          "iter", "convergence", "vcov", "sebeta", "setau", "segamma1", 
                          "sealpha1", "sevee1", "seSig", "CompetingRisk", "quadpoint",
                          "ydata", "cdata", "PropEventType", "LongitudinalSubmodelmean",
-                         "LongitudinalSubmodelvariance", "Survivalsubmodel", "random",
+                         "LongitudinalSubmodelvariance", "SurvivalSubmodel", "random",
                          "call")
       
-      class(result) <- "JMH"
+      class(result) <- "JMMLSM"
       
       return(result)
     }

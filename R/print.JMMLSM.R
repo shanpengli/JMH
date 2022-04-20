@@ -1,16 +1,14 @@
-##' Print contents of JMH object.
-##'
-##'
-##' @title Print JMH
-##' @param x Object of class 'JMH'.
+##' Print contents of JMMLSM object.
+##' @title Print JMMLSM
+##' @param x Object of class 'JMMLSM'.
 ##' @param ... Further arguments passed to or from other methods.
-##' @seealso \code{\link{jmcs}}
+##' @seealso \code{\link{JMMLSM}}
 ##' @author Shanpeng Li
 ##' @export
 ##' 
-print.JMH <- function(x, digits = 4, ...) {
-  if (!inherits(x, "JMH"))
-    stop("Not a legitimate \"JMH\" object")
+print.JMMLSM <- function(x, digits = 4, ...) {
+  if (!inherits(x, "JMMLSM"))
+    stop("Use only with 'JMMLSM' objects.\n")
   
   cat("\nCall:\n", sprintf(format(paste(deparse(x$call, width.cutoff = 500), collapse = ""))), "\n\n")
   
@@ -51,7 +49,7 @@ print.JMH <- function(x, digits = 4, ...) {
     print(dat)
 
     cat("\nSurvival sub-model fixed effects: ",
-        sprintf(format(paste(deparse(x$Survivalsubmodel, width.cutoff = 500), collapse=""))), "\n")
+        sprintf(format(paste(deparse(x$SurvivalSubmodel, width.cutoff = 500), collapse=""))), "\n")
     cat("\n")
     dat <- data.frame(x$gamma1, x$segamma1, x$gamma1/x$segamma1, 2 * pnorm(-abs(x$gamma1/x$segamma1)))
     colnames(dat) <- c("Estimate", "SE", "Z value", "p-val")
@@ -71,15 +69,16 @@ print.JMH <- function(x, digits = 4, ...) {
     colnames(dat) <- c("Estimate", "SE", "Z value", "p-val")
     colnames(subdat) <- c("Estimate", "SE", "Z value", "p-val")
     dat <- rbind(dat, subdat)
-    if (length(x$alpha1) == 1) rownames(dat) <- c("alpha1_1", "alpha2_1")
-    if (length(x$alpha1) == 2) rownames(dat) <- c("alpha1_1", "alpha1_2", "alpha2_1", "alpha2_2")
-    
+    random <- all.vars(x$random)
+    if (length(x$alpha1) == 1) rownames(dat) <- c("(Intercept)_1", "(Intercept)_2")
+    if (length(x$alpha1) == 2) rownames(dat) <- c("(Intercept)_1", paste0(random[1], "_1"), "(Intercept)_2", paste0(random[1], "_2"))
+
     datnu <- matrix(0, nrow = 2, ncol = 4)
     datnu[1, ] <- c(x$vee1, x$sevee1, x$vee1/x$sevee1, 2 * pnorm(-abs(x$vee1/x$sevee1)))
     datnu[2, ] <- c(x$vee2, x$sevee2, x$vee2/x$sevee2, 2 * pnorm(-abs(x$vee2/x$sevee2)))
     datnu <- as.data.frame(datnu)
     colnames(datnu) <- c("Estimate", "SE", "Z value", "p-val")
-    rownames(datnu) <- c("nu1", "nu2")
+    rownames(datnu) <- c("Residual_1", "Residual_2")
     dat <- rbind(dat, datnu)
     dat[, 1:3] <- round(dat[, 1:3], digits+1)
     dat[, 4] <- sprintf(paste("%.", digits, "f", sep = ""), dat[, 4])
@@ -157,7 +156,7 @@ print.JMH <- function(x, digits = 4, ...) {
     print(dat)
     
     cat("\nSurvival sub-model fixed effects: ",
-        sprintf(format(paste(deparse(x$Survivalsubmodel, width.cutoff = 500), collapse=""))), "\n")
+        sprintf(format(paste(deparse(x$SurvivalSubmodel, width.cutoff = 500), collapse=""))), "\n")
     cat("\n")
     dat <- data.frame(x$gamma1, x$segamma1, x$gamma1/x$segamma1, 2 * pnorm(-abs(x$gamma1/x$segamma1)))
     colnames(dat) <- c("Estimate", "SE", "Z value", "p-val")
@@ -168,13 +167,14 @@ print.JMH <- function(x, digits = 4, ...) {
     cat("\n Association parameters:                 \n")
     dat <- data.frame(x$alpha1, x$sealpha1, x$alpha1/x$sealpha1, 2 * pnorm(-abs(x$alpha1/x$sealpha1)))
     colnames(dat) <- c("Estimate", "SE", "Z value", "p-val")
-    if (length(x$alpha1) == 1) rownames(dat) <- c("alpha1_1")
-    if (length(x$alpha1) == 2) rownames(dat) <- c("alpha1_1", "alpha1_2")
+    if (length(x$alpha1) == 1) rownames(dat) <- c("(Intercept)_1")
+    if (length(x$alpha1) == 2) rownames(dat) <- c("(Intercept)_1", paste0(random[1], "_1"))
+    
     datnu <- matrix(0, nrow = 1, ncol = 4)
     datnu[1, ] <- c(x$vee1, x$sevee1, x$vee1/x$sevee1, 2 * pnorm(-abs(x$vee1/x$sevee1)))
     datnu <- as.data.frame(datnu)
     colnames(datnu) <- c("Estimate", "SE", "Z value", "p-val")
-    rownames(datnu) <- c("nu1")
+    rownames(datnu) <- c("Residual_1")
     dat <- rbind(dat, datnu)
     dat[, 1:3] <- round(dat[, 1:3], digits+1)
     dat[, 4] <- sprintf(paste("%.", digits, "f", sep = ""), dat[, 4])

@@ -7,7 +7,7 @@ Author: Shanpeng Li
 Maintainer: Who to complain to <yourfault@somewhere.net>
 Description: More about what it does (maybe more than one line)
 License: What license is it under?
-Imports: Rcpp (>= 1.0.6)
+Imports: Rcpp (>= 1.0.6), parallel, dplyr, stats
 LinkingTo: Rcpp, RcppEigen
-Depends: R (>= 3.0.0), statmod, survival, parallel, dplyr, MASS, stats, lme4, utils
-RoxygenNote: 7.1.1
+Depends: R (>= 3.0.0), survival, nlme, utils, MASS, statmod
+RoxygenNote: 7.1.2

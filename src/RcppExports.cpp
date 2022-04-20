@@ -127,18 +127,6 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
-// haha
-Rcpp::List haha(const Eigen::VectorXd& x, const Eigen::MatrixXd& y);
-RcppExport SEXP _JMH_haha(SEXP xSEXP, SEXP ySEXP) {
-BEGIN_RCPP
-    Rcpp::RObject rcpp_result_gen;
-    Rcpp::RNGScope rcpp_rngScope_gen;
-    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type x(xSEXP);
-    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type y(ySEXP);
-    rcpp_result_gen = Rcpp::wrap(haha(x, y));
-    return rcpp_result_gen;
-END_RCPP
-}
 // getCov
 Rcpp::List getCov(const Eigen::VectorXd& beta, const Eigen::VectorXd& tau, const Eigen::VectorXd& gamma1, const Eigen::VectorXd& gamma2, const Eigen::VectorXd& alpha1, const Eigen::VectorXd& alpha2, const double vee1, const double vee2, const Eigen::MatrixXd& H01, const Eigen::MatrixXd& H02, const Eigen::MatrixXd& Sig, const Eigen::MatrixXd& Z, const Eigen::MatrixXd& X1, const Eigen::MatrixXd& W, const Eigen::VectorXd& Y, const Eigen::MatrixXd& X2, const Eigen::VectorXd& survtime, const Eigen::VectorXd& cmprsk, const Eigen::VectorXd& mdata, const Eigen::VectorXd& mdataS, const Eigen::VectorXd& FUNENW, const Eigen::MatrixXd& FUNBENW, const Eigen::MatrixXd& FUNBS, const Eigen::MatrixXd& FUNBW, const Eigen::VectorXd& FUNWS, const Eigen::MatrixXd& FUNBSENW, const Eigen::MatrixXd& FUNEC, const Eigen::MatrixXd& FUNBEC, const Eigen::MatrixXd& FUNBSEC, const Eigen::MatrixXd& FUNWEC, const Eigen::MatrixXd& FUNWSEC, const Eigen::MatrixXd& FUNB, const Eigen::VectorXd& FUNW);
 RcppExport SEXP _JMH_getCov(SEXP betaSEXP, SEXP tauSEXP, SEXP gamma1SEXP, SEXP gamma2SEXP, SEXP alpha1SEXP, SEXP alpha2SEXP, SEXP vee1SEXP, SEXP vee2SEXP, SEXP H01SEXP, SEXP H02SEXP, SEXP SigSEXP, SEXP ZSEXP, SEXP X1SEXP, SEXP WSEXP, SEXP YSEXP, SEXP X2SEXP, SEXP survtimeSEXP, SEXP cmprskSEXP, SEXP mdataSEXP, SEXP mdataSSEXP, SEXP FUNENWSEXP, SEXP FUNBENWSEXP, SEXP FUNBSSEXP, SEXP FUNBWSEXP, SEXP FUNWSSEXP, SEXP FUNBSENWSEXP, SEXP FUNECSEXP, SEXP FUNBECSEXP, SEXP FUNBSECSEXP, SEXP FUNWECSEXP, SEXP FUNWSECSEXP, SEXP FUNBSEXP, SEXP FUNWSEXP) {
@@ -417,7 +405,6 @@ static const R_CallMethodDef CallEntries[] = {
     {"_JMH_CH", (DL_FUNC) &_JMH_CH, 2},
     {"_JMH_HAZ", (DL_FUNC) &_JMH_HAZ, 2},
     {"_JMH_MultMM", (DL_FUNC) &_JMH_MultMM, 2},
-    {"_JMH_haha", (DL_FUNC) &_JMH_haha, 2},
     {"_JMH_getCov", (DL_FUNC) &_JMH_getCov, 33},
     {"_JMH_getCovSF", (DL_FUNC) &_JMH_getCovSF, 29},
     {"_JMH_getEC", (DL_FUNC) &_JMH_getEC, 26},

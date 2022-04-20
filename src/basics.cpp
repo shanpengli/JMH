@@ -86,24 +86,4 @@ Eigen::MatrixXd MultMM(const Eigen::MatrixXd & x, const Eigen::MatrixXd & y) {
     return v;
 }
 
-// and we can use Rcpp::List to return both at the same time
-//
-// [[Rcpp::export]]
-Rcpp::List haha(const Eigen::VectorXd & x, const Eigen::MatrixXd & y) {
-    double aa = MultVVinprod(x);
-    Eigen::MatrixXd m = MultVVoutprod(x);
-    Eigen::LLT<Eigen::MatrixXd> LLT_of_K(y);
-    if ( !LLT_of_K.info() ) { 
-        Eigen::MatrixXd Rooti = LLT_of_K.matrixL();
-        Eigen::MatrixXd Rootiinv = Rooti.inverse();
-        Eigen::VectorXd v = x + x;
-        return Rcpp::List::create(Rcpp::Named("outer")=aa,
-                                  Rcpp::Named("inner")=v,
-                                  Rcpp::Named("chol")=Rooti,
-                                  Rcpp::Named("cholinv")=Rootiinv);
-    } else {
-        return ( -1.0 );
-    }
-    
-    
-}
+
