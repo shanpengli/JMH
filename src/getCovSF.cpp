@@ -26,7 +26,8 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
                   const Eigen::MatrixXd & FUNWSEC,
                   const Eigen::MatrixXd & FUNB,
                   const Eigen::VectorXd & FUNW) {
-  
+
+
   int d = beta.size() + W.cols() + gamma1.size() + alpha1.size() +
     1 + Sig.cols()*(Sig.cols() + 1)/2;
   int a = H01.rows();
@@ -41,7 +42,6 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
   Eigen::VectorXd S = Eigen::VectorXd::Zero(d);
   
   int risk1_index;
-  int risk2_index;
   int risk1_index_temp=a-1;
   int risk1_index_ttemp=a-1;
   int risk1_index_tttemp=a-1;
@@ -66,14 +66,14 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
   int p1b = tau.size();
   int p1a = Z.cols();
   int p2 = gamma1.size();
-  
+
   Eigen::VectorXd SZ = Eigen::VectorXd::Zero(p1);
   Eigen::VectorXd SZ1 = Eigen::VectorXd::Zero(p1);
   Eigen::MatrixXd SZZ = Eigen::MatrixXd::Zero(p1, p1a);
   Eigen::VectorXd SZtau = Eigen::VectorXd::Zero(p1b);
   Eigen::MatrixXd bbT  = Eigen::MatrixXd::Zero(p1a, p1a);
   Eigen::MatrixXd bbT2  = Eigen::MatrixXd::Zero(p1a, p1a);
-  
+
   Eigen::VectorXd X = Eigen::VectorXd::Zero(p2);
   Eigen::VectorXd SX = Eigen::VectorXd::Zero(p2);
   Eigen::VectorXd SX1 = Eigen::VectorXd::Zero(p2);
@@ -82,57 +82,51 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
   Eigen::MatrixXd SXX1 = Eigen::MatrixXd::Zero(p2, a);
   Eigen::MatrixXd SXX11 = Eigen::MatrixXd::Zero(p2, a);
   Eigen::MatrixXd SRXX1 = Eigen::MatrixXd::Zero(p2, k);
-  Eigen::MatrixXd SRXX2 = Eigen::MatrixXd::Zero(p2, k);
-  
+
   Eigen::VectorXd N = Eigen::VectorXd::Zero(p1a);
   Eigen::VectorXd TN = Eigen::VectorXd::Zero(p1a);
   Eigen::VectorXd TN1 = Eigen::VectorXd::Zero(p1a);
   Eigen::VectorXd TRN = Eigen::VectorXd::Zero(p1a);
   Eigen::VectorXd TRNN = Eigen::VectorXd::Zero(p1a);
   Eigen::MatrixXd TRNN1 = Eigen::MatrixXd::Zero(p1a,k);
-  Eigen::MatrixXd TRNN2 = Eigen::MatrixXd::Zero(p1a,k);
   Eigen::MatrixXd TNN1 = Eigen::MatrixXd::Zero(p1a,a);
   Eigen::MatrixXd TNN11 = Eigen::MatrixXd::Zero(p1a,a);
-  
+
   double G = 0;
   double TG = 0;
   double TG1 = 0;
   double TRG = 0;
   double TRGG = 0;
   Eigen::VectorXd TRGG1 = Eigen::VectorXd::Zero(k);
-  Eigen::VectorXd TRGG2 = Eigen::VectorXd::Zero(k);
   Eigen::VectorXd TGG1 = Eigen::VectorXd::Zero(a);
   Eigen::VectorXd TGG11 = Eigen::VectorXd::Zero(a);
-  
+
   Eigen::MatrixXd bsw = Eigen::MatrixXd::Zero(p1a+1,p1a+1);
   Eigen::MatrixXd bsw2 = Eigen::MatrixXd::Zero(p1a+1,p1a+1);
-  
+
   for (j=0;j<k;j++) {
-    
+  
     S = Eigen::VectorXd::Zero(d);
     q = mdata(j);
-    
+  
     /* calculate score for beta */
     SZ = Eigen::VectorXd::Zero(p1);
     SZ1 = Eigen::VectorXd::Zero(p1);
     for (i=0;i<q;i++) {
-      
+  
       SZ1 += (Y(mdataS(j)-1+i) - MultVV(X1.row(mdataS(j)-1+i), beta))*
         exp(-MultVV(W.row(mdataS(j)-1+i),tau))*FUNENW(j)*X1.row(mdataS(j)-1+i);
-      //SZZ = exp(-MultVV(W.row(mdataS(j)-1+i),tau))*
-        //MultVV2outprod(X1.row(mdataS(j)-1+i), Z.row(mdataS(j)-1+i));
-      //SZ += SZZ*FUNBENW.col(j);
-      
+  
       SZ += exp(-MultVV(W.row(mdataS(j)-1+i),tau))*
         MultVV(Z.row(mdataS(j)-1+i), FUNBENW.col(j))*X1.row(mdataS(j)-1+i);
-      
+  
     }
     for (i=0;i<p1;i++) S(i) = SZ1(i) - SZ(i);
-    
+  
     /* calculate score for tau */
     SZtau = Eigen::VectorXd::Zero(p1b);
     q=mdata(j);
-    
+
     for(t=0;t<p1a;t++)   bbT(t,t) = FUNBSENW(t,j);
     if(p1a>1)
     {
@@ -144,15 +138,16 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
         }
       }
     }
-    
+
     for (i=0;i<q;i++) {
-      
+
       epsilon = Y(mdataS(j)-1+i) - MultVV(X1.row(mdataS(j)-1+i), beta);
       bbT2 = MultVVoutprod(Z.row(mdataS(j)-1+i))*bbT;
       qq = pow(epsilon, 2)*FUNENW(j) - 2*epsilon*MultVV(Z.row(mdataS(j)-1+i), FUNBENW.col(j)) + bbT2.trace();
       SZtau += 0.5*(exp(-MultVV(W.row(mdataS(j)-1+i),tau))*qq-1)*W.row(mdataS(j)-1+i);
     }
     for (i=0;i<p1b;i++) S(p1+i) = SZtau(i);
+    
     
     /* calculate score for gamma */
     if (j == 0)
@@ -161,10 +156,10 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
       risk1_index=risk1_index_temp;
       for (q=j;q<k;q++)
       {
-        
+    
         temp+=exp(MultVV(X2.row(q), gamma1))*FUNEC(0,q);
         SX += exp(MultVV(X2.row(q), gamma1))*FUNEC(0,q)*X2.row(q);
-        
+    
         if (cmprsk(q) == 1)
         {
           if (q == k-1)
@@ -195,7 +190,7 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
             {
               temp+=exp(MultVV(X2.row(q), gamma1))*FUNEC(0,q);
               SX += exp(MultVV(X2.row(q), gamma1))*FUNEC(0,q)*X2.row(q);
-              
+    
               if (q == k-1)
               {
                 SX*= H01(risk1_index, 1)/pow(temp, 2);
@@ -223,7 +218,7 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
               else continue;
             }
           }
-          
+    
         }
         else continue;
       }
@@ -257,18 +252,18 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
     
     if (j==0)
     {
-      SRX -= CumuH01(risk1_index_ttemp)*X2.row(j);  
+      SRX -= CumuH01(risk1_index_ttemp)*X2.row(j);
     }
     else if (survtime(j) >= H01(risk1_index_ttemp, 0))
     {
-      SRX -= CumuH01(risk1_index_ttemp)*X2.row(j);  
+      SRX -= CumuH01(risk1_index_ttemp)*X2.row(j);
     }
     else
     {
       risk1_index_ttemp--;
       if (risk1_index_ttemp>=0)
       {
-        SRX -= CumuH01(risk1_index_ttemp)*X2.row(j);  
+        SRX -= CumuH01(risk1_index_ttemp)*X2.row(j);
       }
       else
       {
@@ -316,16 +311,17 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
         for (q=0;q<p2;q++) S(p1+p1b+q) = SRX(q);
       }
     }
+
     
     /* calculate score for alpha */
     /*  alpha1 */
     if (j == 0)
     {
       temp=0;
-      
+    
       TN = Eigen::VectorXd::Zero(p1a);
       TRN = Eigen::VectorXd::Zero(p1a);
-      
+    
       risk1_index=risk1_index_vtemp;
       for (q=j;q<k;q++)
       {
@@ -390,7 +386,7 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
               else continue;
             }
           }
-          
+    
         }
         else continue;
       }
@@ -488,15 +484,16 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
       }
     }
     
+    
     /* calculate score for vee */
     /*  vee1 */
     if (j == 0)
     {
       temp=0;
-      
+    
       TG = 0;
       TRG = 0;
-      
+    
       risk1_index=risk1_index_wtemp;
       for (q=j;q<k;q++)
       {
@@ -561,7 +558,7 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
               else continue;
             }
           }
-          
+    
         }
         else continue;
       }
@@ -658,8 +655,7 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
         S(p1+p1b+p2+p1a) = TRG;
       }
     }
-    
-    
+
     /*calculate Sig matrix*/
     
     for(t=0;t<p1a;t++) bsw(t,t) = FUNBS(t,j);
@@ -690,19 +686,19 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
     {
       for(t=0;t<(p1a+1-q);t++) S(p1+p1b+p2+p1a+1+p1a+1+t+(q-1)*p1a) = bsw2(t,q+t);
     }
-    
+  
     SS += MultVVoutprod(S);
   }
-  
   SSinv = SS.inverse();
-  
+
   Eigen::VectorXd sebeta = Eigen::VectorXd::Zero(p1);
   Eigen::VectorXd setau = Eigen::VectorXd::Zero(p1b);
   Eigen::VectorXd segamma1 = Eigen::VectorXd::Zero(p2);
   Eigen::VectorXd sealpha1 = Eigen::VectorXd::Zero(p1a);
   double sevee1=0;
   Eigen::MatrixXd seSig = Eigen::MatrixXd::Zero(p1a+1, p1a+1);
-  
+
+
   for (t=0;t<p1;t++) sebeta(t) = sqrt(SSinv(t,t));
   for (t=0;t<p1b;t++) setau(t) = sqrt(SSinv(p1+t,p1+t));
   for (t=0;t<p2;t++) segamma1(t) = sqrt(SSinv(p1+p1b+t,p1+p1b+t));
@@ -718,11 +714,7 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
   }
   
   return Rcpp::List::create(Rcpp::Named("vcov")=SSinv,
-                            Rcpp::Named("sebeta")=sebeta,
-                            Rcpp::Named("setau")=setau,
-                            Rcpp::Named("segamma1")=segamma1,
-                            Rcpp::Named("sealpha1")=sealpha1,
-                            Rcpp::Named("sevee1")=sevee1,
                             Rcpp::Named("seSig")=seSig);
+  
   
 }

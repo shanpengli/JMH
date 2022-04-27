@@ -12,6 +12,7 @@ GetESF <- function(beta, tau, gamma1, alpha1, vee1, H01,
   
   getHazardSF(CumuH01, survtime, cmprsk, H01, CUH01, HAZ01)
   
+  
   status = getECSF(beta, tau, gamma1, alpha1, vee1, H01, Sig, Z, X1, W, Y, X2, 
                    survtime, cmprsk, mdata, mdataS, xsmatrix, wsmatrix, CUH01, HAZ01)
   

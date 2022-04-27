@@ -58,9 +58,10 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
   ydata2 <- rbind(object$ydata, ynewdata)
   cdata2 <- rbind(object$cdata, cnewdata)
   
+  variance.formula <- as.formula(paste("", object$LongitudinalSubmodelvariance[3], sep = "~"))
   getdum <- getdummy(long.formula = object$LongitudinalSubmodelmean,
                      surv.formula = object$SurvivalSubmodel,
-                     variance.formula = object$LongitudinalSubmodelvariance,
+                     variance.formula = variance.formula,
                      random = object$random, ydata = ydata2, cdata = cdata2)
   
   ydata.mean <- getdum$ydata.mean
@@ -95,10 +96,10 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
     ngamma <- length(object$gamma1)
     nalpha <- length(object$alpha1)
     nnu <- 1
-    nsig <- nalpha + 1
+    nsig <- nrow(object$Sig)
     lengthu <- length(u)
     if (!object$CompetingRisk) {
-      Psi <- c(object$beta, object$tau, object$gamma1, object$alpha1, object$nu1)
+      Psi <- c(object$beta, object$tau, object$gamma1, object$alpha1, object$vee1)
       for (l in 1:nsig) Psi <- c(Psi, object$Sig[l, l])
       if (nsig == 2) Psi <- c(Psi, object$Sig[1, 2])
       if (nsig == 3) {
@@ -200,9 +201,8 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       sum
       
     } else {
-      
-      Psi <- c(object$beta, object$gamma1, object$gamma2, 
-               object$nu1, object$nu2, object$sigma)
+      Psi <- c(object$beta, object$tau, object$gamma1, object$gamma2, 
+               object$alpha1, object$alpha2, object$vee1, object$vee2)
       for (l in 1:nsig) Psi <- c(Psi, object$Sig[l, l])
       if (nsig == 2) Psi <- c(Psi, object$Sig[1, 2])
       if (nsig == 3) {
@@ -216,45 +216,51 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       y.obs <- list()
       if (length(bvar) > 1) bvar1 <- bvar[1:(length(bvar) - 1)]
       for (j in 1:N.ID) {
-        subNDy.mean <- ynewdata[ynewdata[, bvar[length(bvar)]] == ID[j], ]
+        subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == ID[j], ]
+        subNDy.variance <- ynewdata.variance[ynewdata.variance[, bvar[length(bvar)]] == ID[j], ]
         subNDc <- cnewdata[cnewdata[, bvar[length(bvar)]] == ID[j], ]
-        y.obs[[j]] <- data.frame(subNDy.mean[, c(bvar[1], Yvar[1])])
+        y.obs[[j]] <- data.frame(subNDy.mean[, c(1, 2)])
+        
         allPi1 <- matrix(0, ncol = length(u), nrow = M)
         allPi2 <- matrix(0, ncol = length(u), nrow = M)
         s <-  as.numeric(subNDc[1, Cvar[1]])
         CH01 <- CH(H01, s)
         CH02 <- CH(H02, s)
         
-        Y <- subNDy.mean[, Yvar[1]]
-        X <- data.frame(1, subNDy.mean[, Yvar[2:length(Yvar)]])
+        Y <- subNDy.mean[, 2]
+        X <- subNDy.mean[, -c(1:2)]
         X <- as.matrix(X)
-        if (nsig == 1) {
+        W <- subNDy.variance[, -1]
+        W <- as.matrix(W)
+        if (nsig == 2) {
           Z <- matrix(1, ncol = 1, nrow = length(Y))
         } else {
           Z <- data.frame(1, subNDy.mean[, bvar1])
           Z <- as.matrix(Z)
         }
-        X2 <- as.matrix(subNDc[, Cvar[3:length(Cvar)]])
+        X2 <- as.matrix(subNDc[, -c(1:3)])
         for (i in 1:M) {
           ##1. draw Psi
           psil <- Psi.MC[i, ]
           betal <- psil[1:nbeta]
-          gammal1 <- psil[(nbeta+1):(nbeta+ngamma)]
-          gammal2 <- psil[(nbeta+ngamma+1):(nbeta+2*ngamma)]
-          nul1 <- psil[(nbeta+2*ngamma+1):(nbeta+2*ngamma+nnu)]
-          nul2 <- psil[(nbeta+2*ngamma+nnu+1):(nbeta+2*ngamma+2*nnu)]
-          sigmal <- psil[nbeta+2*ngamma+2*nnu+1]
+          taul <- psil[(nbeta+1):(nbeta+ntau)]
+          gammal1 <- psil[(nbeta+ntau+1):(nbeta+ntau+ngamma)]
+          gammal2 <- psil[(nbeta+ntau+ngamma+1):(nbeta+ntau+2*ngamma)]
+          alphal1 <- psil[(nbeta+ntau+2*ngamma+1):(nbeta+ntau+2*ngamma+nalpha)]
+          alphal2 <- psil[(nbeta+ntau+2*ngamma+nalpha+1):(nbeta+ntau+2*ngamma+2*nalpha)]
+          nul1 <- psil[nbeta+ntau+2*ngamma+2*nalpha+1]
+          nul2 <- psil[nbeta+ntau+2*ngamma+2*nalpha+2]
           Sigl <- matrix(0, ncol = nsig, nrow = nsig)
-          for (l in 1:nsig) Sigl[l, l] <- psil[nbeta+2*ngamma+2*nnu+1+l]
-          if (nsig == 2) Sigl[1, 2] <- Sigl[2, 1] <- psil[nbeta+2*ngamma+2*nnu+1+nsig+1]
+          for (l in 1:nsig) Sigl[l, l] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+l]
+          if (nsig == 2) Sigl[1, 2] <- Sigl[2, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+1]
           if (nsig == 3) {
-            Sigl[1, 2] <- Sigl[2, 1] <- psil[nbeta+2*ngamma+2*nnu+1+nsig+1]
-            Sigl[2, 3] <- Sigl[3, 2] <- psil[nbeta+2*ngamma+2*nnu+1+nsig+2]
-            Sigl[1, 3] <- Sigl[3, 1] <- psil[nbeta+2*ngamma+2*nnu+1+nsig+3]
+            Sigl[1, 2] <- Sigl[2, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+1]
+            Sigl[2, 3] <- Sigl[3, 2] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+2]
+            Sigl[1, 3] <- Sigl[3, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+3]
           }
-          data <- list(Y, X, Z, X2, CH01, CH02, betal, gammal1, gammal2, nul1, nul2, sigmal, Sigl)
-          names(data) <- c("Y", "X", "Z", "X2", "CH01", "CH02", "beta", 
-                           "gamma1", "gamma2", "nu1", "nu2",  "sigma", "Sig")
+          data <- list(Y, X, Z, W, X2, CH01, CH02, betal, taul, gammal1, gammal2, alphal1, alphal2, nul1, nul2, Sigl)
+          names(data) <- c("Y", "X", "Z", "W", "X2", "CH01", "CH02", "beta", "tau",
+                           "gamma1", "gamma2", "alpha1", "alpha2", "nu1", "nu2", "Sig")
           opt <- optim(rep(0, nsig), logLikCR, data = data, method = "BFGS", hessian = TRUE)
           meanb <- opt$par
           varb <- solve(opt$hessian)
@@ -276,7 +282,6 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
             CIF1 <- CIF1.CR(data, H01, H02, s, u[jj], bl)
             P1us <- Pk.us(CIF1, data, bl)
             allPi1[i, jj] <- P1us
-            
             CIF2 <- CIF2.CR(data, H01, H02, s, u[jj], bl)
             P2us <- Pk.us(CIF2, data, bl)
             allPi2[i, jj] <- P2us

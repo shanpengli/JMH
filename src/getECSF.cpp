@@ -72,7 +72,6 @@ Rcpp::List getECSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
     cuh01=CUH01(j);
     haz01=HAZ01(j);
     xgamma1=MultVV(X2.row(j),gamma1);
-    
     for (db=0;db<point;db++) {
       
       bwi = xsmatrix.row(db);
@@ -163,8 +162,9 @@ Rcpp::List getECSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
     FUNWSEC.col(j)/=dem;
     FUNBEC.col(j)/=dem;
     FUNBSEC.col(j)/=dem;
-    
+
   }
+
   
   return Rcpp::List::create(Rcpp::Named("FUNB")=FUNB,
                             Rcpp::Named("FUNW")=FUNW,

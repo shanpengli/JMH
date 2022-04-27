@@ -27,7 +27,7 @@ print.JMMLSM <- function(x, digits = 4, ...) {
     cat("Model summary:\n")
     cat("Longitudinal process: Mixed effects location scale model\n")
     cat("Event process: cause-specific Cox proportional hazard model with non-parametric baseline hazard\n\n")
-    ##cat("Loglikelihood: ", x$loglike, "\n\n")
+    cat("Loglikelihood: ", x$loglike, "\n\n")
     cat("Fixed effects in mean of longitudinal submodel: ",
         sprintf(format(paste(deparse(x$LongitudinalSubmodelmean, width.cutoff = 500), collapse=""))), "\n")
     cat("\n")
@@ -135,7 +135,7 @@ print.JMMLSM <- function(x, digits = 4, ...) {
     cat("Model summary:\n")
     cat("Longitudinal process: Mixed effects location scale model\n")
     cat("Event process: Cox proportional hazard model with non-parametric baseline hazard\n\n")
-    ##cat("Loglikelihood: ", x$loglike, "\n\n")
+    cat("Loglikelihood: ", x$loglike, "\n\n")
     cat("Fixed effects in mean of longitudinal submodel: ",
         sprintf(format(paste(deparse(x$LongitudinalSubmodelmean, width.cutoff = 500), collapse=""))), "\n")
     cat("\n")

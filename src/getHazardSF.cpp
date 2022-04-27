@@ -4,10 +4,10 @@
 
 //
 // [[Rcpp::export]]
-int getHazardSF(const Eigen::Map<Eigen::VectorXd> & CumuH01,
-              const Eigen::Map<Eigen::VectorXd> & survtime,
-              const Eigen::Map<Eigen::VectorXd> & cmprsk,
-              const Eigen::Map<Eigen::MatrixXd> & H01,
+int getHazardSF(const Eigen::VectorXd & CumuH01,
+              const Eigen::VectorXd & survtime,
+              const Eigen::VectorXd & cmprsk,
+              const Eigen::MatrixXd & H01,
               Eigen::Map<Eigen::VectorXd> & CUH01,
               Eigen::Map<Eigen::VectorXd> & HAZ01) {
   
@@ -48,7 +48,6 @@ int getHazardSF(const Eigen::Map<Eigen::VectorXd> & CumuH01,
   {
     if (risk1_index>=0)
     {
-      //gsl_vector_set(CUH01,j,gsl_vector_get(CumuH01,risk1_index));
       if (survtime(j) == H01(risk1_index, 0))
       {
         HAZ01(j) = H01(risk1_index, 2);
