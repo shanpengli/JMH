@@ -17,17 +17,35 @@
 ##' to be chosen for numerical integration. Default is 6 which produces stable estimates in most dataframes.
 ##' @param print.para Print detailed information of each iteration. Default is FALSE, i.e., not to print the iteration details.
 ##' @param survinitial Fit a Cox model to obtain initial values of the parameter estimates. Default is TRUE.
+##' @examples
+##' require(JMH)
+##' data(ydata)
+##' data(cdata)
+##' fit <- JMMLSM(cdata = cdata, ydata = ydata, 
+##'               long.formula = Y ~ Z1 + Z2 + Z3 + time,
+##'               surv.formula = Surv(survtime, cmprsk) ~ var1 + var2 + var3,
+##'               variance.formula = ~ Z1 + Z2 + Z3 + time, 
+##'               quadpoint = 15, random = ~ 1|ID, print.para = TRUE)
+##' fit    
+##' cnewdata <- cdata[cdata$ID %in% c(122, 952), ]
+##' ynewdata <- ydata[ydata$ID %in% c(122, 952), ]
+##' survfit <- survfit2JMMLSM(fit, seed = 100, ynewdata = ynewdata, cnewdata = cnewdata, 
+##'                      u = seq(5.2, 7.2, by = 0.5), M = 100, simulate = TRUE, quadpoint = 10)
+##' oldpar <- par(mfrow = c(2, 2), mar = c(5, 4, 4, 4))
+##' plot(survfit, estimator = "both", include.y = TRUE)
+##' par(oldpar)
+##' par(oldpar)
 ##' @export
 ##' 
 
 JMMLSM <- function(cdata, ydata,
-                long.formula,
-                surv.formula,
-                variance.formula, 
-                random,
-                maxiter = 1000, epsilon = 1e-04, 
-                quadpoint = 10, print.para = FALSE,
-                survinitial = TRUE) {
+                   long.formula,
+                   surv.formula,
+                   variance.formula, 
+                   random,
+                   maxiter = 1000, epsilon = 1e-04, 
+                   quadpoint = 10, print.para = FALSE,
+                   survinitial = TRUE) {
   
   
   if (!inherits(long.formula, "formula") || length(long.formula) != 3) {
@@ -68,7 +86,7 @@ JMMLSM <- function(cdata, ydata,
   if (!(ID %in% cnames)) {
     stop(paste0("ID column ", ID, " not found in the survival dataset!"))
   }
-
+  
   
   if (length(random.form) == 1) {
     RE <- NULL
@@ -87,12 +105,17 @@ JMMLSM <- function(cdata, ydata,
   getinit <- Getinit(cdata = cdata, ydata = ydata, long.formula = long.formula,
                      surv.formula = surv.formula, variance.formula = variance.formula,
                      model = model, ID = ID, RE = RE, random = random, survinitial = survinitial)
-
-
+  
+  # getinit <- GetinitFake(cdata = cdata, ydata = ydata, long.formula = long.formula,
+  #                            surv.formula = surv.formula, variance.formula = variance.formula,
+  #                            model = model, ID = ID, RE = RE)
+  
+  
   cdata <- getinit$cdata
   
   survival <- all.vars(surv.formula)
   status <- as.vector(cdata[, survival[2]])
+  
   if (prod(c(0, 1, 2) %in% unique(status))) {
     ## initialize parameters
     
@@ -144,63 +167,10 @@ JMMLSM <- function(cdata, ydata,
     CompetingRisk <- FALSE
   }
   
-  gq_vals <- statmod::gauss.quad(n = quadpoint, kind = "hermite")
-  xs <- gq_vals$nodes
-  ws <- gq_vals$weights
+  getGH <- GetGHmatrix(quadpoint = quadpoint, Sigb = Sigb)
   
-  if (nrow(Sigb) == 2) {
-    xsmatrix <- matrix(0, nrow = 3, ncol = quadpoint^3)
-    wsmatrix <- xsmatrix
-    xsmatrix[3, ] <- rep(xs, quadpoint^2)
-    Total <- NULL
-    for (i in 1:quadpoint) {
-      sub <- rep(xs[i], quadpoint)
-      Total <- c(Total, sub)
-    }
-    xsmatrix[2, ] <- rep(Total, quadpoint)
-    Total <- NULL
-    for (i in 1:quadpoint) {
-      sub <- rep(xs[i], quadpoint^2)
-      Total <- c(Total, sub)
-    }
-    xsmatrix[1, ] <- Total
-    xsmatrix <- t(xsmatrix)
-    
-    wsmatrix[3, ] <- rep(ws, quadpoint^2)
-    Total <- NULL
-    for (i in 1:quadpoint) {
-      sub <- rep(ws[i], quadpoint)
-      Total <- c(Total, sub)
-    }
-    wsmatrix[2, ] <- rep(Total, quadpoint)
-    Total <- NULL
-    for (i in 1:quadpoint) {
-      sub <- rep(ws[i], quadpoint^2)
-      Total <- c(Total, sub)
-    }
-    wsmatrix[1, ] <- Total
-    wsmatrix <- t(wsmatrix)
-  } else {
-    xsmatrix <- matrix(0, nrow = 2, ncol = quadpoint^2)
-    wsmatrix <- xsmatrix
-    xsmatrix[2, ] <- rep(xs, quadpoint)
-    Total <- NULL
-    for (i in 1:quadpoint) {
-      sub <- rep(xs[i], quadpoint)
-      Total <- c(Total, sub)
-    }
-    xsmatrix[1, ] <- Total
-    xsmatrix <- t(xsmatrix)
-    
-    wsmatrix[2, ] <- rep(ws, quadpoint)
-    Total <- NULL
-    for (i in 1:quadpoint) {
-      sub <- rep(ws[i], quadpoint)
-      Total <- c(Total, sub)
-    }
-    wsmatrix[1, ] <- Total
-    wsmatrix <- t(wsmatrix)
-  }
+  xsmatrix <- getGH$xsmatrix
+  wsmatrix <- getGH$wsmatrix
   
   iter=0
   
@@ -382,8 +352,8 @@ JMMLSM <- function(cdata, ydata,
       ### get loglike
       
       getloglike <- getLoglike(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, 
-                             H01, H02, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, 
-                             mdataS, xsmatrix, wsmatrix)
+                               H01, H02, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, 
+                               mdataS, xsmatrix, wsmatrix)
       
       names(beta) <- namesbeta
       names(tau) <- namestau
@@ -395,7 +365,7 @@ JMMLSM <- function(cdata, ydata,
       FunCall_longVar <- as.formula(paste("log(sigma^2)", varformula[2], sep = "~"))
       
       PropComp <- as.data.frame(table(cdata[, survival[2]]))
-  
+      
       ## return the joint modelling result
       mycall <- match.call()
       
@@ -449,7 +419,7 @@ JMMLSM <- function(cdata, ydata,
                         X2, survtime, cmprsk, mdata, mdataS, xsmatrix, wsmatrix)
       
       GetMpara <- GetMSF(GetEfun, beta, tau, gamma1, alpha1, vee1, H01,
-                       Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS)
+                         Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS)
       
       beta <- GetMpara$beta
       tau <- GetMpara$tau
@@ -460,7 +430,7 @@ JMMLSM <- function(cdata, ydata,
       H01 <- GetMpara$H01
       
       if((DiffSF(beta, prebeta, tau, pretau, gamma1, pregamma1,
-               alpha1, prealpha1, vee1, prevee1, Sig, preSig, H01, preH01, epsilon) == 0) 
+                 alpha1, prealpha1, vee1, prevee1, Sig, preSig, H01, preH01, epsilon) == 0) 
          || (iter == maxiter) || (!is.list(GetEfun)) || (!is.list(GetMpara))) {
         break
       }
@@ -509,10 +479,10 @@ JMMLSM <- function(cdata, ydata,
     } else {
       
       convergence = 1
-
+      
       GetEfun <- GetESF(beta, tau, gamma1, alpha1, vee1, H01, Sig, Z, X1, W, Y,
                         X2, survtime, cmprsk, mdata, mdataS, xsmatrix, wsmatrix)
-
+      
       FUNENW <- as.vector(GetEfun$FUNENW)
       FUNBENW <- as.matrix(GetEfun$FUNBENW)
       FUNBS <- as.matrix(GetEfun$FUNBS)
@@ -526,12 +496,12 @@ JMMLSM <- function(cdata, ydata,
       FUNWSEC <- as.matrix(GetEfun$FUNWSEC)
       FUNB <- as.matrix(GetEfun$FUNB)
       FUNW <- as.vector(GetEfun$FUNW)
-
+      
       getcov <- getCovSF(beta, tau, gamma1, alpha1, vee1, H01, Sig, Z, X1, W, Y,
                          X2, survtime, cmprsk, mdata, mdataS,
                          FUNENW, FUNBENW, FUNBS, FUNBW, FUNWS, FUNBSENW, FUNEC, FUNBEC,
                          FUNBSEC, FUNWEC, FUNWSEC,FUNB, FUNW)
-
+      
       vcov <- getcov$vcov
       seSig <- getcov$seSig
       sebeta <- vector()
@@ -541,9 +511,9 @@ JMMLSM <- function(cdata, ydata,
       for (i in 1:length(beta)) sebeta[i] <- sqrt(vcov[i, i])
       for (i in 1:length(tau)) setau[i] <- sqrt(vcov[length(beta)+i, length(beta)+i])
       for (i in 1:length(gamma1)) segamma1[i] <- sqrt(vcov[length(beta)+length(tau)+i, 
-                                                        length(beta)+length(tau)+i])
+                                                           length(beta)+length(tau)+i])
       for (i in 1:length(alpha1)) sealpha1[i] <- sqrt(vcov[length(beta)+length(tau)+length(gamma1)+i, 
-                                                        length(beta)+length(tau)+length(gamma1)+i])
+                                                           length(beta)+length(tau)+length(gamma1)+i])
       sevee1 <- sqrt(vcov[length(beta)+length(tau)+length(gamma1)+length(alpha1)+1, 
                           length(beta)+length(tau)+length(gamma1)+length(alpha1)+1])
       
@@ -586,8 +556,8 @@ JMMLSM <- function(cdata, ydata,
     
     
   }
-
   
-
-    
+  
+  
+  
 }

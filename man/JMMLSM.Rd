@@ -50,3 +50,22 @@ to be chosen for numerical integration. Default is 6 which produces stable estim
 \description{
 Joint modeling of longitudinal continuous data and competing risks
 }
+\examples{
+require(JMH)
+data(ydata)
+data(cdata)
+fit <- JMMLSM(cdata = cdata, ydata = ydata, 
+              long.formula = Y ~ Z1 + Z2 + Z3 + time,
+              surv.formula = Surv(survtime, cmprsk) ~ var1 + var2 + var3,
+              variance.formula = ~ Z1 + Z2 + Z3 + time, 
+              quadpoint = 15, random = ~ 1|ID, print.para = TRUE)
+fit    
+cnewdata <- cdata[cdata$ID \%in\% c(122, 952), ]
+ynewdata <- ydata[ydata$ID \%in\% c(122, 952), ]
+survfit <- survfit2JMMLSM(fit, seed = 100, ynewdata = ynewdata, cnewdata = cnewdata, 
+                     u = seq(5.2, 7.2, by = 0.5), M = 100, simulate = TRUE, quadpoint = 10)
+oldpar <- par(mfrow = c(2, 2), mar = c(5, 4, 4, 4))
+plot(survfit, estimator = "both", include.y = TRUE)
+par(oldpar)
+par(oldpar)
+}

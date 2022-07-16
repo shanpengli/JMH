@@ -68,9 +68,10 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
   ydata.variance <- getdum$ydata.variance
   cdata2 <- getdum$cdata
   
+  Yvar <- colnames(ydata.mean)[-1]
   Cvar <- colnames(cdata2)[-1]
   bvar <- all.vars(object$random)
-  
+
   ny <- nrow(ynewdata)
   nc <- nrow(cnewdata)
   Ny <- nrow(ydata2)
@@ -219,7 +220,7 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == ID[j], ]
         subNDy.variance <- ynewdata.variance[ynewdata.variance[, bvar[length(bvar)]] == ID[j], ]
         subNDc <- cnewdata[cnewdata[, bvar[length(bvar)]] == ID[j], ]
-        y.obs[[j]] <- data.frame(subNDy.mean[, c(1, 2)])
+        y.obs[[j]] <- data.frame(subNDy.mean[, c(bvar[1], Yvar[1])])
         
         allPi1 <- matrix(0, ncol = length(u), nrow = M)
         allPi2 <- matrix(0, ncol = length(u), nrow = M)
@@ -333,81 +334,17 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       sum
     }
   } else {
-    if (is.null(quadpoint)) {
-      quadpoint = 20 
-    }
-    gq_vals <- statmod::gauss.quad(n = quadpoint, kind = "hermite")
-    xs <- gq_vals$nodes
-    ws <- gq_vals$weights
-    p1a <- ncol(object$Sig)
     
-    if (p1a == 3) {
-      xsmatrix <- matrix(0, nrow = 3, ncol = quadpoint^3)
-      wsmatrix <- xsmatrix
-      xsmatrix[3, ] <- rep(xs, quadpoint^2)
-      Total <- NULL
-      for (i in 1:quadpoint) {
-        sub <- rep(xs[i], quadpoint)
-        Total <- c(Total, sub)
-      }
-      xsmatrix[2, ] <- rep(Total, quadpoint)
-      Total <- NULL
-      for (i in 1:quadpoint) {
-        sub <- rep(xs[i], quadpoint^2)
-        Total <- c(Total, sub)
-      }
-      xsmatrix[1, ] <- Total
-      xsmatrix <- t(xsmatrix)
-      
-      wsmatrix[3, ] <- rep(ws, quadpoint^2)
-      Total <- NULL
-      for (i in 1:quadpoint) {
-        sub <- rep(ws[i], quadpoint)
-        Total <- c(Total, sub)
-      }
-      wsmatrix[2, ] <- rep(Total, quadpoint)
-      Total <- NULL
-      for (i in 1:quadpoint) {
-        sub <- rep(ws[i], quadpoint^2)
-        Total <- c(Total, sub)
-      }
-      wsmatrix[1, ] <- Total
-      wsmatrix <- t(wsmatrix)
-    } else if (p1a == 2) {
-      xsmatrix <- matrix(0, nrow = 2, ncol = quadpoint^2)
-      wsmatrix <- xsmatrix
-      xsmatrix[2, ] <- rep(xs, quadpoint)
-      Total <- NULL
-      for (i in 1:quadpoint) {
-        sub <- rep(xs[i], quadpoint)
-        Total <- c(Total, sub)
-      }
-      xsmatrix[1, ] <- Total
-      xsmatrix <- t(xsmatrix)
-      
-      wsmatrix[2, ] <- rep(ws, quadpoint)
-      Total <- NULL
-      for (i in 1:quadpoint) {
-        sub <- rep(ws[i], quadpoint)
-        Total <- c(Total, sub)
-      }
-      wsmatrix[1, ] <- Total
-      wsmatrix <- t(wsmatrix)
-    } else {
-      xsmatrix <- matrix(0, nrow = 1, ncol = quadpoint)
-      wsmatrix <- xsmatrix
-      xsmatrix[1, ] <- xs
-      xsmatrix <- t(xsmatrix)
-      wsmatrix[1, ] <- ws
-      wsmatrix <- t(wsmatrix)
-    }
+    nsig <- ncol(object$Sig)
+
     if (length(bvar) > 1) bvar1 <- bvar[1:(length(bvar) - 1)]
     if (!object$CompetingRisk) {
       Predraw <- matrix(0, nrow = nrow(cnewdata), ncol = length(u))
       beta <- object$beta
-      sigma <- object$sigma
+      tau <- object$tau
       gamma <- object$gamma1
-      nu <- object$nu1
+      alpha <- object$alpha1
+      nu <- object$vee1
       H01 <- object$H01
       Sig <- object$Sig
       
@@ -415,57 +352,62 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       lengthu <- length(u)
       Last.time <- cnewdata[, c(bvar[length(bvar)], Cvar[1])]
       CompetingRisk <- object$CompetingRisk
+      
       for (j in 1:N.ID) {
-        subNDy.mean <- ynewdata[ynewdata[, bvar[length(bvar)]] == ID[j], ]
+        subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == ID[j], ]
+        subNDy.variance <- ynewdata.variance[ynewdata.variance[, bvar[length(bvar)]] == ID[j], ]
         subNDc <- cnewdata[cnewdata[, bvar[length(bvar)]] == ID[j], ]
         y.obs[[j]] <- data.frame(subNDy.mean[, c(bvar[1], Yvar[1])])
+        CH0 <- CH(H01, subNDc[, Cvar[1]])
+        CH0u <- vector()
+        for (jj in 1:lengthu) {
+          CH0u[jj] <- CH(H01, u[jj])
+        }
+        Y <- subNDy.mean[, Yvar[1]]
+        X <- subNDy.mean[, Yvar[2:length(Yvar)]]
+        X <- as.matrix(X)
+        W <- subNDy.variance[, -1]
+        W <- as.matrix(W)
+        if (nsig == 2) {
+          Z <- matrix(1, ncol = 1, nrow = length(Y))
+        } else {
+          Z <- data.frame(1, subNDy.mean[, bvar1])
+          Z <- as.matrix(Z)
+        }
+        X2 <- as.matrix(subNDc[1, Cvar[3:length(Cvar)]])
+        
+        ## find out E(theta_i)
+        data <- list(Y, X, Z, W, X2, CH0, beta, tau, gamma, alpha, nu, Sig)
+        names(data) <- c("Y", "X", "Z", "W", "X2", "CH0", "beta", "tau", "gamma", "alpha", "nu", "Sig")
+        opt <- optim(rep(0, nsig), logLik, data = data, method = "BFGS", hessian = TRUE)
+        meanbw <- opt$par
+        
+        for (jj in 1:lengthu) {
+          Pi <- P.us(data, CH0u[jj], meanbw)
+          Predraw[j, jj] <- 1 - Pi
+        }
+        
       }
       names(y.obs) <- ID
-      Y <- ynewdata[, Yvar[1]]
-      X <- data.frame(1, ynewdata[, Yvar[2:length(Yvar)]])
-      X <- as.matrix(X)
-      if (p1a == 1) {
-        Z <- matrix(1, ncol = 1, nrow = length(Y))
-      } else {
-        Z <- data.frame(1, ynewdata[, bvar1])
-        Z <- as.matrix(Z)
-      }
-      X2 <- as.matrix(cnewdata[, Cvar[3:length(Cvar)]])
-      
-      survtime <- cnewdata[, Cvar[1]]
-      
-      mdata <- as.data.frame(table(ynewdata[, bvar[length(bvar)]]))
-      colnames(mdata) <- c("ID", "ni")
-      mdata[, "ID"] <- as.character(mdata[, "ID"])
-      n <- nrow(mdata)
-      mdata <- as.vector(mdata$ni)
-      mdataS <- rep(0, n) 
-      mdataS[1] <- 1
-      mdataCum <- cumsum(mdata)
-      mdata2 <- mdata - 1
-      mdataS[2:n] <- mdataCum[2:n] - mdata2[2:n]
-      
-      for (jj in 1:lengthu) {
-        Pus <- getPus(beta, gamma, nu, Sig, sigma, H01, Z, X, Y, X2,
-                      mdata, mdataS, survtime, xsmatrix, wsmatrix, u[jj])
-        Predraw[, jj] <- Pus
-      }
       Pred <- list()
       for (jj in 1:N.ID) {
         Pred[[jj]] <- data.frame(u, Predraw[jj, ])
         colnames(Pred[[jj]]) <- c("times", "PredSurv")
       }
       names(Pred) <- ID
-      sum <- list(Pred = Pred, Last.time = Last.time, y.obs = y.obs, simulate = simulate, quadpoint = quadpoint)
+      sum <- list(Pred = Pred, Last.time = Last.time, y.obs = y.obs, simulate = simulate, 
+                  quadpoint = quadpoint, CompetingRisk = CompetingRisk)
       class(sum) <- "survfitJMMLSM"
       sum
     } else {
       beta <- object$beta
-      sigma <- object$sigma
+      tau <- object$tau
       gamma1 <- object$gamma1
       gamma2 <- object$gamma2
-      nu1 <- object$nu1
-      nu2 <- object$nu2
+      alpha1 <- object$alpha1
+      alpha2 <- object$alpha2
+      nu1 <- object$vee1
+      nu2 <- object$vee2
       H01 <- object$H01
       H02 <- object$H02
       Sig <- object$Sig
@@ -477,42 +419,47 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       Last.time <- cnewdata[, c(bvar[length(bvar)], Cvar[1])]
       CompetingRisk <- object$CompetingRisk
       for (j in 1:N.ID) {
-        subNDy.mean <- ynewdata[ynewdata[, bvar[length(bvar)]] == ID[j], ]
+        subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == ID[j], ]
+        subNDy.variance <- ynewdata.variance[ynewdata.variance[, bvar[length(bvar)]] == ID[j], ]
         subNDc <- cnewdata[cnewdata[, bvar[length(bvar)]] == ID[j], ]
         y.obs[[j]] <- data.frame(subNDy.mean[, c(bvar[1], Yvar[1])])
+        
+        allPi <- matrix(0, ncol = length(u), nrow = M)
+        s <-  as.numeric(subNDc[1, Cvar[1]])
+        CH01 <- CH(H01, s)
+        CH02 <- CH(H02, s)
+        Y <- subNDy.mean[, Yvar[1]]
+        X <- subNDy.mean[, Yvar[2:length(Yvar)]]
+        X <- as.matrix(X)
+        W <- subNDy.variance[, -1]
+        W <- as.matrix(W)
+        if (nsig == 2) {
+          Z <- matrix(1, ncol = 1, nrow = length(Y))
+        } else {
+          Z <- data.frame(1, subNDy.mean[, bvar1])
+          Z <- as.matrix(Z)
+        }
+        X2 <- as.matrix(subNDc[1, Cvar[3:length(Cvar)]])
+        data <- list(Y, X, Z, W, X2, CH01, CH02, beta, tau, gamma1, gamma2, alpha1, alpha2, nu1, nu2, Sig)
+        names(data) <- c("Y", "X", "Z", "W", "X2", "CH01", "CH02", "beta", "tau",
+                         "gamma1", "gamma2", "alpha1", "alpha2", "nu1", "nu2", "Sig")
+
+        opt <- optim(rep(0, nsig), logLikCR, data = data, method = "BFGS", hessian = TRUE)
+        meanbw <- opt$par
+        
+        for (jj in 1:lengthu) {
+          ## calculate the CIF
+          CIF1 <- CIF1.CR(data, H01, H02, s, u[jj], meanbw)
+          P1us <- Pk.us(CIF1, data, meanbw)
+          Predraw1[j, jj] <- P1us
+          CIF2 <- CIF2.CR(data, H01, H02, s, u[jj], meanbw)
+          P2us <- Pk.us(CIF2, data, meanbw)
+          Predraw2[j, jj] <- P2us
+        }
       }
       names(y.obs) <- ID
-      Y <- ynewdata[, Yvar[1]]
-      X <- data.frame(1, ynewdata[, Yvar[2:length(Yvar)]])
-      X <- as.matrix(X)
-      if (p1a == 1) {
-        Z <- matrix(1, ncol = 1, nrow = length(Y))
-      } else {
-        Z <- data.frame(1, ynewdata[, bvar1])
-        Z <- as.matrix(Z)
-      }
-      X2 <- as.matrix(cnewdata[, Cvar[3:length(Cvar)]])
+    
       
-      survtime <- cnewdata[, Cvar[1]]
-      
-      mdata <- as.data.frame(table(ynewdata[, bvar[length(bvar)]]))
-      colnames(mdata) <- c("ID", "ni")
-      mdata[, "ID"] <- as.character(mdata[, "ID"])
-      n <- nrow(mdata)
-      mdata <- as.vector(mdata$ni)
-      mdataS <- rep(0, n) 
-      mdataS[1] <- 1
-      mdataCum <- cumsum(mdata)
-      mdata2 <- mdata - 1
-      mdataS[2:n] <- mdataCum[2:n] - mdata2[2:n]
-      
-      for (jj in 1:lengthu) {
-        Pus <- getPusCR(beta, gamma1, gamma2, nu1, nu2, Sig, sigma, H01, 
-                        H02, Z, X, Y, X2, mdata, mdataS, survtime, 
-                        xsmatrix, wsmatrix, u[jj])
-        Predraw1[, jj] <- Pus[, 1]
-        Predraw2[, jj] <- Pus[, 2]
-      }
       Pred <- list()
       for (jj in 1:N.ID) {
         Pred[[jj]] <- data.frame(u, Predraw1[jj, ], Predraw2[jj, ])

@@ -79,12 +79,13 @@ Getinit <- function(cdata, ydata, long.formula, surv.formula, variance.formula,
   beta <- longfit$coefficients$fixed
   D <- as.matrix(nlme::getVarCov(longfit))
   resid <- Y - as.vector(fitted(longfit))
+
   ## get initial estimates of fixed effects in WS variance
   logResidsquare <- as.vector(log(resid^2))
   Tau <- OLS(W, logResidsquare)
   tau <- Tau$betahat
   names(tau) <- colnames(W)
-  
+
   if (sum(unique(cmprsk)) <= 3) {
     if (prod(c(0, 1, 2) %in% unique(cmprsk))) {
         ## get initial estimates of fixed effects in competing risks model
@@ -129,6 +130,8 @@ Getinit <- function(cdata, ydata, long.formula, surv.formula, variance.formula,
         Sig[1:2, 3] <- c(Sig[1, 1], Sig[2, 2])*0.5
         Sig[3, 1:2] <- Sig[1:2, 3] 
       }
+      
+
       
       a <- list(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, Sig, 
                 Z, X, W, Y, X2, survtime, cmprsk, cdata, mdata)

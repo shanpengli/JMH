@@ -1,18 +1,21 @@
 {
     "args": [
+        "-std=gnu++14",
+        "-I/Library/Frameworks/R.framework/Resources/include",
+        "-DNDEBUG",
+        "-I/usr/local/include",
+        "-fPIC",
+        "-I/Library/Frameworks/R.framework/Versions/4.1/Resources/library/Rcpp/include",
+        "-I/Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include",
         "-I/Library/Developer/CommandLineTools/usr/lib/clang/12.0.0/include",
         "-I/Library/Developer/CommandLineTools/usr/bin/../include/c++/v1",
         "-I/Library/Developer/CommandLineTools/usr/lib/clang/12.0.0/include",
         "-I/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/include",
-        "-I/Library/Developer/CommandLineTools/usr/include",
-        "-I/Library/Frameworks/R.framework/Versions/4.1/Resources/library/Rcpp/include",
-        "-I/Library/Frameworks/R.framework/Versions/4.1/Resources/library/RcppEigen/include",
-        "-I/Library/Frameworks/R.framework/Resources/include",
-        "-DNDEBUG",
-        "-I/usr/local/include",
-        "-fPIC"
+        "-I/Library/Developer/CommandLineTools/usr/include"
     ],
     "pch": "RcppEigen",
     "is_cpp": true,
-    "hash": "1611021323165039142516222453121622245312"
+    "hash": "165721994616222453121622245312",
+    "compiler": "3083250897243086868",
+    "rversion": "4.1.3"
 }

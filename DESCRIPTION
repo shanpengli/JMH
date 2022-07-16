@@ -11,3 +11,4 @@ Imports: Rcpp (>= 1.0.6), parallel, dplyr, stats
 LinkingTo: Rcpp, RcppEigen
 Depends: R (>= 3.0.0), survival, nlme, utils, MASS, statmod
 RoxygenNote: 7.1.2
+LazyData: true

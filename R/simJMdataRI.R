@@ -12,12 +12,11 @@ simJMdataRI <- function(seed = 100, N = 200, increment = 0.7, beta = c(5, 1.5, 2
                       lambda1 = 0.05,
                       lambda2 = 0.025,
                       CL = 5,
-                      CU = 10
+                      CU = 10,
+                      covbw = matrix(c(0.5, 0.25, 0.25, 0.5), nrow = 2, ncol = 2)
 ) {
   
   set.seed(seed)
-  
-  covbw <- matrix(c(0.5, 0.25, 0.25, 0.5), nrow = 2, ncol = 2)
   
   bwi <- MASS::mvrnorm(n = N, c(0, 0), covbw, tol = 1e-6, empirical = FALSE)
   
@@ -85,11 +84,11 @@ simJMdataRI <- function(seed = 100, N = 200, increment = 0.7, beta = c(5, 1.5, 2
       }
     }
     YdataRaw <- rbind(YdataRaw, suby)
-    
   }
   Z <- cbind(ID, Z)
   Z <- as.data.frame(Z)
   YdataRaw <- as.data.frame(YdataRaw)
+  colnames(YdataRaw) <- c("ID", "Y", "time")
   ydata <- dplyr::left_join(YdataRaw, Z, by = "ID")
   cdata <- as.data.frame(cdata)
   a <- list(cdata, ydata)
