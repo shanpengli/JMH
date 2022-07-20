@@ -1,12 +1,12 @@
 CIF1.CR <- function(data, H01, H02, s, u, bl) {
   a <- nrow(H01)
   b <- nrow(H02)
-  CH01 <- cumsum(H01[, 3])
+  CH01 <- c(0, cumsum(H01[, 3])[-a])
   CH02 <- rep(0, a)
   count <- 1
   i = 1
   while (count <= b & i <= a) {
-    if (H02[count, 1] <= H01[i, 1]) {
+    if (H02[count, 1] < H01[i, 1]) {
       CH02[i] <- CH02[i] + H02[count, 3]
       count <- count + 1
     } else {
@@ -20,7 +20,7 @@ CIF1.CR <- function(data, H01, H02, s, u, bl) {
   b <- as.vector(bl[1:p1a])
   w <- bl[p1a+1]
   for (i in 1:a) {
-    if (s <= H01[i, 1] & u >= H01[i, 1]) {
+    if (s < H01[i, 1] & u >= H01[i, 1]) {
       CIF1 <- CIF1 + H01[i, 3]*exp(data$X2%*%data$gamma1 + data$alpha1%*%b + data$nu1*w)*
         exp(-CH01[i]*exp(data$X2%*%data$gamma1 + data$alpha1%*%b + data$nu1*w)-
               CH02[i]*exp(data$X2%*%data$gamma2 + data$alpha2%*%b + data$nu2*w))
