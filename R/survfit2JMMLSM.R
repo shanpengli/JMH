@@ -108,6 +108,7 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
     
     xsmatrix <- getGH$xsmatrix
     wsmatrix <- getGH$wsmatrix
+    
 
     set.seed(seed)
     nbeta <- length(object$beta)
@@ -230,6 +231,7 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         Psi <- c(Psi, object$Sig[2, 3])
         Psi <- c(Psi, object$Sig[1, 3])
       }
+
       covPsi <- vcov(object)
 
       Psi.MC <- mvrnorm(n = M, Psi, covPsi, tol = 1e-6, empirical = FALSE)

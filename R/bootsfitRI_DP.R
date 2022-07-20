@@ -33,7 +33,7 @@ bootsfitRI_DP <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
     return(coef)
   } else {
     
-    survfit <- try(survfit2JMMLSM(fit, seed = seed, ynewdata = ynewdata, cnewdata = cnewdata, 
+    survfit <- try(survfit2JMMLSM(fit, seed = seed + i, ynewdata = ynewdata, cnewdata = cnewdata, 
                                   u = u, M = M, simulate = TRUE, quadpoint = quadpoint), silent = TRUE)
     
     if ('try-error' %in% class(survfit)) {
