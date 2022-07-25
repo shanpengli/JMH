@@ -232,7 +232,8 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         Psi <- c(Psi, object$Sig[1, 3])
       }
 
-      covPsi <- vcov(object)
+      # covPsi <- vcov(object)
+      covPsi <- object$vcov
 
       Psi.MC <- mvrnorm(n = M, Psi, covPsi, tol = 1e-6, empirical = FALSE)
       Pred <- list()
@@ -389,12 +390,19 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
             ## calculate the CIF
             CIF1 <- CIF1.CR(data, H01, H02, s, u[jj], bl)
             P1us <- Pk.us(CIF1, data, bl)
-            allPi1[[j]][i, jj] <- P1us
+            if (P1us > 1) {
+              allPi1[[j]][i, jj] <- NA
+            } else {
+              allPi1[[j]][i, jj] <- P1us
+            }
             CIF2 <- CIF2.CR(data, H01, H02, s, u[jj], bl)
             P2us <- Pk.us(CIF2, data, bl)
-            allPi2[[j]][i, jj] <- P2us
+            if (P2us > 1) {
+              allPi2[[j]][i, jj] <- NA
+            } else {
+              allPi2[[j]][i, jj] <- P2us
+            }
           }
-          
         }
         ## pass the current sample parameters to the next iteration
         Psi.init <- psil
@@ -404,6 +412,10 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       }
       
       for (j in 1:N.ID) {
+        
+        allPi1[[j]] <- allPi1[[j]][complete.cases(allPi1[[j]]), ]
+        allPi2[[j]] <- allPi2[[j]][complete.cases(allPi2[[j]]), ]
+        
         subCP1 <- as.data.frame(matrix(0, nrow = length(u), ncol = 5))
         colnames(subCP1) <- c("times", "Mean", "Median", "95%Lower", "95%Upper")
         for (b in 1:length(u)) {
