@@ -1,13 +1,7 @@
 GetEmpiricalCIF <- function(data, time, status) {
-  
+  library(survival)
   if (!is.data.frame(data))
     stop("data must be a dataframe format.")
-  
-  if(!(time %in% colnames(data)))
-    stop("time variable is not found in data.")
-  
-  if(!(status %in% colnames(data)))
-    stop("status variable is not found in data.")
   
   data$status1 <- ifelse(data[, status] == 1, 1, 0)
   data$status2 <- ifelse(data[, status] == 2, 1, 0)
@@ -33,7 +27,9 @@ GetEmpiricalCIF <- function(data, time, status) {
   CIF <- 0
   count <- 1
   for (i in 1:nrow(table1)) {
-    if (table1[i, 1] != time1[count]) {
+    if (count > length(time1)) {
+      break
+    } else if (table1[i, 1] != time1[count]) {
       next
     } else {
       CIF <- CIF + table1[i, 2]*h1[count]
@@ -57,7 +53,9 @@ GetEmpiricalCIF <- function(data, time, status) {
   CIF <- 0
   count <- 1
   for (i in 1:nrow(table1)) {
-    if (table1[i, 1] != time2[count]) {
+    if (count > length(time2)) {
+      break
+    } else if (table1[i, 1] != time2[count]) {
       next
     } else {
       CIF <- CIF + table1[i, 2]*h2[count]

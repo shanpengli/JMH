@@ -10,54 +10,62 @@
                 "name": "GetBreslowInit(const Eigen::MatrixXd &, const Eigen::VectorXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/GetBreslowInit.cpp",
                 "line": 7,
-                "column": 12
+                "column": 12,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/GetrisksetC.cpp",
         "file_last_write": 1627949685.0,
         "definitions": [
             {
-                "usr": "c:@F@GetrisksetC#&1$@N@Eigen@S@Matrix>#d#VI-1#VI-1#VI0#VI-1#VI-1#",
+                "usr": "c:@F@GetrisksetC#&1I#",
                 "kind": 6,
                 "parent_name": "",
                 "name": "GetrisksetC(const Eigen::MatrixXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/GetrisksetC.cpp",
                 "line": 7,
-                "column": 12
+                "column": 12,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/GetrisksetCSF.cpp",
         "file_last_write": 1627949875.0,
         "definitions": [
             {
-                "usr": "c:@F@GetrisksetCSF#&1$@N@Eigen@S@Matrix>#d#VI-1#VI-1#VI0#VI-1#VI-1#",
+                "usr": "c:@F@GetrisksetCSF#&1I#",
                 "kind": 6,
                 "parent_name": "",
                 "name": "GetrisksetCSF(const Eigen::MatrixXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/GetrisksetCSF.cpp",
                 "line": 7,
-                "column": 12
+                "column": 12,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/OLS.cpp",
         "file_last_write": 1623105507.0,
         "definitions": [
             {
-                "usr": "c:@F@OLS#&1$@N@Eigen@S@Matrix>#d#VI-1#VI-1#VI0#VI-1#VI-1#&1$@N@Eigen@S@Matrix>#d#VI-1#VI1#VI0#VI-1#VI1#",
+                "usr": "c:@F@OLS#&1I#S0_#",
                 "kind": 6,
                 "parent_name": "",
                 "name": "OLS(const Eigen::MatrixXd &, const Eigen::VectorXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/OLS.cpp",
                 "line": 7,
-                "column": 12
+                "column": 12,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/basics.cpp",
@@ -70,7 +78,8 @@
                 "name": "MultVV(const Eigen::VectorXd &, const Eigen::VectorXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/basics.cpp",
                 "line": 23,
-                "column": 9
+                "column": 9,
+                "hidden": false
             },
             {
                 "usr": "c:@F@MultVVoutprod#&1I#",
@@ -79,7 +88,8 @@
                 "name": "MultVVoutprod(const Eigen::VectorXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/basics.cpp",
                 "line": 29,
-                "column": 17
+                "column": 17,
+                "hidden": false
             },
             {
                 "usr": "c:@F@MultVV2outprod#&1I#S0_#",
@@ -88,7 +98,8 @@
                 "name": "MultVV2outprod(const Eigen::VectorXd &, const Eigen::VectorXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/basics.cpp",
                 "line": 35,
-                "column": 17
+                "column": 17,
+                "hidden": false
             },
             {
                 "usr": "c:@F@MultVVinprod#&1I#",
@@ -97,7 +108,8 @@
                 "name": "MultVVinprod(const Eigen::VectorXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/basics.cpp",
                 "line": 43,
-                "column": 9
+                "column": 9,
+                "hidden": false
             },
             {
                 "usr": "c:@F@CH#&1I#d#",
@@ -106,7 +118,8 @@
                 "name": "CH(const Eigen::MatrixXd &, double)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/basics.cpp",
                 "line": 49,
-                "column": 9
+                "column": 9,
+                "hidden": false
             },
             {
                 "usr": "c:@F@HAZ#&1I#d#",
@@ -115,7 +128,8 @@
                 "name": "HAZ(const Eigen::MatrixXd &, double)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/basics.cpp",
                 "line": 70,
-                "column": 8
+                "column": 8,
+                "hidden": false
             },
             {
                 "usr": "c:@F@MultMM#&1I#S0_#",
@@ -124,14 +138,17 @@
                 "name": "MultMM(const Eigen::MatrixXd &, const Eigen::MatrixXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/basics.cpp",
                 "line": 84,
-                "column": 17
+                "column": 17,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/basics.h",
         "file_last_write": 1629940240.0,
-        "definitions": []
+        "definitions": [],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getCov.cpp",
@@ -144,9 +161,11 @@
                 "name": "getCov(const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const double, const double, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getCov.cpp",
                 "line": 8,
-                "column": 12
+                "column": 12,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getCovSF.cpp",
@@ -159,24 +178,28 @@
                 "name": "getCovSF(const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const double, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getCovSF.cpp",
                 "line": 8,
-                "column": 12
+                "column": 12,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getEC.cpp",
         "file_last_write": 1626240193.0,
         "definitions": [
             {
-                "usr": "c:@F@getEC#&1$@N@Eigen@S@Matrix>#d#VI-1#VI1#VI0#VI-1#VI1#S0_#S0_#S0_#S0_#S0_#1d#1d#&1$@N@Eigen@S@Matrix>#d#VI-1#VI-1#VI0#VI-1#VI-1#S2_#S2_#S2_#S2_#S2_#S0_#S2_#S0_#S0_#S0_#S0_#S2_#S2_#S0_#S0_#S0_#S0_#",
+                "usr": "c:@F@getEC#&1I#S0_#S0_#S0_#S0_#S0_#1d#1d#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#S0_#",
                 "kind": 6,
                 "parent_name": "",
                 "name": "getEC(const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const double, const double, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getEC.cpp",
                 "line": 8,
-                "column": 12
+                "column": 12,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getECSF.cpp",
@@ -189,9 +212,11 @@
                 "name": "getECSF(const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const double, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getECSF.cpp",
                 "line": 8,
-                "column": 12
+                "column": 12,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getEWik.cpp",
@@ -204,9 +229,11 @@
                 "name": "getEWik(const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const double, const double, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getEWik.cpp",
                 "line": 8,
-                "column": 12
+                "column": 12,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getHazard.cpp",
@@ -219,9 +246,11 @@
                 "name": "getHazard(const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, Eigen::Map<Eigen::VectorXd> &, Eigen::Map<Eigen::VectorXd> &, Eigen::Map<Eigen::VectorXd> &, Eigen::Map<Eigen::VectorXd> &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getHazard.cpp",
                 "line": 7,
-                "column": 5
+                "column": 5,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getHazardSF.cpp",
@@ -234,39 +263,45 @@
                 "name": "getHazardSF(const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, Eigen::Map<Eigen::VectorXd> &, Eigen::Map<Eigen::VectorXd> &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getHazardSF.cpp",
                 "line": 7,
-                "column": 5
+                "column": 5,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getMC.cpp",
         "file_last_write": 1624152951.0,
         "definitions": [
             {
-                "usr": "c:@F@getMC#&$@N@Eigen@S@Matrix>#d#VI-1#VI1#VI0#VI-1#VI1#S0_#S0_#S0_#S0_#S0_#d#d#&$@N@Eigen@S@Matrix>#d#VI-1#VI-1#VI0#VI-1#VI-1#S2_#S2_#&1S3_#S4_#S4_#&1S1_#S4_#S5_#S5_#S5_#S5_#S5_#S4_#S4_#S4_#S5_#S4_#S4_#S4_#S4_#S4_#S4_#S4_#S5_#",
+                "usr": "c:@F@getMC#&I#S0_#S0_#S0_#S0_#S0_#d#d#S0_#S0_#S0_#&1I#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#",
                 "kind": 6,
                 "parent_name": "",
                 "name": "getMC(Eigen::VectorXd &, Eigen::VectorXd &, Eigen::VectorXd &, Eigen::VectorXd &, Eigen::VectorXd &, Eigen::VectorXd &, double, double, Eigen::MatrixXd &, Eigen::MatrixXd &, Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getMC.cpp",
                 "line": 8,
-                "column": 12
+                "column": 12,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getMCSF.cpp",
         "file_last_write": 1626392449.0,
         "definitions": [
             {
-                "usr": "c:@F@getMCSF#&$@N@Eigen@S@Matrix>#d#VI-1#VI1#VI0#VI-1#VI1#S0_#S0_#S0_#d#&$@N@Eigen@S@Matrix>#d#VI-1#VI-1#VI0#VI-1#VI-1#S2_#&1S3_#S4_#S4_#&1S1_#S4_#S5_#S5_#S5_#S5_#S5_#S4_#S4_#S4_#S5_#S4_#S4_#S4_#S4_#S4_#S4_#S4_#S5_#",
+                "usr": "c:@F@getMCSF#&I#S0_#S0_#S0_#d#S0_#S0_#&1I#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#S1_#",
                 "kind": 6,
                 "parent_name": "",
                 "name": "getMCSF(Eigen::VectorXd &, Eigen::VectorXd &, Eigen::VectorXd &, Eigen::VectorXd &, double, Eigen::MatrixXd &, Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getMCSF.cpp",
                 "line": 8,
-                "column": 12
+                "column": 12,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getTruePik.cpp",
@@ -279,9 +314,11 @@
                 "name": "getTruePik(const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const double, const double, const Eigen::MatrixXd &, const int, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getTruePik.cpp",
                 "line": 8,
-                "column": 12
+                "column": 12,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getloglikeC.cpp",
@@ -294,9 +331,11 @@
                 "name": "getloglikeC(const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const double, const double, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getloglikeC.cpp",
                 "line": 8,
-                "column": 8
+                "column": 8,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getloglikeCSF.cpp",
@@ -309,9 +348,11 @@
                 "name": "getloglikeCSF(const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const double, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/getloglikeCSF.cpp",
                 "line": 8,
-                "column": 8
+                "column": 8,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     },
     {
         "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/updateH0.cpp",
@@ -324,8 +365,10 @@
                 "name": "updateH0(const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, const Eigen::VectorXd &, const Eigen::MatrixXd &, const Eigen::VectorXd &, Eigen::MatrixXd &, Eigen::MatrixXd &)",
                 "file": "/Users/shanpengli/Desktop/GSR CODES/2021/2021 summer/JMH/src/updateH0.cpp",
                 "line": 8,
-                "column": 12
+                "column": 12,
+                "hidden": false
             }
-        ]
+        ],
+        "hidden": false
     }
 ]
