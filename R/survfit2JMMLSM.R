@@ -263,7 +263,7 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       for (i in 1:M) {
         
         ### 0. Set the initial estimator
-        Psil <- Psi.init
+        psil <- Psi.init
         H01l <- H01.init
         H02l <- H02.init
         
