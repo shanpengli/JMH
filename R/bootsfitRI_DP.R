@@ -46,8 +46,8 @@ bootsfitRI_DP <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
       pred1 <- list()
       pred2 <- list()
       for (i in 1:nrow(cnewdata)) {
-        pred1[[i]] <- survfit$Pred[[i]]$`Cumulative incidence probabilities for type 1 failure`[, c(2, 4, 5)]
-        pred2[[i]] <- survfit$Pred[[i]]$`Cumulative incidence probabilities for type 2 failure`[, c(2, 4, 5)]
+        pred1[[i]] <- survfit$Pred[[i]]$`Cumulative incidence probabilities for type 1 failure`[, c(2, 6, 7)]
+        pred2[[i]] <- survfit$Pred[[i]]$`Cumulative incidence probabilities for type 2 failure`[, c(2, 6, 7)]
         colnames(pred1[[i]]) <- c("mean", "95%Lower", "95%Upper")
         colnames(pred2[[i]]) <- c("mean", "95%Lower", "95%Upper")
         rownames(pred1[[i]]) <- u

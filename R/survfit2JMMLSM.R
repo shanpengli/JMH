@@ -23,7 +23,7 @@
 ##' @export
 ##' 
 survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL, 
-                          u = NULL, M = 200, simulate = TRUE, quadpoint = NULL, ...) {
+                           u = NULL, M = 200, simulate = TRUE, quadpoint = NULL, ...) {
   if (!inherits(object, "JMMLSM"))
     stop("Use only with 'JMMLSM' objects.\n")
   if (is.null(ynewdata))
@@ -57,13 +57,13 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
   
   ydata2 <- rbind(object$ydata, ynewdata)
   cdata2 <- rbind(object$cdata, cnewdata)
-
+  
   variance.formula <- as.formula(paste("", object$LongitudinalSubmodelvariance[3], sep = "~"))
   getdum <- getdummy(long.formula = object$LongitudinalSubmodelmean,
                      surv.formula = object$SurvivalSubmodel,
                      variance.formula = variance.formula,
                      random = object$random, ydata = ydata2, cdata = cdata2)
-
+  
   
   ydata.mean <- getdum$ydata.mean
   ydata.variance <- getdum$ydata.variance
@@ -85,6 +85,7 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
   ynewdata.mean2 <- ydata.mean[c(1:(Ny-ny)), ]
   ynewdata.variance2 <- ydata.variance[c(1:(Ny-ny)), ]
   cnewdata2 <- cdata2[c(1:(Nc-nc)), ]
+  
   GetVar <- GetVarSurvfit(cdata = cnewdata2, ydata.mean = ynewdata.mean2,
                           ydata.variance = ynewdata.variance2, random = object$random)
   
@@ -109,7 +110,7 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
     xsmatrix <- getGH$xsmatrix
     wsmatrix <- getGH$wsmatrix
     
-
+    
     set.seed(seed)
     nbeta <- length(object$beta)
     ntau <- length(object$tau)
@@ -231,10 +232,10 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         Psi <- c(Psi, object$Sig[2, 3])
         Psi <- c(Psi, object$Sig[1, 3])
       }
-
+      
       # covPsi <- vcov(object)
       covPsi <- object$vcov
-
+      
       Psi.MC <- mvrnorm(n = M, Psi, covPsi, tol = 1e-6, empirical = FALSE)
       Pred <- list()
       y.obs <- list()
@@ -261,7 +262,6 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       names(allPi2) <- ID
       
       for (i in 1:M) {
-        
         ### 0. Set the initial estimator
         psil <- Psi.init
         H01l <- H01.init
@@ -305,9 +305,64 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         mdataS <- GetVar$mdataS
         
         getHazard(CumuH01, CumuH02, survtime, cmprsk, H01l, H02l, CUH01, CUH02, HAZ01, HAZ02)
+        
+        bvar <- all.vars(object$random)
+        SID <- cnewdata2[, bvar[length(bvar)]]
 
-        EWik = getEWik(betal, taul, gammal1, gammal2, alphal1, alphal2, nul1, nul2, H01l, 
-                       H02l, Sigl, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix, 
+        # ## draw theta_s_i
+        # EWik <- matrix(0, nrow = 2, ncol = n)
+        # for (k in 1:length(SID)) {
+        #   subNDy.mean <- ynewdata.mean2[ynewdata.mean2[, bvar[length(bvar)]] == SID[k], ]
+        #   subNDy.variance <- ynewdata.variance2[ynewdata.variance2[, bvar[length(bvar)]] == SID[k], ]
+        #   subNDc <- cnewdata2[cnewdata2[, bvar[length(bvar)]] == SID[k], ]
+        #   Y <- subNDy.mean[, 2]
+        #   X <- subNDy.mean[, -c(1:2)]
+        #   X <- as.matrix(X)
+        #   W <- subNDy.variance[, -1]
+        #   W <- as.matrix(W)
+        #   D <- subNDc[, 3]
+        #   print(subNDc)
+        #   if (nsig == 2) {
+        #     Z <- matrix(1, ncol = 1, nrow = length(Y))
+        #   } else {
+        #     Z <- data.frame(1, subNDy.mean[, bvar1])
+        #     Z <- as.matrix(Z)
+        #   }
+        #   X2 <- as.matrix(subNDc[, -c(1:3)])
+        # 
+        #   CH01l <- CUH01[k]
+        #   CH02l <- CUH02[k]
+        #   HAZ01l <- HAZ01[k]
+        #   HAZ02l <- HAZ02[k]
+        # 
+        #   data <- list(Y = Y, X = X, Z = Z, W = W, X2 = X2, D = D, CH01 = CH01l, 
+        #                CH02 = CH02l, HAZ01 = HAZ01l, HAZ02 = HAZ02l,
+        #                beta = betal, tau = taul, gamma1 = gammal1, gamma2 = gammal2, 
+        #                alpha1 = alphal1, alpha2 = alphal2, nu1 = nul1, nu2 = nul2, Sig = Sigl)
+        #   opt <- optim(rep(0, nsig), logLikCR.learn, data = data, method = "BFGS", hessian = TRUE)
+        #   meanb <- opt$par
+        #   varb <- solve(opt$hessian)
+        #   b.old <- meanb
+        #   ## simulate new random effects estimates using the Metropolis Hastings algorithm
+        #   propose.bl <- as.vector(mvtnorm::rmvt(1, delta = meanb, sigma = varb, df = 4))
+        #   dmvt.old <- mvtnorm::dmvt(b.old, meanb, varb, df = 4, TRUE)
+        #   dmvt.propose <- mvtnorm::dmvt(propose.bl, meanb, varb, df = 4, TRUE)
+        #   logpost.old <- -logLikCR.learn(data, b.old)
+        #   logpost.propose <- -logLikCR.learn(data, propose.bl)
+        #   ratio <- min(exp(logpost.propose + dmvt.old - logpost.old - dmvt.propose), 1)
+        #   if (runif(1) <= ratio) {
+        #     bl = propose.bl
+        #   } else {
+        #     bl = b.old
+        #   }
+        #   bbl <- bl[1:p1a]
+        #   bwl <- bl[p1a+1]
+        #   EWik[1, k] <- exp(alphal1%*%bbl + nul1*bwl)
+        #   EWik[2, k] <- exp(alphal2%*%bbl + nul2*bwl)
+        # }
+        
+        EWik = getEWik(betal, taul, gammal1, gammal2, alphal1, alphal2, nul1, nul2, H01l,
+                       H02l, Sigl, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix,
                        wsmatrix, CUH01, CUH02, HAZ01, HAZ02)
         EWik <- EWik$FUNEC
         
@@ -320,7 +375,7 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         GetNewH0 <- GetBreslowInit(subcdata, vil)
         H01l <- GetNewH0$H01
         H02l <- GetNewH0$H02
-
+        
         GetNewH0 <- updateH0(gammal1, gammal2, X2, survtime, cmprsk, EWik, vil, H01l, H02l)
         H01l <- GetNewH0$H01
         H02l <- GetNewH0$H02
@@ -408,7 +463,7 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         Psi.init <- psil
         H01.init <- H01l
         H02.init <- H02l
-
+        
       }
       
       for (j in 1:N.ID) {
@@ -416,24 +471,30 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         allPi1[[j]] <- allPi1[[j]][complete.cases(allPi1[[j]]), ]
         allPi2[[j]] <- allPi2[[j]][complete.cases(allPi2[[j]]), ]
         
-        subCP1 <- as.data.frame(matrix(0, nrow = length(u), ncol = 5))
-        colnames(subCP1) <- c("times", "Mean", "Median", "95%Lower", "95%Upper")
+        subCP1 <- as.data.frame(matrix(0, nrow = length(u), ncol = 7))
+        colnames(subCP1) <- c("times", "Mean", "Median", "95%Lower", "95%Upper",
+                              "95%HDLower", "95%HDUpper")
         for (b in 1:length(u)) {
           subCP1[b, 1] <- u[b]
           subCP1[b, 2] <- mean(allPi1[[j]][, b])
           subCP1[b, 3] <- median(allPi1[[j]][, b])
           subCP1[b, 4] <- quantile(allPi1[[j]][, b], probs = 0.025)
           subCP1[b, 5] <- quantile(allPi1[[j]][, b], probs = 0.975)
+          subCP1[b, 6] <- Hmisc::hdquantile(allPi1[[j]][, b], probs = 0.025)
+          subCP1[b, 7] <- Hmisc::hdquantile(allPi1[[j]][, b], probs = 0.975)
         }
         
-        subCP2 <- as.data.frame(matrix(0, nrow = length(u), ncol = 5))
-        colnames(subCP2) <- c("times", "Mean", "Median", "95%Lower", "95%Upper")
+        subCP2 <- as.data.frame(matrix(0, nrow = length(u), ncol = 7))
+        colnames(subCP2) <- c("times", "Mean", "Median", "95%Lower", "95%Upper",
+                              "95%HDLower", "95%HDUpper")
         for (b in 1:length(u)) {
           subCP2[b, 1] <- u[b]
           subCP2[b, 2] <- mean(allPi2[[j]][, b])
           subCP2[b, 3] <- median(allPi2[[j]][, b])
           subCP2[b, 4] <- quantile(allPi2[[j]][, b], probs = 0.025)
           subCP2[b, 5] <- quantile(allPi2[[j]][, b], probs = 0.975)
+          subCP2[b, 6] <- Hmisc::hdquantile(allPi2[[j]][, b], probs = 0.025)
+          subCP2[b, 7] <- Hmisc::hdquantile(allPi2[[j]][, b], probs = 0.975)
         }
         
         subCP <- list(subCP1, subCP2)

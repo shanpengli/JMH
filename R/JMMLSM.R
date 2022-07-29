@@ -112,6 +112,7 @@ JMMLSM <- function(cdata, ydata,
 
   
   cdata <- getinit$cdata
+  ydata <- getinit$ydata
   
   survival <- all.vars(surv.formula)
   status <- as.vector(cdata[, survival[2]])
@@ -333,6 +334,12 @@ JMMLSM <- function(cdata, ydata,
       FUNB <- as.matrix(GetEfun$FUNB)
       FUNW <- as.vector(GetEfun$FUNW)
       
+      EFuntheta <- list(FUNENW = FUNENW, FUNBENW = FUNBENW, FUNBS = FUNBS,
+                        FUNBW = FUNBW, FUNWS = FUNWS, FUNBSENW = FUNBSENW,
+                        FUNEC = FUNEC, FUNBEC = FUNBEC, FUNBSEC = FUNBSEC,
+                        FUNWEC = FUNWEC, FUNWSEC = FUNWSEC, FUNB = FUNB,
+                        FUNW = FUNW)
+      
       getcov <- getCov(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, H01, 
                        H02, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS,
                        FUNENW, FUNBENW, FUNBS, FUNBW, FUNWS, FUNBSENW, FUNEC, FUNBEC,
@@ -372,13 +379,14 @@ JMMLSM <- function(cdata, ydata,
       result <- list(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, H01, 
                      H02, Sig, iter, convergence, vcov, sebeta, setau, segamma1,
                      segamma2, sealpha1, sealpha2, sevee1, sevee2, seSig, getloglike,
-                     CompetingRisk, quadpoint, ydata, cdata, PropComp, 
+                     EFuntheta, CompetingRisk, quadpoint, ydata, cdata, PropComp, 
                      FunCall_long, FunCall_longVar, FunCall_survival, random, mycall)
       
       names(result) <- c("beta", "tau", "gamma1", "gamma2", "alpha1", "alpha2", "vee1",
                          "vee2", "H01", "H02", "Sig", "iter", "convergence", "vcov",
                          "sebeta", "setau", "segamma1", "segamma2", "sealpha1", "sealpha2", 
-                         "sevee1", "sevee2", "seSig", "loglike", "CompetingRisk", "quadpoint",
+                         "sevee1", "sevee2", "seSig", "loglike", "EFuntheta",
+                         "CompetingRisk", "quadpoint",
                          "ydata", "cdata", "PropEventType", "LongitudinalSubmodelmean",
                          "LongitudinalSubmodelvariance", "SurvivalSubmodel", "random",
                          "call")
