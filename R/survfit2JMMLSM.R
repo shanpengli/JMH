@@ -261,12 +261,10 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       names(allPi1) <- ID
       names(allPi2) <- ID
       
+      count <- rep(0, nrow(cnewdata))
       for (i in 1:M) {
-        ### 0. Set the initial estimator
-        psil <- Psi.init
-        H01l <- H01.init
-        H02l <- H02.init
-        
+        ###1. draw new parameters
+        psil <- Psi.MC[i, ]
         betal <- psil[1:nbeta]
         taul <- psil[(nbeta+1):(nbeta+ntau)]
         gammal1 <- psil[(nbeta+ntau+1):(nbeta+ntau+ngamma)]
@@ -284,30 +282,31 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
           Sigl[1, 3] <- Sigl[3, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+3]
         }
         
-        ###1. Compute the expected value
+        ###2. Compute the expected value
         n <- nrow(object$cdata)
         p1a <- nsig-1
         CUH01 <- rep(0, n)
         CUH02 <- rep(0, n)
         HAZ01 <- rep(0, n)
         HAZ02 <- rep(0, n)
-        CumuH01 <- cumsum(H01l[, 3])
-        CumuH02 <- cumsum(H02l[, 3])
+        CumuH01 <- cumsum(H01.init[, 3])
+        CumuH02 <- cumsum(H02.init[, 3])
         
         Z <- GetVar$Z
         X1 <- GetVar$X1
         W <- GetVar$W
         Y <- GetVar$Y
+        
         X2 <- GetVar$X2
         survtime <- GetVar$survtime
         cmprsk <- GetVar$cmprsk
         mdata <- GetVar$mdata
         mdataS <- GetVar$mdataS
         
-        getHazard(CumuH01, CumuH02, survtime, cmprsk, H01l, H02l, CUH01, CUH02, HAZ01, HAZ02)
+        getHazard(CumuH01, CumuH02, survtime, cmprsk, H01.init, H02.init, CUH01, CUH02, HAZ01, HAZ02)
         
-        bvar <- all.vars(object$random)
-        SID <- cnewdata2[, bvar[length(bvar)]]
+        # bvar <- all.vars(object$random)
+        # SID <- cnewdata2[, bvar[length(bvar)]]
 
         # ## draw theta_s_i
         # EWik <- matrix(0, nrow = 2, ncol = n)
@@ -321,7 +320,6 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         #   W <- subNDy.variance[, -1]
         #   W <- as.matrix(W)
         #   D <- subNDc[, 3]
-        #   print(subNDc)
         #   if (nsig == 2) {
         #     Z <- matrix(1, ncol = 1, nrow = length(Y))
         #   } else {
@@ -335,9 +333,9 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         #   HAZ01l <- HAZ01[k]
         #   HAZ02l <- HAZ02[k]
         # 
-        #   data <- list(Y = Y, X = X, Z = Z, W = W, X2 = X2, D = D, CH01 = CH01l, 
+        #   data <- list(Y = Y, X = X, Z = Z, W = W, X2 = X2, D = D, CH01 = CH01l,
         #                CH02 = CH02l, HAZ01 = HAZ01l, HAZ02 = HAZ02l,
-        #                beta = betal, tau = taul, gamma1 = gammal1, gamma2 = gammal2, 
+        #                beta = betal, tau = taul, gamma1 = gammal1, gamma2 = gammal2,
         #                alpha1 = alphal1, alpha2 = alphal2, nu1 = nul1, nu2 = nul2, Sig = Sigl)
         #   opt <- optim(rep(0, nsig), logLikCR.learn, data = data, method = "BFGS", hessian = TRUE)
         #   meanb <- opt$par
@@ -361,8 +359,8 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         #   EWik[2, k] <- exp(alphal2%*%bbl + nul2*bwl)
         # }
         
-        EWik = getEWik(betal, taul, gammal1, gammal2, alphal1, alphal2, nul1, nul2, H01l,
-                       H02l, Sigl, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix,
+        EWik = getEWik(betal, taul, gammal1, gammal2, alphal1, alphal2, nul1, nul2, H01.init,
+                       H02.init, Sigl, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix,
                        wsmatrix, CUH01, CUH02, HAZ01, HAZ02)
         EWik <- EWik$FUNEC
         
@@ -379,25 +377,6 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         GetNewH0 <- updateH0(gammal1, gammal2, X2, survtime, cmprsk, EWik, vil, H01l, H02l)
         H01l <- GetNewH0$H01
         H02l <- GetNewH0$H02
-        
-        ###4. draw new parameters
-        psil <- Psi.MC[i, ]
-        betal <- psil[1:nbeta]
-        taul <- psil[(nbeta+1):(nbeta+ntau)]
-        gammal1 <- psil[(nbeta+ntau+1):(nbeta+ntau+ngamma)]
-        gammal2 <- psil[(nbeta+ntau+ngamma+1):(nbeta+ntau+2*ngamma)]
-        alphal1 <- psil[(nbeta+ntau+2*ngamma+1):(nbeta+ntau+2*ngamma+nalpha)]
-        alphal2 <- psil[(nbeta+ntau+2*ngamma+nalpha+1):(nbeta+ntau+2*ngamma+2*nalpha)]
-        nul1 <- psil[nbeta+ntau+2*ngamma+2*nalpha+1]
-        nul2 <- psil[nbeta+ntau+2*ngamma+2*nalpha+2]
-        Sigl <- matrix(0, ncol = nsig, nrow = nsig)
-        for (l in 1:nsig) Sigl[l, l] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+l]
-        if (nsig == 2) Sigl[1, 2] <- Sigl[2, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+1]
-        if (nsig == 3) {
-          Sigl[1, 2] <- Sigl[2, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+1]
-          Sigl[2, 3] <- Sigl[3, 2] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+2]
-          Sigl[1, 3] <- Sigl[3, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+3]
-        }
         
         for (j in 1:N.ID) {
           subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == ID[j], ]
@@ -460,11 +439,12 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
           }
         }
         ## pass the current sample parameters to the next iteration
-        Psi.init <- psil
-        H01.init <- H01l
-        H02.init <- H02l
+        # Psi.init <- psil
+        # H01.init <- H01l
+        # H02.init <- H02l
         
       }
+      print(count/M)
       
       for (j in 1:N.ID) {
         

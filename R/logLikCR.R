@@ -18,17 +18,15 @@ logLikCR.learn <- function(data, bw) {
     data$CH01*exp(data$X2%*%data$gamma1 + data$alpha1%*%b + data$nu1*w) +
     data$CH02*exp(data$X2%*%data$gamma2 + data$alpha2%*%b + data$nu2*w) +
     t(bw)%*%solve(data$Sig)%*%bw/2
-  print(total)
-  print(data$D)
   if (data$D == 1) {
     total <- total - log(data$HAZ01) - (data$X2%*%data$gamma1 + data$alpha1%*%b + data$nu1*w)
+    total
   } else if (data$D == 2) {
     total <- total - log(data$HAZ02) - (data$X2%*%data$gamma2 + data$alpha2%*%b + data$nu2*w)
-    print(total)
+    total
   } else {
-    next
+    total
   }
-  total
 }
 
 

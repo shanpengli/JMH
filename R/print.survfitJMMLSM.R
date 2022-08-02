@@ -15,7 +15,7 @@ print.survfitJMMLSM <- function (x, ...) {
   if (x$simulate) {
     cat("\nPrediction of Conditional Probabilities of Event\n\tbased on", x$M, "Monte Carlo samples\n\n")
     f <- function (d, t) {
-      a <- matrix(1, nrow = 1, ncol = 5)
+      a <- matrix(1, nrow = 1, ncol = 7)
       a[1, 1] <- t 
       a <- as.data.frame(a)
       colnames(a) <- colnames(d)
@@ -24,7 +24,7 @@ print.survfitJMMLSM <- function (x, ...) {
     }
     
     f.CR <- function (d, t) {
-      a <- matrix(0, nrow = 1, ncol = 5)
+      a <- matrix(0, nrow = 1, ncol = 7)
       a[1, 1] <- t 
       a <- as.data.frame(a)
       
