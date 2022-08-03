@@ -262,6 +262,8 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       names(allPi2) <- ID
       
       count <- rep(0, nrow(cnewdata))
+      EWik <- object$EFuntheta$FUNEC
+      
       for (i in 1:M) {
         ###1. draw new parameters
         psil <- Psi.MC[i, ]
@@ -359,10 +361,12 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         #   EWik[2, k] <- exp(alphal2%*%bbl + nul2*bwl)
         # }
         
-        EWik = getEWik(betal, taul, gammal1, gammal2, alphal1, alphal2, nul1, nul2, H01.init,
-                       H02.init, Sigl, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix,
-                       wsmatrix, CUH01, CUH02, HAZ01, HAZ02)
-        EWik <- EWik$FUNEC
+        # EWik = getEWik(betal, taul, gammal1, gammal2, alphal1, alphal2, nul1, nul2, H01.init,
+        #                H02.init, Sigl, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix,
+        #                wsmatrix, CUH01, CUH02, HAZ01, HAZ02)
+        # EWik <- EWik$FUNEC
+        
+        
         
         ###2. Generate a perturbation
         vil <- 4*rbeta(n, shape1 = 1/2, shape2 = 3/2)
@@ -444,7 +448,6 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         # H02.init <- H02l
         
       }
-      print(count/M)
       
       for (j in 1:N.ID) {
         
