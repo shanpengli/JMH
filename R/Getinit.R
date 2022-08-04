@@ -134,10 +134,10 @@ Getinit <- function(cdata, ydata, long.formula, surv.formula, variance.formula,
 
       
       a <- list(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, Sig, 
-                Z, X, W, Y, X2, survtime, cmprsk, cdata, mdata)
+                Z, X, W, Y, X2, survtime, cmprsk, ydata, cdata, mdata)
       
       names(a) <- c("beta", "tau", "gamma1", "gamma2", "alpha1", "alpha2", "vee1", "vee2", "Sig",
-                    "Z", "X1", "W", "Y", "X2", "survtime", "cmprsk",
+                    "Z", "X1", "W", "Y", "X2", "survtime", "cmprsk", "ydata",
                     "cdata", "mdata")
       
       return(a)
@@ -178,10 +178,10 @@ Getinit <- function(cdata, ydata, long.formula, surv.formula, variance.formula,
       }
       
       a <- list(beta, tau, gamma1, alpha1, vee1, Sig, 
-                Z, X, W, Y, X2, survtime, cmprsk, cdata, mdata)
+                Z, X, W, Y, X2, survtime, cmprsk, ydata, cdata, mdata)
       
       names(a) <- c("beta", "tau", "gamma1", "alpha1", "vee1", "Sig",
-                    "Z", "X1", "W", "Y", "X2", "survtime", "cmprsk",
+                    "Z", "X1", "W", "Y", "X2", "survtime", "cmprsk", "ydata",
                     "cdata", "mdata")
       
       return(a)

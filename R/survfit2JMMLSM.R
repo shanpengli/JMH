@@ -87,7 +87,8 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
   cnewdata2 <- cdata2[c(1:(Nc-nc)), ]
   
   GetVar <- GetVarSurvfit(cdata = cnewdata2, ydata.mean = ynewdata.mean2,
-                          ydata.variance = ynewdata.variance2, random = object$random)
+                          ydata.variance = ynewdata.variance2, 
+                          random = object$random)
   
   ## dynamic prediction 
   ## Monte Carlo simulation
@@ -260,9 +261,8 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       
       names(allPi1) <- ID
       names(allPi2) <- ID
-      
-      count <- rep(0, nrow(cnewdata))
-      EWik <- object$EFuntheta$FUNEC
+    
+      # EWik <- object$EFuntheta$FUNEC
       
       for (i in 1:M) {
         ###1. draw new parameters
@@ -306,67 +306,11 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         mdataS <- GetVar$mdataS
         
         getHazard(CumuH01, CumuH02, survtime, cmprsk, H01.init, H02.init, CUH01, CUH02, HAZ01, HAZ02)
-        
-        # bvar <- all.vars(object$random)
-        # SID <- cnewdata2[, bvar[length(bvar)]]
-
-        # ## draw theta_s_i
-        # EWik <- matrix(0, nrow = 2, ncol = n)
-        # for (k in 1:length(SID)) {
-        #   subNDy.mean <- ynewdata.mean2[ynewdata.mean2[, bvar[length(bvar)]] == SID[k], ]
-        #   subNDy.variance <- ynewdata.variance2[ynewdata.variance2[, bvar[length(bvar)]] == SID[k], ]
-        #   subNDc <- cnewdata2[cnewdata2[, bvar[length(bvar)]] == SID[k], ]
-        #   Y <- subNDy.mean[, 2]
-        #   X <- subNDy.mean[, -c(1:2)]
-        #   X <- as.matrix(X)
-        #   W <- subNDy.variance[, -1]
-        #   W <- as.matrix(W)
-        #   D <- subNDc[, 3]
-        #   if (nsig == 2) {
-        #     Z <- matrix(1, ncol = 1, nrow = length(Y))
-        #   } else {
-        #     Z <- data.frame(1, subNDy.mean[, bvar1])
-        #     Z <- as.matrix(Z)
-        #   }
-        #   X2 <- as.matrix(subNDc[, -c(1:3)])
-        # 
-        #   CH01l <- CUH01[k]
-        #   CH02l <- CUH02[k]
-        #   HAZ01l <- HAZ01[k]
-        #   HAZ02l <- HAZ02[k]
-        # 
-        #   data <- list(Y = Y, X = X, Z = Z, W = W, X2 = X2, D = D, CH01 = CH01l,
-        #                CH02 = CH02l, HAZ01 = HAZ01l, HAZ02 = HAZ02l,
-        #                beta = betal, tau = taul, gamma1 = gammal1, gamma2 = gammal2,
-        #                alpha1 = alphal1, alpha2 = alphal2, nu1 = nul1, nu2 = nul2, Sig = Sigl)
-        #   opt <- optim(rep(0, nsig), logLikCR.learn, data = data, method = "BFGS", hessian = TRUE)
-        #   meanb <- opt$par
-        #   varb <- solve(opt$hessian)
-        #   b.old <- meanb
-        #   ## simulate new random effects estimates using the Metropolis Hastings algorithm
-        #   propose.bl <- as.vector(mvtnorm::rmvt(1, delta = meanb, sigma = varb, df = 4))
-        #   dmvt.old <- mvtnorm::dmvt(b.old, meanb, varb, df = 4, TRUE)
-        #   dmvt.propose <- mvtnorm::dmvt(propose.bl, meanb, varb, df = 4, TRUE)
-        #   logpost.old <- -logLikCR.learn(data, b.old)
-        #   logpost.propose <- -logLikCR.learn(data, propose.bl)
-        #   ratio <- min(exp(logpost.propose + dmvt.old - logpost.old - dmvt.propose), 1)
-        #   if (runif(1) <= ratio) {
-        #     bl = propose.bl
-        #   } else {
-        #     bl = b.old
-        #   }
-        #   bbl <- bl[1:p1a]
-        #   bwl <- bl[p1a+1]
-        #   EWik[1, k] <- exp(alphal1%*%bbl + nul1*bwl)
-        #   EWik[2, k] <- exp(alphal2%*%bbl + nul2*bwl)
-        # }
-        
-        # EWik = getEWik(betal, taul, gammal1, gammal2, alphal1, alphal2, nul1, nul2, H01.init,
-        #                H02.init, Sigl, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix,
-        #                wsmatrix, CUH01, CUH02, HAZ01, HAZ02)
-        # EWik <- EWik$FUNEC
-        
-        
+      
+        EWik = getEWik(betal, taul, gammal1, gammal2, alphal1, alphal2, nul1, nul2,
+                       Sigl, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix,
+                       wsmatrix, CUH01, CUH02, HAZ01, HAZ02)
+        EWik <- EWik$FUNEC
         
         ###2. Generate a perturbation
         vil <- 4*rbeta(n, shape1 = 1/2, shape2 = 3/2)
