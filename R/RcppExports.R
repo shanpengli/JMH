@@ -61,8 +61,8 @@ getECSF <- function(beta, tau, gamma1, alpha1, vee1, H01, Sig, Z, X1, W, Y, X2, 
     .Call(`_JMH_getECSF`, beta, tau, gamma1, alpha1, vee1, H01, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix, wsmatrix, CUH01, HAZ01)
 }
 
-getEWik <- function(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, H01, H02, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix, wsmatrix, CUH01, CUH02, HAZ01, HAZ02) {
-    .Call(`_JMH_getEWik`, beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, H01, H02, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix, wsmatrix, CUH01, CUH02, HAZ01, HAZ02)
+getEWik <- function(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix, wsmatrix, CUH01, CUH02, HAZ01, HAZ02) {
+    .Call(`_JMH_getEWik`, beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix, wsmatrix, CUH01, CUH02, HAZ01, HAZ02)
 }
 
 getHazard <- function(CumuH01, CumuH02, survtime, cmprsk, H01, H02, CUH01, CUH02, HAZ01, HAZ02) {

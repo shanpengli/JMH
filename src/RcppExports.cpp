@@ -288,8 +288,8 @@ BEGIN_RCPP
 END_RCPP
 }
 // getEWik
-Rcpp::List getEWik(const Eigen::VectorXd& beta, const Eigen::VectorXd& tau, const Eigen::VectorXd& gamma1, const Eigen::VectorXd& gamma2, const Eigen::VectorXd& alpha1, const Eigen::VectorXd& alpha2, const double vee1, const double vee2, const Eigen::MatrixXd& H01, const Eigen::MatrixXd& H02, const Eigen::MatrixXd& Sig, const Eigen::MatrixXd& Z, const Eigen::MatrixXd& X1, const Eigen::MatrixXd& W, const Eigen::VectorXd& Y, const Eigen::MatrixXd& X2, const Eigen::VectorXd& survtime, const Eigen::VectorXd& cmprsk, const Eigen::VectorXd& mdata, const Eigen::VectorXd& mdataS, const Eigen::MatrixXd& xsmatrix, const Eigen::MatrixXd& wsmatrix, const Eigen::VectorXd& CUH01, const Eigen::VectorXd& CUH02, const Eigen::VectorXd& HAZ01, const Eigen::VectorXd& HAZ02);
-RcppExport SEXP _JMH_getEWik(SEXP betaSEXP, SEXP tauSEXP, SEXP gamma1SEXP, SEXP gamma2SEXP, SEXP alpha1SEXP, SEXP alpha2SEXP, SEXP vee1SEXP, SEXP vee2SEXP, SEXP H01SEXP, SEXP H02SEXP, SEXP SigSEXP, SEXP ZSEXP, SEXP X1SEXP, SEXP WSEXP, SEXP YSEXP, SEXP X2SEXP, SEXP survtimeSEXP, SEXP cmprskSEXP, SEXP mdataSEXP, SEXP mdataSSEXP, SEXP xsmatrixSEXP, SEXP wsmatrixSEXP, SEXP CUH01SEXP, SEXP CUH02SEXP, SEXP HAZ01SEXP, SEXP HAZ02SEXP) {
+Rcpp::List getEWik(const Eigen::VectorXd& beta, const Eigen::VectorXd& tau, const Eigen::VectorXd& gamma1, const Eigen::VectorXd& gamma2, const Eigen::VectorXd& alpha1, const Eigen::VectorXd& alpha2, const double vee1, const double vee2, const Eigen::MatrixXd& Sig, const Eigen::MatrixXd& Z, const Eigen::MatrixXd& X1, const Eigen::MatrixXd& W, const Eigen::VectorXd& Y, const Eigen::MatrixXd& X2, const Eigen::VectorXd& survtime, const Eigen::VectorXd& cmprsk, const Eigen::VectorXd& mdata, const Eigen::VectorXd& mdataS, const Eigen::MatrixXd& xsmatrix, const Eigen::MatrixXd& wsmatrix, const Eigen::VectorXd& CUH01, const Eigen::VectorXd& CUH02, const Eigen::VectorXd& HAZ01, const Eigen::VectorXd& HAZ02);
+RcppExport SEXP _JMH_getEWik(SEXP betaSEXP, SEXP tauSEXP, SEXP gamma1SEXP, SEXP gamma2SEXP, SEXP alpha1SEXP, SEXP alpha2SEXP, SEXP vee1SEXP, SEXP vee2SEXP, SEXP SigSEXP, SEXP ZSEXP, SEXP X1SEXP, SEXP WSEXP, SEXP YSEXP, SEXP X2SEXP, SEXP survtimeSEXP, SEXP cmprskSEXP, SEXP mdataSEXP, SEXP mdataSSEXP, SEXP xsmatrixSEXP, SEXP wsmatrixSEXP, SEXP CUH01SEXP, SEXP CUH02SEXP, SEXP HAZ01SEXP, SEXP HAZ02SEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -301,8 +301,6 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type alpha2(alpha2SEXP);
     Rcpp::traits::input_parameter< const double >::type vee1(vee1SEXP);
     Rcpp::traits::input_parameter< const double >::type vee2(vee2SEXP);
-    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type H01(H01SEXP);
-    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type H02(H02SEXP);
     Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type Sig(SigSEXP);
     Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type Z(ZSEXP);
     Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type X1(X1SEXP);
@@ -319,7 +317,7 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type CUH02(CUH02SEXP);
     Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type HAZ01(HAZ01SEXP);
     Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type HAZ02(HAZ02SEXP);
-    rcpp_result_gen = Rcpp::wrap(getEWik(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, H01, H02, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix, wsmatrix, CUH01, CUH02, HAZ01, HAZ02));
+    rcpp_result_gen = Rcpp::wrap(getEWik(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix, wsmatrix, CUH01, CUH02, HAZ01, HAZ02));
     return rcpp_result_gen;
 END_RCPP
 }
@@ -565,7 +563,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_JMH_getCovSF", (DL_FUNC) &_JMH_getCovSF, 29},
     {"_JMH_getEC", (DL_FUNC) &_JMH_getEC, 26},
     {"_JMH_getECSF", (DL_FUNC) &_JMH_getECSF, 20},
-    {"_JMH_getEWik", (DL_FUNC) &_JMH_getEWik, 26},
+    {"_JMH_getEWik", (DL_FUNC) &_JMH_getEWik, 24},
     {"_JMH_getHazard", (DL_FUNC) &_JMH_getHazard, 10},
     {"_JMH_getHazardSF", (DL_FUNC) &_JMH_getHazardSF, 6},
     {"_JMH_getMC", (DL_FUNC) &_JMH_getMC, 33},
