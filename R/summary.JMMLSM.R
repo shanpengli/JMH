@@ -1,11 +1,12 @@
 ##' @export
+##' 
 
-summary.JMH <- function(object, coeff = c("longitudinal", "survival"), digits = 4) {
+summary.JMMLSM <- function(object, process = c("longitudinal", "survival"), digits = 4) {
   
-  if (!inherits(object, "JMH"))
-    stop("Use only with 'JMH' objects.\n")
+  if (!inherits(object, "JMMLSM"))
+    stop("Use only with 'JMMLSM' objects.\n")
   
-  if (coeff == "longitudinal") {
+  if (process == "longitudinal") {
     ##Estimates of betas
     Estimate <- object$beta
     SE <- object$sebeta
@@ -14,7 +15,7 @@ summary.JMH <- function(object, coeff = c("longitudinal", "survival"), digits = 
     zval = (Estimate/SE)
     pval = 2 * pnorm(-abs(zval))
     out <- data.frame(Estimate, SE, LowerLimit, UpperLimit, pval)
-    out <- cbind(rownames(out), out)
+    out <- cbind(paste0("Mean_", rownames(out)), out)
     rownames(out) <- NULL
     colnames(out)[1] <- "Parameter"
     
@@ -26,7 +27,7 @@ summary.JMH <- function(object, coeff = c("longitudinal", "survival"), digits = 
     zval = (Estimate/SE)
     pval = 2 * pnorm(-abs(zval))
     out2 <- data.frame(Estimate, SE, LowerLimit, UpperLimit, pval)
-    out2 <- cbind(rownames(out2), out2)
+    out2 <- cbind(paste0("Var_", rownames(out2)), out2)
     rownames(out2) <- NULL
     colnames(out2)[1] <- "Parameter"
     
@@ -40,7 +41,7 @@ summary.JMH <- function(object, coeff = c("longitudinal", "survival"), digits = 
     
     return(out3)
     
-  } else if (coeff == "survival") {
+  } else if (process == "survival") {
     ##gamma
     Estimate <- object$gamma1
     SE <- object$segamma1
@@ -52,7 +53,7 @@ summary.JMH <- function(object, coeff = c("longitudinal", "survival"), digits = 
     out <- cbind(rownames(out), out)
     rownames(out) <- NULL
     colnames(out)[1] <- "Parameter"
-
+    
     Estimate <- object$gamma2
     SE <- object$segamma2
     LowerLimit <- Estimate - 1.96 * SE

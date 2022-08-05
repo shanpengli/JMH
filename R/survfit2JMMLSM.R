@@ -43,10 +43,10 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
   } else {
     H01 <- object$H01
     H02 <- object$H02
-    if (max(u) > H01[nrow(H01), 1] | max(u) > H02[nrow(H02), 1])
-      stop(paste("The current joint model cannot predict the conditional 
-         survival probabilities later than the last observed time of the object. 
-               The last observed time for risk 1 and 2 is", max(H01[, 1]), "and", max(H02[, 1])))
+    # if (max(u) > H01[nrow(H01), 1] | max(u) > H02[nrow(H02), 1])
+    #   stop(paste("The current joint model cannot predict the conditional 
+    #      survival probabilities later than the last observed time of the object. 
+    #            The last observed time for risk 1 and 2 is", max(H01[, 1]), "and", max(H02[, 1])))
   }
   
   bvar <- all.vars(object$random)
@@ -87,8 +87,7 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
   cnewdata2 <- cdata2[c(1:(Nc-nc)), ]
   
   GetVar <- GetVarSurvfit(cdata = cnewdata2, ydata.mean = ynewdata.mean2,
-                          ydata.variance = ynewdata.variance2, 
-                          random = object$random)
+                          ydata.variance = ynewdata.variance2, random = object$random)
   
   ## dynamic prediction 
   ## Monte Carlo simulation
@@ -234,8 +233,8 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         Psi <- c(Psi, object$Sig[1, 3])
       }
       
-      # covPsi <- vcov(object)
-      covPsi <- object$vcov
+      covPsi <- vcov(object)
+      # covPsi <- object$vcov
       
       Psi.MC <- mvrnorm(n = M, Psi, covPsi, tol = 1e-6, empirical = FALSE)
       Pred <- list()
@@ -261,12 +260,14 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       
       names(allPi1) <- ID
       names(allPi2) <- ID
-    
-      # EWik <- object$EFuntheta$FUNEC
       
       for (i in 1:M) {
-        ###1. draw new parameters
-        psil <- Psi.MC[i, ]
+        print(i)
+        ### 0. Set the initial estimator
+        psil <- Psi.init
+        H01l <- H01.init
+        H02l <- H02.init
+        
         betal <- psil[1:nbeta]
         taul <- psil[(nbeta+1):(nbeta+ntau)]
         gammal1 <- psil[(nbeta+ntau+1):(nbeta+ntau+ngamma)]
@@ -284,30 +285,29 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
           Sigl[1, 3] <- Sigl[3, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+3]
         }
         
-        ###2. Compute the expected value
+        ###1. Compute the expected value
         n <- nrow(object$cdata)
         p1a <- nsig-1
         CUH01 <- rep(0, n)
         CUH02 <- rep(0, n)
         HAZ01 <- rep(0, n)
         HAZ02 <- rep(0, n)
-        CumuH01 <- cumsum(H01.init[, 3])
-        CumuH02 <- cumsum(H02.init[, 3])
+        CumuH01 <- cumsum(H01l[, 3])
+        CumuH02 <- cumsum(H02l[, 3])
         
         Z <- GetVar$Z
         X1 <- GetVar$X1
         W <- GetVar$W
         Y <- GetVar$Y
-        
         X2 <- GetVar$X2
         survtime <- GetVar$survtime
         cmprsk <- GetVar$cmprsk
         mdata <- GetVar$mdata
         mdataS <- GetVar$mdataS
         
-        getHazard(CumuH01, CumuH02, survtime, cmprsk, H01.init, H02.init, CUH01, CUH02, HAZ01, HAZ02)
-      
-        EWik = getEWik(betal, taul, gammal1, gammal2, alphal1, alphal2, nul1, nul2,
+        getHazard(CumuH01, CumuH02, survtime, cmprsk, H01l, H02l, CUH01, CUH02, HAZ01, HAZ02)
+        
+        EWik = getEWik(betal, taul, gammal1, gammal2, alphal1, alphal2, nul1, nul2, 
                        Sigl, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix,
                        wsmatrix, CUH01, CUH02, HAZ01, HAZ02)
         EWik <- EWik$FUNEC
@@ -325,6 +325,25 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         GetNewH0 <- updateH0(gammal1, gammal2, X2, survtime, cmprsk, EWik, vil, H01l, H02l)
         H01l <- GetNewH0$H01
         H02l <- GetNewH0$H02
+        
+        ###4. draw new parameters
+        psil <- Psi.MC[i, ]
+        betal <- psil[1:nbeta]
+        taul <- psil[(nbeta+1):(nbeta+ntau)]
+        gammal1 <- psil[(nbeta+ntau+1):(nbeta+ntau+ngamma)]
+        gammal2 <- psil[(nbeta+ntau+ngamma+1):(nbeta+ntau+2*ngamma)]
+        alphal1 <- psil[(nbeta+ntau+2*ngamma+1):(nbeta+ntau+2*ngamma+nalpha)]
+        alphal2 <- psil[(nbeta+ntau+2*ngamma+nalpha+1):(nbeta+ntau+2*ngamma+2*nalpha)]
+        nul1 <- psil[nbeta+ntau+2*ngamma+2*nalpha+1]
+        nul2 <- psil[nbeta+ntau+2*ngamma+2*nalpha+2]
+        Sigl <- matrix(0, ncol = nsig, nrow = nsig)
+        for (l in 1:nsig) Sigl[l, l] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+l]
+        if (nsig == 2) Sigl[1, 2] <- Sigl[2, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+1]
+        if (nsig == 3) {
+          Sigl[1, 2] <- Sigl[2, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+1]
+          Sigl[2, 3] <- Sigl[3, 2] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+2]
+          Sigl[1, 3] <- Sigl[3, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+3]
+        }
         
         for (j in 1:N.ID) {
           subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == ID[j], ]
@@ -370,14 +389,14 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
           }
           for (jj in 1:lengthu) {
             ## calculate the CIF
-            CIF1 <- CIF1.CR(data, H01, H02, s, u[jj], bl)
+            CIF1 <- CIF1.CR(data, H01l, H02l, s, u[jj], bl)
             P1us <- Pk.us(CIF1, data, bl)
             if (P1us > 1) {
               allPi1[[j]][i, jj] <- NA
             } else {
               allPi1[[j]][i, jj] <- P1us
             }
-            CIF2 <- CIF2.CR(data, H01, H02, s, u[jj], bl)
+            CIF2 <- CIF2.CR(data, H01l, H02l, s, u[jj], bl)
             P2us <- Pk.us(CIF2, data, bl)
             if (P2us > 1) {
               allPi2[[j]][i, jj] <- NA
@@ -387,9 +406,9 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
           }
         }
         ## pass the current sample parameters to the next iteration
-        # Psi.init <- psil
-        # H01.init <- H01l
-        # H02.init <- H02l
+        Psi.init <- psil
+        H01.init <- H01l
+        H02.init <- H02l
         
       }
       
@@ -398,30 +417,24 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         allPi1[[j]] <- allPi1[[j]][complete.cases(allPi1[[j]]), ]
         allPi2[[j]] <- allPi2[[j]][complete.cases(allPi2[[j]]), ]
         
-        subCP1 <- as.data.frame(matrix(0, nrow = length(u), ncol = 7))
-        colnames(subCP1) <- c("times", "Mean", "Median", "95%Lower", "95%Upper",
-                              "95%HDLower", "95%HDUpper")
+        subCP1 <- as.data.frame(matrix(0, nrow = length(u), ncol = 5))
+        colnames(subCP1) <- c("times", "Mean", "Median", "95%HDLower", "95%HDUpper")
         for (b in 1:length(u)) {
           subCP1[b, 1] <- u[b]
           subCP1[b, 2] <- mean(allPi1[[j]][, b])
           subCP1[b, 3] <- median(allPi1[[j]][, b])
-          subCP1[b, 4] <- quantile(allPi1[[j]][, b], probs = 0.025)
-          subCP1[b, 5] <- quantile(allPi1[[j]][, b], probs = 0.975)
-          subCP1[b, 6] <- Hmisc::hdquantile(allPi1[[j]][, b], probs = 0.025)
-          subCP1[b, 7] <- Hmisc::hdquantile(allPi1[[j]][, b], probs = 0.975)
+          subCP1[b, 4] <- Hmisc::hdquantile(allPi1[[j]][, b], probs = 0.025)
+          subCP1[b, 5] <- Hmisc::hdquantile(allPi1[[j]][, b], probs = 0.975)
         }
         
-        subCP2 <- as.data.frame(matrix(0, nrow = length(u), ncol = 7))
-        colnames(subCP2) <- c("times", "Mean", "Median", "95%Lower", "95%Upper",
-                              "95%HDLower", "95%HDUpper")
+        subCP2 <- as.data.frame(matrix(0, nrow = length(u), ncol = 5))
+        colnames(subCP2) <- c("times", "Mean", "Median", "95%HDLower", "95%HDUpper")
         for (b in 1:length(u)) {
           subCP2[b, 1] <- u[b]
           subCP2[b, 2] <- mean(allPi2[[j]][, b])
           subCP2[b, 3] <- median(allPi2[[j]][, b])
-          subCP2[b, 4] <- quantile(allPi2[[j]][, b], probs = 0.025)
-          subCP2[b, 5] <- quantile(allPi2[[j]][, b], probs = 0.975)
-          subCP2[b, 6] <- Hmisc::hdquantile(allPi2[[j]][, b], probs = 0.025)
-          subCP2[b, 7] <- Hmisc::hdquantile(allPi2[[j]][, b], probs = 0.975)
+          subCP2[b, 4] <- Hmisc::hdquantile(allPi2[[j]][, b], probs = 0.025)
+          subCP2[b, 5] <- Hmisc::hdquantile(allPi2[[j]][, b], probs = 0.975)
         }
         
         subCP <- list(subCP1, subCP2)

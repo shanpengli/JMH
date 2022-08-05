@@ -21,9 +21,14 @@ CIF1.CR <- function(data, H01, H02, s, u, bl) {
   w <- bl[p1a+1]
   for (i in 1:a) {
     if (s < H01[i, 1] & u >= H01[i, 1]) {
-      CIF1 <- CIF1 + H01[i, 3]*exp(data$X2%*%data$gamma1 + data$alpha1%*%b + data$nu1*w)*
-        exp(-CH01[i]*exp(data$X2%*%data$gamma1 + data$alpha1%*%b + data$nu1*w)-
-              CH02[i]*exp(data$X2%*%data$gamma2 + data$alpha2%*%b + data$nu2*w))
+      if (i >= 2) {
+        CIF1 <- CIF1 + H01[i, 3]*exp(data$X2%*%data$gamma1 + data$alpha1%*%b + data$nu1*w)*
+          exp(-CH01[i-1]*exp(data$X2%*%data$gamma1 + data$alpha1%*%b + data$nu1*w)-
+                CH02[i-1]*exp(data$X2%*%data$gamma2 + data$alpha2%*%b + data$nu2*w))
+      } else {
+        CIF1 <- CIF1 + H01[i, 3]*exp(data$X2%*%data$gamma1 + data$alpha1%*%b + data$nu1*w)
+      }
+
       
     } else next
   }
