@@ -24,6 +24,8 @@ Getinit <- function(cdata, ydata, long.formula, surv.formula, variance.formula,
   ydata <- orderdata$ydata
   cdata <- orderdata$cdata
   mdata <- orderdata$mdata
+  RAWydata <- ydata
+  RAWcdata <- cdata
   
   ##random effect covariates
   if (model == "interslope") {
@@ -134,7 +136,7 @@ Getinit <- function(cdata, ydata, long.formula, surv.formula, variance.formula,
 
       
       a <- list(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, Sig, 
-                Z, X, W, Y, X2, survtime, cmprsk, ydata, cdata, mdata)
+                Z, X, W, Y, X2, survtime, cmprsk, RAWydata, RAWcdata, mdata)
       
       names(a) <- c("beta", "tau", "gamma1", "gamma2", "alpha1", "alpha2", "vee1", "vee2", "Sig",
                     "Z", "X1", "W", "Y", "X2", "survtime", "cmprsk", "ydata",
@@ -178,7 +180,7 @@ Getinit <- function(cdata, ydata, long.formula, surv.formula, variance.formula,
       }
       
       a <- list(beta, tau, gamma1, alpha1, vee1, Sig, 
-                Z, X, W, Y, X2, survtime, cmprsk, ydata, cdata, mdata)
+                Z, X, W, Y, X2, survtime, cmprsk, RAWydata, RAWcdata, mdata)
       
       names(a) <- c("beta", "tau", "gamma1", "alpha1", "vee1", "Sig",
                     "Z", "X1", "W", "Y", "X2", "survtime", "cmprsk", "ydata",
