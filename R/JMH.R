@@ -9,4 +9,5 @@
 #' @importFrom MASS mvrnorm
 #' @importFrom nlme lme getVarCov lmeControl
 #' @importFrom Hmisc hdquantile
+#' @importFrom utils setTxtProgressBar txtProgressBar
 NULL

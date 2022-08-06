@@ -261,8 +261,10 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       names(allPi1) <- ID
       names(allPi2) <- ID
       
+      pb = txtProgressBar(min = 1, max = M, initial = 1, style = 3) 
+      
       for (i in 1:M) {
-        print(i)
+
         ### 0. Set the initial estimator
         psil <- Psi.init
         H01l <- H01.init
@@ -410,7 +412,9 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         H01.init <- H01l
         H02.init <- H02l
         
+        setTxtProgressBar(pb,i) 
       }
+      close(pb)
       
       for (j in 1:N.ID) {
         

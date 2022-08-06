@@ -1,13 +1,10 @@
 ##' @export
 ##' 
 ##' 
-GetFraminghamScore <- function(cdata, ydata, survtime, increment = 0.25, status,
-                               ytime, ID, LandmarkTime, u, M = 100, quadpoint = 15,
+GetFraminghamScore <- function(object, cdata, ydata, survtime, increment = 0.25, status,
+                               ytime, ID, LandmarkTime, u = NULL, M = 100, quadpoint = 15,
                                quant.width = 0.25) {
-  
-  # if (!is.integer(1/quant.width)) {
-  #   stop(writeLines("The quantile width is not correct."))
-  # }
+
   
   cdata <- cdata[cdata[, survtime] > LandmarkTime, ]
   cID <- cdata[, ID]
@@ -15,7 +12,14 @@ GetFraminghamScore <- function(cdata, ydata, survtime, increment = 0.25, status,
   cdata2 <- cdata
   cdata2[, survtime] <- LandmarkTime
   ydata2 <- ydata[ydata[, ytime]*increment <= LandmarkTime, ]
-  survfit <- survfit2JMMLSM(fit, seed = 100, ynewdata = ydata2, cnewdata = cdata2, 
+  if (is.null(u)) {
+    maxtime1 <- object$H01[nrow(object$H01), 1]
+    maxtime2 <- object$H02[nrow(object$H02), 1]
+    u <- c(ceiling(max(maxtime1, maxtime2)) - 1, ceiling(max(maxtime1, maxtime2)))
+  } else {
+    next
+  }
+  survfit <- survfit2JMMLSM(object = object, seed = 100, ynewdata = ydata2, cnewdata = cdata2, 
                             u = u, M = M, simulate = TRUE, quadpoint = quadpoint)
   cID <- cdata2[, ID]
   AllCIF1 <- list()
@@ -55,6 +59,7 @@ GetFraminghamScore <- function(cdata, ydata, survtime, increment = 0.25, status,
           ii <- ii + 1
         }
       }
+      if (is.na(EmpiricalCIF1[i])) EmpiricalCIF1[i] <- quantsubRisk1[nrow(quantsubRisk1), 4]
       PredictedCIF1[i] <- mean(subquant$CIF1)
     }
     AllCIF1[[j]] <- data.frame(EmpiricalCIF1, PredictedCIF1)
@@ -85,6 +90,7 @@ GetFraminghamScore <- function(cdata, ydata, survtime, increment = 0.25, status,
           ii <- ii + 1
         }
       }
+      if (is.na(EmpiricalCIF2[i])) EmpiricalCIF2[i] <- quantsubRisk2[nrow(quantsubRisk2), 4]
       PredictedCIF2[i] <- mean(subquant$CIF2)
     }
     AllCIF2[[j]] <- data.frame(EmpiricalCIF2, PredictedCIF2)
