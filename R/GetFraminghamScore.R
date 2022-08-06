@@ -12,6 +12,8 @@ GetFraminghamScore <- function(object, cdata, ydata, survtime, increment = 0.25,
   cdata2 <- cdata
   cdata2[, survtime] <- LandmarkTime
   ydata2 <- ydata[ydata[, ytime]*increment <= LandmarkTime, ]
+  yID <- unique(ydata2[, ID])
+  cdata2 <- cdata2[cdata2[, ID] %in% yID, ]
   if (is.null(u)) {
     maxtime1 <- object$H01[nrow(object$H01), 1]
     maxtime2 <- object$H02[nrow(object$H02), 1]
