@@ -1,6 +1,6 @@
 ##' @title Prediction in Joint Models
-##' @name survfit2JMMLSM
-##' @aliases survfit2JMMLSM
+##' @name survfit3JMMLSM
+##' @aliases survfit3JMMLSM
 ##' @description This function computes the conditional probability of 
 ##' surviving later times than the last observed time for which a longitudinal 
 ##' measurement was available.
@@ -22,7 +22,7 @@
 ##' @seealso \code{\link{JMMLSM}}
 ##' @export
 ##' 
-survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL, 
+survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL, 
                            u = NULL, M = 200, simulate = TRUE, quadpoint = NULL, ...) {
   if (!inherits(object, "JMMLSM"))
     stop("Use only with 'JMMLSM' objects.\n")
@@ -267,7 +267,7 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       pb = txtProgressBar(min = 1, max = M, initial = 1, style = 3) 
       
       for (i in 1:M) {
-
+        
         ### 0. Set the initial estimator
         psil <- Psi.init
         H01l <- H01.init
@@ -379,35 +379,43 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
           opt <- optim(rep(0, nsig), logLikCR, data = data, method = "BFGS", hessian = TRUE)
           meanb <- opt$par
           varb <- solve(opt$hessian)
-          ## simulate new random effects estimates using the Metropolis Hastings algorithm
-          propose.bl <- as.vector(mvtnorm::rmvt(1, delta = meanb, sigma = varb, df = 4))
-          dmvt.old <- mvtnorm::dmvt(meanb, propose.bl, varb, df = 4, TRUE)
-          dmvt.propose <- mvtnorm::dmvt(propose.bl, meanb, varb, df = 4, TRUE)
-          logpost.old <- -logLikCR(data, meanb)
-          logpost.propose <- -logLikCR(data, propose.bl)
-          ratio <- min(exp(logpost.propose + dmvt.old - logpost.old - dmvt.propose), 1)
-          if (runif(1) <= ratio) {
-            bl = propose.bl
-          } else {
-            bl = meanb
+          
+          ## nested MCMC
+          P1us <- matrix(0, nrow = 99, ncol = lengthu)
+          P2us <- matrix(0, nrow = 99, ncol = lengthu)
+          bl.matrix <- matrix(0, nrow = 100, ncol = length(meanb))
+          bl.matrix[1, ] <- meanb
+          for (ii in 2:100) {
+            current.bl <- as.vector(bl.matrix[ii-1, ])
+            ## simulate new random effects estimates using the Metropolis Hastings algorithm
+            propose.bl <- as.vector(mvtnorm::rmvt(1, delta = current.bl, sigma = varb, df = 4))
+            dmvt.old <- mvtnorm::dmvt(current.bl, propose.bl, varb, df = 4, TRUE)
+            dmvt.propose <- mvtnorm::dmvt(propose.bl, current.bl, varb, df = 4, TRUE)
+            logpost.old <- -logLikCR(data, current.bl)
+            logpost.propose <- -logLikCR(data, propose.bl)
+            ratio <- min(exp(logpost.propose + dmvt.old - logpost.old - dmvt.propose), 1)
+            if (runif(1) <= ratio) {
+              bl = propose.bl
+            } else {
+              bl = current.bl
+            }
+            bl.matrix[ii, ] <- bl
+            for (jj in 1:lengthu) {
+              ## calculate the CIF
+              CIF1 <- CIF1.CR(data, H01l, H02l, s, u[jj], bl)
+              P1us[ii-1, jj] <- Pk.us(CIF1, data, bl)
+              CIF2 <- CIF2.CR(data, H01l, H02l, s, u[jj], bl)
+              P2us[ii-1, jj] <- Pk.us(CIF2, data, bl)
+            }
           }
+          
           for (jj in 1:lengthu) {
-            ## calculate the CIF
-            CIF1 <- CIF1.CR(data, H01l, H02l, s, u[jj], bl)
-            P1us <- Pk.us(CIF1, data, bl)
-            if (P1us > 1) {
-              allPi1[[j]][i, jj] <- NA
-            } else {
-              allPi1[[j]][i, jj] <- P1us
-            }
-            CIF2 <- CIF2.CR(data, H01l, H02l, s, u[jj], bl)
-            P2us <- Pk.us(CIF2, data, bl)
-            if (P2us > 1) {
-              allPi2[[j]][i, jj] <- NA
-            } else {
-              allPi2[[j]][i, jj] <- P2us
-            }
+            allPi1[[j]][i, jj] <- mean(P1us[, jj])
+            allPi2[[j]][i, jj] <- mean(P2us[, jj])
           }
+          
+
+
         }
         ## pass the current sample parameters to the next iteration
         Psi.init <- psil
