@@ -402,9 +402,15 @@ survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
             bl.matrix[ii, ] <- bl
             for (jj in 1:lengthu) {
               ## calculate the CIF
-              CIF1 <- CIF1.CR(data, H01l, H02l, s, u[jj], bl)
+              CIF1 <- GetCIF1CR(data$gamma1, data$gamma2, data$alpha1, data$alpha2, 
+                                data$nu1, data$nu2, as.vector(data$X2),
+                                 H01l, H02l, s, u[jj],  bl, nrow(data$Sig))
+              # CIF1 <- CIF1.CR(data, H01l, H02l, s, u[jj], bl)
               P1us[ii-1, jj] <- Pk.us(CIF1, data, bl)
-              CIF2 <- CIF2.CR(data, H01l, H02l, s, u[jj], bl)
+              CIF2 <- GetCIF2CR(data$gamma1, data$gamma2, data$alpha1, data$alpha2, 
+                                data$nu1, data$nu2, as.vector(data$X2),
+                                H01l, H02l, s, u[jj],  bl, nrow(data$Sig))
+              # CIF2 <- CIF2.CR(data, H01l, H02l, s, u[jj], bl)
               P2us[ii-1, jj] <- Pk.us(CIF2, data, bl)
             }
           }

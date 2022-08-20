@@ -15,7 +15,7 @@ simfitRI_DP <- function(sim = 10, Nt = 200, Nv = 2, seed = 10, increment = 0.7, 
                         CU = 8,
                         covbw = matrix(c(0.5, 0.25, 0.25, 0.5), nrow = 2, ncol = 2),
                         M = 100, maxiter = 1000, quadpoint = 10, 
-                        u = seq(4.5, 6.5, by = 1), ncores = 10) {
+                        u = seq(4.5, 6.5, by = 1), ncores = 10, method) {
   
   validated_set <- simJMdataRI_DP(seed = seed, N = Nv, increment = increment,
                                   beta = beta, tau = tau, gamma1 = gamma1,
@@ -72,16 +72,32 @@ simfitRI_DP <- function(sim = 10, Nt = 200, Nv = 2, seed = 10, increment = 0.7, 
 
   # return(list(TrueP1ik = TrueP1ik, TrueP2ik = TrueP2ik))
   
-  ParaMatrixRaw <- parallel::mclapply(1:sim, bootsfitRI_DP,
-                                      seed = seed, N = Nt, increment = increment,
-                                      beta = beta, tau = tau, gamma1 = gamma1,
-                                      gamma2 = gamma2, alpha1 = alpha1, alpha2 = alpha2,
-                                      vee1 = vee1, vee2 = vee2,
-                                      lambda1 = lambda1, lambda2 = lambda2,
-                                      CL = CL, CU = CU, covbw = covbw,
-                                      quadpoint = quadpoint, maxiter = maxiter,
-                                      u = u[-1], ynewdata = vali.ydata, cnewdata = vali.cdata,
-                                      M = M, mc.cores = ncores)
+  if (method == "nested") {
+    ParaMatrixRaw <- parallel::mclapply(1:sim, bootsfitRI_DP,
+                                        seed = seed, N = Nt, increment = increment,
+                                        beta = beta, tau = tau, gamma1 = gamma1,
+                                        gamma2 = gamma2, alpha1 = alpha1, alpha2 = alpha2,
+                                        vee1 = vee1, vee2 = vee2,
+                                        lambda1 = lambda1, lambda2 = lambda2,
+                                        CL = CL, CU = CU, covbw = covbw,
+                                        quadpoint = quadpoint, maxiter = maxiter,
+                                        u = u[-1], ynewdata = vali.ydata, cnewdata = vali.cdata,
+                                        M = M, mc.cores = ncores)
+  } else {
+    
+    ParaMatrixRaw <- parallel::mclapply(1:sim, bootsfitRI_DP2,
+                                        seed = seed, N = Nt, increment = increment,
+                                        beta = beta, tau = tau, gamma1 = gamma1,
+                                        gamma2 = gamma2, alpha1 = alpha1, alpha2 = alpha2,
+                                        vee1 = vee1, vee2 = vee2,
+                                        lambda1 = lambda1, lambda2 = lambda2,
+                                        CL = CL, CU = CU, covbw = covbw,
+                                        quadpoint = quadpoint, maxiter = maxiter,
+                                        u = u[-1], ynewdata = vali.ydata, cnewdata = vali.cdata,
+                                        M = M, mc.cores = ncores)
+    
+  }
+  
   
   result <- list(TrueP1ik = TrueP1ik, TrueP2ik = TrueP2ik, ParaMatrixRaw = ParaMatrixRaw)
 

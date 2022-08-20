@@ -1,7 +1,7 @@
 CIF2.CR <- function(data, H01, H02, s, u, bl) {
   a <- nrow(H01)
   b <- nrow(H02)
-  CH02 <- c(0, cumsum(H02[, 3])[-b])
+  CH02 <- cumsum(H02[, 3])
   CH01 <- rep(0, b)
   count <- 1
   i = 1

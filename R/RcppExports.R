@@ -45,6 +45,14 @@ MultMM <- function(x, y) {
     .Call(`_JMH_MultMM`, x, y)
 }
 
+GetCIF1CR <- function(gamma1, gamma2, alpha1, alpha2, nu1, nu2, X2, H01, H02, s, u, bwi, q) {
+    .Call(`_JMH_GetCIF1CR`, gamma1, gamma2, alpha1, alpha2, nu1, nu2, X2, H01, H02, s, u, bwi, q)
+}
+
+GetCIF2CR <- function(gamma1, gamma2, alpha1, alpha2, nu1, nu2, X2, H01, H02, s, u, bwi, q) {
+    .Call(`_JMH_GetCIF2CR`, gamma1, gamma2, alpha1, alpha2, nu1, nu2, X2, H01, H02, s, u, bwi, q)
+}
+
 getCov <- function(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, H01, H02, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, FUNENW, FUNBENW, FUNBS, FUNBW, FUNWS, FUNBSENW, FUNEC, FUNBEC, FUNBSEC, FUNWEC, FUNWSEC, FUNB, FUNW) {
     .Call(`_JMH_getCov`, beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, H01, H02, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, FUNENW, FUNBENW, FUNBS, FUNBW, FUNWS, FUNBSENW, FUNEC, FUNBEC, FUNBSEC, FUNWEC, FUNWSEC, FUNB, FUNW)
 }
@@ -55,6 +63,10 @@ getCovSF <- function(beta, tau, gamma1, alpha1, vee1, H01, Sig, Z, X1, W, Y, X2,
 
 getEC <- function(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, H01, H02, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix, wsmatrix, CUH01, CUH02, HAZ01, HAZ02) {
     .Call(`_JMH_getEC`, beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, H01, H02, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix, wsmatrix, CUH01, CUH02, HAZ01, HAZ02)
+}
+
+getECIF <- function(beta, tau, gamma1, gamma2, alpha1, alpha2, nu1, nu2, Sig, Z, X1, W, Y, X2, H01, H02, xsmatrix, wsmatrix, CH01, CH02, s, u) {
+    .Call(`_JMH_getECIF`, beta, tau, gamma1, gamma2, alpha1, alpha2, nu1, nu2, Sig, Z, X1, W, Y, X2, H01, H02, xsmatrix, wsmatrix, CH01, CH02, s, u)
 }
 
 getECSF <- function(beta, tau, gamma1, alpha1, vee1, H01, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix, wsmatrix, CUH01, HAZ01) {
