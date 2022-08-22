@@ -566,7 +566,7 @@ survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == ID[j], ]
         subNDy.variance <- ynewdata.variance[ynewdata.variance[, bvar[length(bvar)]] == ID[j], ]
         subNDc <- cnewdata[cnewdata[, bvar[length(bvar)]] == ID[j], ]
-        y.obs[[j]] <- data.frame(subNDy.mean[, c(bvar[2], Yvar[1])])
+        y.obs[[j]] <- data.frame(subNDy.mean[, c(bvar[1], Yvar[1])])
         
         allPi <- matrix(0, ncol = length(u), nrow = M)
         s <-  as.numeric(subNDc[1, Cvar[1]])
