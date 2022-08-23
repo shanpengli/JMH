@@ -83,7 +83,7 @@ simfitRI_DP <- function(sim = 10, Nt = 200, Nv = 2, seed = 10, increment = 0.7, 
                                         quadpoint = quadpoint, maxiter = maxiter,
                                         u = u[-1], ynewdata = vali.ydata, cnewdata = vali.cdata,
                                         M = M, mc.cores = ncores)
-  } else {
+  } else if (method == "GH"){
     
     ParaMatrixRaw <- parallel::mclapply(1:sim, bootsfitRI_DP2,
                                         seed = seed, N = Nt, increment = increment,
@@ -96,13 +96,24 @@ simfitRI_DP <- function(sim = 10, Nt = 200, Nv = 2, seed = 10, increment = 0.7, 
                                         u = u[-1], ynewdata = vali.ydata, cnewdata = vali.cdata,
                                         M = M, mc.cores = ncores)
     
+  } else if (method == "original") {
+    ParaMatrixRaw <- parallel::mclapply(1:sim, bootsfitRI_DPOriginal,
+                                        seed = seed, N = Nt, increment = increment,
+                                        beta = beta, tau = tau, gamma1 = gamma1,
+                                        gamma2 = gamma2, alpha1 = alpha1, alpha2 = alpha2,
+                                        vee1 = vee1, vee2 = vee2,
+                                        lambda1 = lambda1, lambda2 = lambda2,
+                                        CL = CL, CU = CU, covbw = covbw,
+                                        quadpoint = quadpoint, maxiter = maxiter,
+                                        u = u[-1], ynewdata = vali.ydata, cnewdata = vali.cdata,
+                                        M = M, mc.cores = ncores)
+  } else {
+    ParaMatrixRaw = NULL
   }
   
   
   result <- list(TrueP1ik = TrueP1ik, TrueP2ik = TrueP2ik, ParaMatrixRaw = ParaMatrixRaw)
 
   return(result)
-  
-  
   
 }

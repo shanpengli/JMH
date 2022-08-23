@@ -67,10 +67,10 @@ Rcpp::List getECIF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
     dem+=temp;
   
     //calculate CIF
-    CIF1+=temp*GetCIF1CR(gamma1,gamma2,alpha1,alpha2,nu1,nu2,X2,H01,H02,s,u,ri,(p1a+1))/
-      exp(0-CH01*exp(xgamma1+MultVV(alpha1,bi)+nu1*wi)-CH02*exp(xgamma2+MultVV(alpha2,bi)+nu2*wi));
-    CIF2+=temp*GetCIF2CR(gamma1,gamma2,alpha1,alpha2,nu1,nu2,X2,H01,H02,s,u,ri,(p1a+1))/
-      exp(0-CH01*exp(xgamma1+MultVV(alpha1,bi)+nu1*wi)-CH02*exp(xgamma2+MultVV(alpha2,bi)+nu2*wi));
+    CIF1+=exp(log(temp) + log(GetCIF1CR(gamma1,gamma2,alpha1,alpha2,nu1,nu2,X2,H01,H02,s,u,ri,(p1a+1))) -
+      (0-CH01*exp(xgamma1+MultVV(alpha1,bi)+nu1*wi)-CH02*exp(xgamma2+MultVV(alpha2,bi)+nu2*wi)));
+    CIF2+=exp(log(temp) + log(GetCIF2CR(gamma1,gamma2,alpha1,alpha2,nu1,nu2,X2,H01,H02,s,u,ri,(p1a+1))) -
+      (0-CH01*exp(xgamma1+MultVV(alpha1,bi)+nu1*wi)-CH02*exp(xgamma2+MultVV(alpha2,bi)+nu2*wi)));
   
   }
 

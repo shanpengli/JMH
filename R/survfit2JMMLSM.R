@@ -12,6 +12,7 @@
 ##' for which prediction of survival probabilities is required.
 ##' @param u a numeric vector of times for which prediction survival probabilities are to be computed.
 ##' @param M the number of Monte Carlo samples to be generated. Default is 200.
+##' @param burn.in The proportion of M to discard as burn-in. Default is 0.2.
 ##' @param simulate logical; if \code{TRUE}, a Monte Carlo approach is used to estimate conditional probabilities. 
 ##' Otherwise, Gauss-Hermite quadrature rule is used for numerical integration to estimate instead. 
 ##' Default is \code{TRUE}.
@@ -23,7 +24,7 @@
 ##' @export
 ##' 
 survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL, 
-                           u = NULL, M = 200, simulate = TRUE, quadpoint = NULL, ...) {
+                           u = NULL, M = 200, burn.in = 0.2, simulate = TRUE, quadpoint = NULL, ...) {
   if (!inherits(object, "JMMLSM"))
     stop("Use only with 'JMMLSM' objects.\n")
   if (is.null(ynewdata))
@@ -266,6 +267,7 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       
       pb = txtProgressBar(min = 1, max = M, initial = 1, style = 3) 
       
+      posterior <- list()
       for (i in 1:M) {
 
         ### 0. Set the initial estimator
@@ -349,7 +351,7 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
           Sigl[2, 3] <- Sigl[3, 2] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+2]
           Sigl[1, 3] <- Sigl[3, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+3]
         }
-        
+        postbl <- matrix(NA, nrow = N.ID, ncol = nsig)
         for (j in 1:N.ID) {
           subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == ID[j], ]
           subNDy.variance <- ynewdata.variance[ynewdata.variance[, bvar[length(bvar)]] == ID[j], ]
@@ -391,6 +393,7 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
           } else {
             bl = meanb
           }
+          postbl[j, ] <- bl
           for (jj in 1:lengthu) {
             ## calculate the CIF
             CIF1 <- CIF1.CR(data, H01l, H02l, s, u[jj], bl)
@@ -414,14 +417,24 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         H01.init <- H01l
         H02.init <- H02l
         
+        posterior[[i]] <- postbl
+        
         setTxtProgressBar(pb,i) 
       }
+      names(posterior) <- c(1:M)
       close(pb)
       
       for (j in 1:N.ID) {
         
         allPi1[[j]] <- allPi1[[j]][complete.cases(allPi1[[j]]), ]
         allPi2[[j]] <- allPi2[[j]][complete.cases(allPi2[[j]]), ]
+        
+        nEnd1 <- nrow(allPi1[[j]])
+        nEnd2 <- nrow(allPi2[[j]])
+        nStart1 <- floor(nEnd1*burn.in)+1
+        nStart2 <- floor(nEnd2*burn.in)+1
+        allPi1[[j]] <- allPi1[[j]][nStart1:nEnd1, ]
+        allPi2[[j]] <- allPi2[[j]][nStart2:nEnd2, ]
         
         subCP1 <- as.data.frame(matrix(0, nrow = length(u), ncol = 5))
         colnames(subCP1) <- c("times", "Mean", "Median", "95%HDLower", "95%HDUpper")
@@ -460,6 +473,7 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       sum$y.obs <- y.obs
       sum$CompetingRisk <- TRUE
       sum$simulate <- simulate
+      sum$posterior <- posterior
       sum
       
     }

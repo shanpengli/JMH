@@ -479,6 +479,16 @@ survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
     }
   } else {
     
+    Sig <- object$Sig
+    p1a <- ncol(Sig) - 1
+    if (p1a == 2) Sigb <- Sig[1:2, 1:2]
+    if (p1a == 1) Sigb <- as.matrix(Sig[1, 1])
+    
+    getGH <- GetGHmatrix(quadpoint = quadpoint, Sigb = Sigb)
+    
+    xsmatrix <- getGH$xsmatrix
+    wsmatrix <- getGH$wsmatrix
+    
     nsig <- ncol(object$Sig)
     
     if (length(bvar) > 1) bvar1 <- bvar[1:(length(bvar) - 1)]
@@ -593,13 +603,25 @@ survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         
         for (jj in 1:lengthu) {
           ## calculate the CIF
-          CIF1 <- CIF1.CR(data, H01, H02, s, u[jj], meanbw)
-          P1us <- Pk.us(CIF1, data, meanbw)
+          CIF <- getECIF(beta, tau, gamma1, gamma2, alpha1, alpha2, nu1,
+                         nu2, Sig, Z, X, W, Y, as.vector(X2), H01, H02,
+                         xsmatrix, wsmatrix, CH01, CH02, s, u[jj])
+          P1us <- CIF$CIF1
+          P2us <- CIF$CIF2
+          
           Predraw1[j, jj] <- P1us
-          CIF2 <- CIF2.CR(data, H01, H02, s, u[jj], meanbw)
-          P2us <- Pk.us(CIF2, data, meanbw)
           Predraw2[j, jj] <- P2us
         }
+        
+        # for (jj in 1:lengthu) {
+        #   ## calculate the CIF
+        #   CIF1 <- CIF1.CR(data, H01, H02, s, u[jj], meanbw)
+        #   P1us <- Pk.us(CIF1, data, meanbw)
+        #   Predraw1[j, jj] <- P1us
+        #   CIF2 <- CIF2.CR(data, H01, H02, s, u[jj], meanbw)
+        #   P2us <- Pk.us(CIF2, data, meanbw)
+        #   Predraw2[j, jj] <- P2us
+        # }
       }
       names(y.obs) <- ID
       
