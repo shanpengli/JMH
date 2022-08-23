@@ -2,10 +2,9 @@
 % Please edit documentation in R/print.survfitJMMLSMboot.R
 \name{print.survfitJMMLSMboot}
 \alias{print.survfitJMMLSMboot}
-\alias{print.survfitJMMLSM}
 \title{Print survfitJMMLSMboot}
 \usage{
-\method{print}{survfitJMMLSM}(x, ...)
+\method{print}{survfitJMMLSMboot}(x, ...)
 }
 \arguments{
 \item{x}{x of class 'survfitJMMLSMboot'.}

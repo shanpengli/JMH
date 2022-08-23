@@ -1,6 +1,6 @@
 ##' @title Prediction in Joint Models
-##' @name survfit5JMMLSM
-##' @aliases survfit5JMMLSM
+##' @name survfitJMMLSMboot
+##' @aliases survfitJMMLSMboot
 ##' @description This function computes the conditional probability of 
 ##' surviving later times than the last observed time for which a longitudinal 
 ##' measurement was available.
@@ -22,7 +22,7 @@
 ##' @seealso \code{\link{JMMLSM}}
 ##' @export
 ##' 
-survfit5JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL, 
+survfitJMMLSMboot <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL, 
                            u = NULL, B = 100, method = c("Laplace", "GH"), quadpoint = NULL, ...) {
   if (!inherits(object, "JMMLSM"))
     stop("Use only with 'JMMLSM' objects.\n")
