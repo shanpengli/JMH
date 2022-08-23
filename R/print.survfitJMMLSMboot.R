@@ -8,9 +8,9 @@
 ##' @seealso \code{\link{JMMLSM}, \link{survfitJMMLSM}}
 ##' @export
 ##' 
-print.survfitJMMLSM <- function (x, ...) {
-  if (!inherits(x, "survfitJMMLSM"))
-    stop("Use only with 'survfitJMMLSM' xs.\n")
+print.survfitJMMLSMboot <- function (x, ...) {
+  if (!inherits(x, "survfitJMMLSMboot"))
+    stop("Use only with 'survfitJMMLSMboot' xs.\n")
   
   cat("\nPrediction of Conditional Probabilities of Event\n\tbased on", x$B, "bootstrap samples\n\n")
   f <- function (d, t) {
