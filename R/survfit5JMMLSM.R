@@ -104,6 +104,7 @@ survfit5JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
   Predraw1 <- array(rep(NA, B*nrow(cnewdata)*length(u)), dim=c(B, nrow(cnewdata), length(u)))
   Predraw2 <- array(rep(NA, B*nrow(cnewdata)*length(u)), dim=c(B, nrow(cnewdata), length(u)))
   CompetingRisk <- object$CompetingRisk
+  pb = txtProgressBar(min = 1, max = B, initial = 1, style = 3) 
   for (b in 1:B) {
     
     btsp <- sample(c(1:nrow(object$cdata)), replace = TRUE)
@@ -225,8 +226,9 @@ survfit5JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       }
     } 
     
-
+    setTxtProgressBar(pb,i) 
   }
+  close(pb)
   
   if (CompetingRisk) {
     Pred <- list()
