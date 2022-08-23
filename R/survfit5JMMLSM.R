@@ -146,7 +146,7 @@ survfit5JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
     
     if ('try-error' %in% class(fitboot)) {
       next
-    } else if (fitboot$iter == maxiter) {
+    } else if (fitboot$iter == 1000) {
       next
     } else {
       if (fitboot$CompetingRisk == CompetingRisk) {
