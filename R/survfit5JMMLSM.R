@@ -226,7 +226,7 @@ survfit5JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       }
     } 
     
-    setTxtProgressBar(pb,i) 
+    setTxtProgressBar(pb,b) 
   }
   close(pb)
   
