@@ -419,7 +419,7 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
                            "gamma1", "gamma2", "alpha1", "alpha2", "nu1", "nu2", "Sig")
 
           ## simulate new random effects estimates using the Metropolis Hastings algorithm
-          propose.theta <- as.vector(mvtnorm::rmvt(1, delta = theta.modes[j, ], sigma = theta.var[[j]], df = 4))
+          propose.theta <- as.vector(mvtnorm::rmvt(1, delta = theta.old[j, ], sigma = theta.var[[j]], df = 4))
           dmvt.old <- mvtnorm::dmvt(theta.old[j, ], propose.theta, theta.var[[j]], df = 4, TRUE)
           dmvt.propose <- mvtnorm::dmvt(propose.theta, theta.old[j, ], theta.var[[j]], df = 4, TRUE)
           logpost.old <- -logLikCR(data, theta.old[j, ])
