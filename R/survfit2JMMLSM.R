@@ -227,6 +227,7 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       
     } else {
       
+      
       Psi <- c(object$beta, object$tau, object$gamma1, object$gamma2, 
                object$alpha1, object$alpha2, object$vee1, object$vee2)
       for (l in 1:nsig) Psi <- c(Psi, object$Sig[l, l])
@@ -268,6 +269,44 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       pb = txtProgressBar(min = 1, max = M, initial = 1, style = 3) 
       
       posterior <- list()
+      
+      theta.modes <- matrix(0, nrow = N.ID, ncol = nsig)
+      theta.var <- list()
+      ## extract Empirical Bayes estimates 
+      for (j in 1:N.ID) {
+        subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == ID[j], ]
+        subNDy.variance <- ynewdata.variance[ynewdata.variance[, bvar[length(bvar)]] == ID[j], ]
+        subNDc <- cnewdata[cnewdata[, bvar[length(bvar)]] == ID[j], ]
+        y.obs[[j]] <- data.frame(subNDy.mean[, c(bvar[1], Yvar[1])])
+        
+        s <-  as.numeric(subNDc[1, Cvar[1]])
+        Y <- subNDy.mean[, 2]
+        X <- subNDy.mean[, -c(1:2)]
+        X <- as.matrix(X)
+        W <- subNDy.variance[, -1]
+        W <- as.matrix(W)
+        if (nsig == 2) {
+          Z <- matrix(1, ncol = 1, nrow = length(Y))
+        } else {
+          Z <- data.frame(1, subNDy.mean[, bvar1])
+          Z <- as.matrix(Z)
+        }
+        X2 <- as.matrix(subNDc[, -c(1:3)])
+        
+        CH01 <- CH(H01.init, s)
+        CH02 <- CH(H02.init, s)
+        
+        data <- list(Y, X, Z, W, X2, CH01, CH02, object$beta, object$tau, object$gamma1, 
+                     object$gamma2, object$alpha1, object$alpha2, object$vee1, object$vee2, 
+                     object$Sig)
+        names(data) <- c("Y", "X", "Z", "W", "X2", "CH01", "CH02", "beta", "tau",
+                         "gamma1", "gamma2", "alpha1", "alpha2", "nu1", "nu2", "Sig")
+        opt <- optim(rep(0, nsig), logLikCR, data = data, method = "BFGS", hessian = TRUE)
+        theta.modes[j, ] <- opt$par
+        theta.var[[j]] <- solve(opt$hessian)
+      }
+      theta.old <- theta.new <- theta.modes
+      
       for (i in 1:M) {
 
         ### 0. Set the initial estimator
@@ -378,40 +417,35 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
           data <- list(Y, X, Z, W, X2, CH01, CH02, betal, taul, gammal1, gammal2, alphal1, alphal2, nul1, nul2, Sigl)
           names(data) <- c("Y", "X", "Z", "W", "X2", "CH01", "CH02", "beta", "tau",
                            "gamma1", "gamma2", "alpha1", "alpha2", "nu1", "nu2", "Sig")
-          opt <- optim(rep(0, nsig), logLikCR, data = data, method = "BFGS", hessian = TRUE)
-          meanb <- opt$par
-          varb <- solve(opt$hessian)
+
           ## simulate new random effects estimates using the Metropolis Hastings algorithm
-          propose.bl <- as.vector(mvtnorm::rmvt(1, delta = meanb, sigma = varb, df = 4))
-          dmvt.old <- mvtnorm::dmvt(meanb, propose.bl, varb, df = 4, TRUE)
-          dmvt.propose <- mvtnorm::dmvt(propose.bl, meanb, varb, df = 4, TRUE)
-          logpost.old <- -logLikCR(data, meanb)
-          logpost.propose <- -logLikCR(data, propose.bl)
+          propose.theta <- as.vector(mvtnorm::rmvt(1, delta = theta.modes[j, ], sigma = theta.var[[j]], df = 4))
+          dmvt.old <- mvtnorm::dmvt(theta.old[j, ], theta.modes[j, ], theta.var[[j]], df = 4, TRUE)
+          dmvt.propose <- mvtnorm::dmvt(propose.theta, theta.modes[j, ], theta.var[[j]], df = 4, TRUE)
+          logpost.old <- -logLikCR(data, theta.old[j, ])
+          logpost.propose <- -logLikCR(data, propose.theta)
           ratio <- min(exp(logpost.propose + dmvt.old - logpost.old - dmvt.propose), 1)
           if (runif(1) <= ratio) {
-            bl = propose.bl
-          } else {
-            bl = meanb
-          }
-          postbl[j, ] <- bl
+            theta.new[j, ] = propose.theta
+          } 
+          postbl[j, ] <- theta.new[j, ]
           for (jj in 1:lengthu) {
             ## calculate the CIF
-            CIF1 <- CIF1.CR(data, H01l, H02l, s, u[jj], bl)
-            P1us <- Pk.us(CIF1, data, bl)
-            if (P1us > 1) {
-              allPi1[[j]][i, jj] <- NA
-            } else {
-              allPi1[[j]][i, jj] <- P1us
-            }
-            CIF2 <- CIF2.CR(data, H01l, H02l, s, u[jj], bl)
-            P2us <- Pk.us(CIF2, data, bl)
-            if (P2us > 1) {
-              allPi2[[j]][i, jj] <- NA
-            } else {
-              allPi2[[j]][i, jj] <- P2us
-            }
+            CIF1 <- GetCIF1CR(data$gamma1, data$gamma2, data$alpha1, data$alpha2, 
+                              data$nu1, data$nu2, as.vector(data$X2),
+                              H01l, H02l, s, u[jj], theta.new[j, ], nrow(data$Sig))
+            P1us <- Pk.us(CIF1, data, theta.new[j, ])
+            if (P1us > 1) P1us <- 1
+            allPi1[[j]][i, jj] <- P1us
+            CIF2 <- GetCIF2CR(data$gamma1, data$gamma2, data$alpha1, data$alpha2, 
+                              data$nu1, data$nu2, as.vector(data$X2),
+                              H01l, H02l, s, u[jj], theta.new[j, ], nrow(data$Sig))
+            P2us <- Pk.us(CIF2, data, theta.new[j, ])
+            if (P2us > 1) P2us <- 1
+            allPi2[[j]][i, jj] <- P2us
           }
         }
+        theta.old <- theta.new
         ## pass the current sample parameters to the next iteration
         Psi.init <- psil
         H01.init <- H01l
