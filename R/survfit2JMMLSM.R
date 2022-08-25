@@ -310,10 +310,11 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       for (i in 1:M) {
 
         ### 0. Set the initial estimator
-        psil <- Psi.init
         H01l <- H01.init
         H02l <- H02.init
         
+        ###1. draw new parameters
+        psil <- Psi.MC[i, ]
         betal <- psil[1:nbeta]
         taul <- psil[(nbeta+1):(nbeta+ntau)]
         gammal1 <- psil[(nbeta+ntau+1):(nbeta+ntau+ngamma)]
@@ -372,24 +373,6 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         H01l <- GetNewH0$H01
         H02l <- GetNewH0$H02
         
-        ###4. draw new parameters
-        psil <- Psi.MC[i, ]
-        betal <- psil[1:nbeta]
-        taul <- psil[(nbeta+1):(nbeta+ntau)]
-        gammal1 <- psil[(nbeta+ntau+1):(nbeta+ntau+ngamma)]
-        gammal2 <- psil[(nbeta+ntau+ngamma+1):(nbeta+ntau+2*ngamma)]
-        alphal1 <- psil[(nbeta+ntau+2*ngamma+1):(nbeta+ntau+2*ngamma+nalpha)]
-        alphal2 <- psil[(nbeta+ntau+2*ngamma+nalpha+1):(nbeta+ntau+2*ngamma+2*nalpha)]
-        nul1 <- psil[nbeta+ntau+2*ngamma+2*nalpha+1]
-        nul2 <- psil[nbeta+ntau+2*ngamma+2*nalpha+2]
-        Sigl <- matrix(0, ncol = nsig, nrow = nsig)
-        for (l in 1:nsig) Sigl[l, l] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+l]
-        if (nsig == 2) Sigl[1, 2] <- Sigl[2, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+1]
-        if (nsig == 3) {
-          Sigl[1, 2] <- Sigl[2, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+1]
-          Sigl[2, 3] <- Sigl[3, 2] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+2]
-          Sigl[1, 3] <- Sigl[3, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+3]
-        }
         postbl <- matrix(NA, nrow = N.ID, ncol = nsig)
         for (j in 1:N.ID) {
           subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == ID[j], ]
@@ -447,7 +430,6 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         }
         theta.old <- theta.new
         ## pass the current sample parameters to the next iteration
-        Psi.init <- psil
         H01.init <- H01l
         H02.init <- H02l
         

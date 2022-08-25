@@ -266,6 +266,43 @@ survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       
       pb = txtProgressBar(min = 1, max = M, initial = 1, style = 3) 
       
+      theta.modes <- matrix(0, nrow = N.ID, ncol = nsig)
+      theta.var <- list()
+      ## extract Empirical Bayes estimates 
+      for (j in 1:N.ID) {
+        subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == ID[j], ]
+        subNDy.variance <- ynewdata.variance[ynewdata.variance[, bvar[length(bvar)]] == ID[j], ]
+        subNDc <- cnewdata[cnewdata[, bvar[length(bvar)]] == ID[j], ]
+        y.obs[[j]] <- data.frame(subNDy.mean[, c(bvar[1], Yvar[1])])
+        
+        s <-  as.numeric(subNDc[1, Cvar[1]])
+        Y <- subNDy.mean[, 2]
+        X <- subNDy.mean[, -c(1:2)]
+        X <- as.matrix(X)
+        W <- subNDy.variance[, -1]
+        W <- as.matrix(W)
+        if (nsig == 2) {
+          Z <- matrix(1, ncol = 1, nrow = length(Y))
+        } else {
+          Z <- data.frame(1, subNDy.mean[, bvar1])
+          Z <- as.matrix(Z)
+        }
+        X2 <- as.matrix(subNDc[, -c(1:3)])
+        
+        CH01 <- CH(H01.init, s)
+        CH02 <- CH(H02.init, s)
+        
+        data <- list(Y, X, Z, W, X2, CH01, CH02, object$beta, object$tau, object$gamma1, 
+                     object$gamma2, object$alpha1, object$alpha2, object$vee1, object$vee2, 
+                     object$Sig)
+        names(data) <- c("Y", "X", "Z", "W", "X2", "CH01", "CH02", "beta", "tau",
+                         "gamma1", "gamma2", "alpha1", "alpha2", "nu1", "nu2", "Sig")
+        opt <- optim(rep(0, nsig), logLikCR, data = data, method = "BFGS", hessian = TRUE)
+        theta.modes[j, ] <- opt$par
+        theta.var[[j]] <- solve(opt$hessian)
+      }
+      theta.old <- theta.new <- theta.modes
+      
       for (i in 1:M) {
         
         ### 0. Set the initial estimator
@@ -376,9 +413,6 @@ survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
           data <- list(Y, X, Z, W, X2, CH01, CH02, betal, taul, gammal1, gammal2, alphal1, alphal2, nul1, nul2, Sigl)
           names(data) <- c("Y", "X", "Z", "W", "X2", "CH01", "CH02", "beta", "tau",
                            "gamma1", "gamma2", "alpha1", "alpha2", "nu1", "nu2", "Sig")
-          opt <- optim(rep(0, nsig), logLikCR, data = data, method = "BFGS", hessian = TRUE)
-          meanb <- opt$par
-          varb <- solve(opt$hessian)
           
           ## nested MCMC
           P1us <- matrix(0, nrow = 99, ncol = lengthu)
@@ -388,11 +422,11 @@ survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
           for (ii in 2:100) {
             current.bl <- as.vector(bl.matrix[ii-1, ])
             ## simulate new random effects estimates using the Metropolis Hastings algorithm
-            propose.bl <- as.vector(mvtnorm::rmvt(1, delta = current.bl, sigma = varb, df = 4))
-            dmvt.old <- mvtnorm::dmvt(current.bl, propose.bl, varb, df = 4, TRUE)
-            dmvt.propose <- mvtnorm::dmvt(propose.bl, current.bl, varb, df = 4, TRUE)
-            logpost.old <- -logLikCR(data, current.bl)
-            logpost.propose <- -logLikCR(data, propose.bl)
+            propose.theta <- as.vector(mvtnorm::rmvt(1, delta = theta.old[j, ], sigma = theta.var[[j]], df = 4))
+            dmvt.old <- mvtnorm::dmvt(theta.old[j, ], propose.theta, theta.var[[j]], df = 4, TRUE)
+            dmvt.propose <- mvtnorm::dmvt(propose.theta, theta.old[j, ], theta.var[[j]], df = 4, TRUE)
+            logpost.old <- -logLikCR(data, theta.old[j, ])
+            logpost.propose <- -logLikCR(data, propose.theta)
             ratio <- min(exp(logpost.propose + dmvt.old - logpost.old - dmvt.propose), 1)
             if (runif(1) <= ratio) {
               bl = propose.bl
