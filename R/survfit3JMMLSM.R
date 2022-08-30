@@ -417,36 +417,34 @@ survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
           ## nested MCMC
           P1us <- matrix(0, nrow = 99, ncol = lengthu)
           P2us <- matrix(0, nrow = 99, ncol = lengthu)
-          bl.matrix <- matrix(0, nrow = 100, ncol = length(meanb))
-          bl.matrix[1, ] <- meanb
+
           for (ii in 2:100) {
-            current.bl <- as.vector(bl.matrix[ii-1, ])
             ## simulate new random effects estimates using the Metropolis Hastings algorithm
-            propose.theta <- as.vector(mvtnorm::rmvt(1, delta = theta.old[j, ], sigma = theta.var[[j]], df = 4))
-            dmvt.old <- mvtnorm::dmvt(theta.old[j, ], propose.theta, theta.var[[j]], df = 4, TRUE)
-            dmvt.propose <- mvtnorm::dmvt(propose.theta, theta.old[j, ], theta.var[[j]], df = 4, TRUE)
+            propose.theta <- as.vector(mvrnorm(n = 1, theta.old[j, ], theta.var[[j]], tol = 1e-6, empirical = FALSE))
             logpost.old <- -logLikCR(data, theta.old[j, ])
             logpost.propose <- -logLikCR(data, propose.theta)
-            ratio <- min(exp(logpost.propose + dmvt.old - logpost.old - dmvt.propose), 1)
+            ratio <- min(exp(logpost.propose - logpost.old), 1)
+            
             if (runif(1) <= ratio) {
-              bl = propose.bl
-            } else {
-              bl = current.bl
-            }
-            bl.matrix[ii, ] <- bl
+              theta.new[j, ] = propose.theta
+            } 
+
             for (jj in 1:lengthu) {
               ## calculate the CIF
               CIF1 <- GetCIF1CR(data$gamma1, data$gamma2, data$alpha1, data$alpha2, 
                                 data$nu1, data$nu2, as.vector(data$X2),
-                                 H01l, H02l, s, u[jj],  bl, nrow(data$Sig))
-              # CIF1 <- CIF1.CR(data, H01l, H02l, s, u[jj], bl)
-              P1us[ii-1, jj] <- Pk.us(CIF1, data, bl)
+                                 H01l, H02l, s, u[jj],  theta.new[j, ], nrow(data$Sig))
+              P1us[ii-1, jj] <- Pk.us(CIF1, data, theta.new[j, ])
+              if (P1us[ii-1, jj] > 1) P1us[ii-1, jj] <- 1
+              allPi1[[j]][i, jj] <- P1us[ii-1, jj]
               CIF2 <- GetCIF2CR(data$gamma1, data$gamma2, data$alpha1, data$alpha2, 
                                 data$nu1, data$nu2, as.vector(data$X2),
-                                H01l, H02l, s, u[jj],  bl, nrow(data$Sig))
-              # CIF2 <- CIF2.CR(data, H01l, H02l, s, u[jj], bl)
-              P2us[ii-1, jj] <- Pk.us(CIF2, data, bl)
+                                H01l, H02l, s, u[jj],  theta.new[j, ], nrow(data$Sig))
+              P2us[ii-1, jj] <- Pk.us(CIF2, data, theta.new[j, ])
+              if (P2us[ii-1, jj] > 1) P2us[ii-1, jj] <- 1
+              allPi2[[j]][i, jj] <- P2us[ii-1, jj]
             }
+            theta.old[j, ] <- theta.new[j, ]
           }
           
           for (jj in 1:lengthu) {
@@ -477,8 +475,8 @@ survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
           subCP1[b, 1] <- u[b]
           subCP1[b, 2] <- mean(allPi1[[j]][, b])
           subCP1[b, 3] <- median(allPi1[[j]][, b])
-          subCP1[b, 4] <- Hmisc::hdquantile(allPi1[[j]][, b], probs = 0.025)
-          subCP1[b, 5] <- Hmisc::hdquantile(allPi1[[j]][, b], probs = 0.975)
+          subCP1[b, 4] <- quantile(allPi1[[j]][, b], probs = 0.025)
+          subCP1[b, 5] <- quantile(allPi1[[j]][, b], probs = 0.975)
         }
         
         subCP2 <- as.data.frame(matrix(0, nrow = length(u), ncol = 5))
@@ -487,8 +485,8 @@ survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
           subCP2[b, 1] <- u[b]
           subCP2[b, 2] <- mean(allPi2[[j]][, b])
           subCP2[b, 3] <- median(allPi2[[j]][, b])
-          subCP2[b, 4] <- Hmisc::hdquantile(allPi2[[j]][, b], probs = 0.025)
-          subCP2[b, 5] <- Hmisc::hdquantile(allPi2[[j]][, b], probs = 0.975)
+          subCP2[b, 4] <- quantile(allPi2[[j]][, b], probs = 0.025)
+          subCP2[b, 5] <- quantile(allPi2[[j]][, b], probs = 0.975)
         }
         
         subCP <- list(subCP1, subCP2)
