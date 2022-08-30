@@ -458,8 +458,8 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
           subCP1[b, 1] <- u[b]
           subCP1[b, 2] <- mean(allPi1[[j]][, b])
           subCP1[b, 3] <- median(allPi1[[j]][, b])
-          subCP1[b, 4] <- Hmisc::hdquantile(allPi1[[j]][, b], probs = 0.025)
-          subCP1[b, 5] <- Hmisc::hdquantile(allPi1[[j]][, b], probs = 0.975)
+          subCP1[b, 4] <- quantile(allPi1[[j]][, b], probs = 0.025)
+          subCP1[b, 5] <- quantile(allPi1[[j]][, b], probs = 0.975)
         }
         
         subCP2 <- as.data.frame(matrix(0, nrow = length(u), ncol = 5))
@@ -468,8 +468,8 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
           subCP2[b, 1] <- u[b]
           subCP2[b, 2] <- mean(allPi2[[j]][, b])
           subCP2[b, 3] <- median(allPi2[[j]][, b])
-          subCP2[b, 4] <- Hmisc::hdquantile(allPi2[[j]][, b], probs = 0.025)
-          subCP2[b, 5] <- Hmisc::hdquantile(allPi2[[j]][, b], probs = 0.975)
+          subCP2[b, 4] <- quantile(allPi2[[j]][, b], probs = 0.025)
+          subCP2[b, 5] <- quantile(allPi2[[j]][, b], probs = 0.975)
         }
         
         subCP <- list(subCP1, subCP2)
