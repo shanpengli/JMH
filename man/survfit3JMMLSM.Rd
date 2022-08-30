@@ -11,6 +11,7 @@ survfit3JMMLSM(
   cnewdata = NULL,
   u = NULL,
   M = 200,
+  burn.in = 0.2,
   simulate = TRUE,
   quadpoint = NULL,
   ...
@@ -30,6 +31,8 @@ for which prediction of survival probabilities is required.}
 \item{u}{a numeric vector of times for which prediction survival probabilities are to be computed.}
 
 \item{M}{the number of Monte Carlo samples to be generated. Default is 200.}
+
+\item{burn.in}{The proportion of M to discard as burn-in. Default is 0.2.}
 
 \item{simulate}{logical; if \code{TRUE}, a Monte Carlo approach is used to estimate conditional probabilities. 
 Otherwise, Gauss-Hermite quadrature rule is used for numerical integration to estimate instead. 
