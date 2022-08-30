@@ -402,12 +402,18 @@ survfit2JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
                            "gamma1", "gamma2", "alpha1", "alpha2", "nu1", "nu2", "Sig")
 
           ## simulate new random effects estimates using the Metropolis Hastings algorithm
-          propose.theta <- as.vector(mvtnorm::rmvt(1, delta = theta.old[j, ], sigma = theta.var[[j]], df = 4))
-          dmvt.old <- mvtnorm::dmvt(theta.old[j, ], propose.theta, theta.var[[j]], df = 4, TRUE)
-          dmvt.propose <- mvtnorm::dmvt(propose.theta, theta.old[j, ], theta.var[[j]], df = 4, TRUE)
+          # propose.theta <- as.vector(mvtnorm::rmvt(1, delta = theta.old[j, ], sigma = theta.var[[j]], df = 4))
+          # dmvt.old <- mvtnorm::dmvt(theta.old[j, ], propose.theta, theta.var[[j]], df = 4, TRUE)
+          # dmvt.propose <- mvtnorm::dmvt(propose.theta, theta.old[j, ], theta.var[[j]], df = 4, TRUE)
+          # logpost.old <- -logLikCR(data, theta.old[j, ])
+          # logpost.propose <- -logLikCR(data, propose.theta)
+          # ratio <- min(exp(logpost.propose + dmvt.old - logpost.old - dmvt.propose), 1)
+          
+          propose.theta <- as.vector(mvrnorm(n = 1, theta.old[j, ], theta.var[[j]], tol = 1e-6, empirical = FALSE))
           logpost.old <- -logLikCR(data, theta.old[j, ])
           logpost.propose <- -logLikCR(data, propose.theta)
-          ratio <- min(exp(logpost.propose + dmvt.old - logpost.old - dmvt.propose), 1)
+          ratio <- min(exp(logpost.propose - logpost.old), 1)
+          
           if (runif(1) <= ratio) {
             theta.new[j, ] = propose.theta
           } 
