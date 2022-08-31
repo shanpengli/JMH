@@ -34,7 +34,8 @@ bootsfitRI_DP <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
   } else {
     
     survfit <- try(survfit3JMMLSM(fit, seed = seed + i, ynewdata = ynewdata, cnewdata = cnewdata, 
-                                  u = u, M = M, simulate = TRUE, quadpoint = quadpoint), silent = TRUE)
+                                  u = u, M = M, burn.in = 0.2, 
+                                  n.nested = 400, simulate = TRUE, quadpoint = quadpoint), silent = TRUE)
     
     if ('try-error' %in% class(survfit)) {
       pred1 <- NULL
