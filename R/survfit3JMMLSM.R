@@ -13,6 +13,7 @@
 ##' @param u a numeric vector of times for which prediction survival probabilities are to be computed.
 ##' @param M the number of Monte Carlo samples to be generated. Default is 200.
 ##' @param burn.in The proportion of M to discard as burn-in. Default is 0.2.
+##' @param n.nested the length of Markov chain in Monte Carlo sampling. Default is 100.
 ##' @param simulate logical; if \code{TRUE}, a Monte Carlo approach is used to estimate conditional probabilities. 
 ##' Otherwise, Gauss-Hermite quadrature rule is used for numerical integration to estimate instead. 
 ##' Default is \code{TRUE}.
@@ -24,7 +25,7 @@
 ##' @export
 ##' 
 survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL, 
-                           u = NULL, M = 200, burn.in = 0.2, simulate = TRUE, quadpoint = NULL, ...) {
+                           u = NULL, M = 200, burn.in = 0.2, n.nested = 100, simulate = TRUE, quadpoint = NULL, ...) {
   if (!inherits(object, "JMMLSM"))
     stop("Use only with 'JMMLSM' objects.\n")
   if (is.null(ynewdata))
@@ -307,10 +308,11 @@ survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       for (i in 1:M) {
         
         ### 0. Set the initial estimator
-        psil <- Psi.init
         H01l <- H01.init
         H02l <- H02.init
         
+        ###1. draw new parameters
+        psil <- Psi.MC[i, ]
         betal <- psil[1:nbeta]
         taul <- psil[(nbeta+1):(nbeta+ntau)]
         gammal1 <- psil[(nbeta+ntau+1):(nbeta+ntau+ngamma)]
@@ -328,7 +330,7 @@ survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
           Sigl[1, 3] <- Sigl[3, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+3]
         }
         
-        ###1. Compute the expected value
+        ###2. Compute the expected value
         n <- nrow(object$cdata)
         p1a <- nsig-1
         CUH01 <- rep(0, n)
@@ -369,25 +371,6 @@ survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         H01l <- GetNewH0$H01
         H02l <- GetNewH0$H02
         
-        ###4. draw new parameters
-        psil <- Psi.MC[i, ]
-        betal <- psil[1:nbeta]
-        taul <- psil[(nbeta+1):(nbeta+ntau)]
-        gammal1 <- psil[(nbeta+ntau+1):(nbeta+ntau+ngamma)]
-        gammal2 <- psil[(nbeta+ntau+ngamma+1):(nbeta+ntau+2*ngamma)]
-        alphal1 <- psil[(nbeta+ntau+2*ngamma+1):(nbeta+ntau+2*ngamma+nalpha)]
-        alphal2 <- psil[(nbeta+ntau+2*ngamma+nalpha+1):(nbeta+ntau+2*ngamma+2*nalpha)]
-        nul1 <- psil[nbeta+ntau+2*ngamma+2*nalpha+1]
-        nul2 <- psil[nbeta+ntau+2*ngamma+2*nalpha+2]
-        Sigl <- matrix(0, ncol = nsig, nrow = nsig)
-        for (l in 1:nsig) Sigl[l, l] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+l]
-        if (nsig == 2) Sigl[1, 2] <- Sigl[2, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+1]
-        if (nsig == 3) {
-          Sigl[1, 2] <- Sigl[2, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+1]
-          Sigl[2, 3] <- Sigl[3, 2] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+2]
-          Sigl[1, 3] <- Sigl[3, 1] <- psil[nbeta+ntau+2*ngamma+2*nalpha+2+nsig+3]
-        }
-        
         for (j in 1:N.ID) {
           subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == ID[j], ]
           subNDy.variance <- ynewdata.variance[ynewdata.variance[, bvar[length(bvar)]] == ID[j], ]
@@ -416,10 +399,10 @@ survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
                            "gamma1", "gamma2", "alpha1", "alpha2", "nu1", "nu2", "Sig")
           
           ## nested MCMC
-          P1us <- matrix(0, nrow = 99, ncol = lengthu)
-          P2us <- matrix(0, nrow = 99, ncol = lengthu)
+          P1us <- matrix(0, nrow = n.nested, ncol = lengthu)
+          P2us <- matrix(0, nrow = n.nested, ncol = lengthu)
 
-          for (ii in 2:100) {
+          for (ii in 1:n.nested) {
             ## simulate new random effects estimates using the Metropolis Hastings algorithm
             propose.theta <- as.vector(mvrnorm(n = 1, theta.old[j, ], theta.var[[j]], tol = 1e-6, empirical = FALSE))
             logpost.old <- -logLikCR(data, theta.old[j, ])
@@ -435,15 +418,15 @@ survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
               CIF1 <- GetCIF1CR(data$gamma1, data$gamma2, data$alpha1, data$alpha2, 
                                 data$nu1, data$nu2, as.vector(data$X2),
                                  H01l, H02l, s, u[jj],  theta.new[j, ], nrow(data$Sig))
-              P1us[ii-1, jj] <- Pk.us(CIF1, data, theta.new[j, ])
-              if (P1us[ii-1, jj] > 1) P1us[ii-1, jj] <- 1
-              allPi1[[j]][i, jj] <- P1us[ii-1, jj]
+              P1us[ii, jj] <- Pk.us(CIF1, data, theta.new[j, ])
+              if (P1us[ii, jj] > 1) P1us[ii, jj] <- 1
+              allPi1[[j]][i, jj] <- P1us[ii, jj]
               CIF2 <- GetCIF2CR(data$gamma1, data$gamma2, data$alpha1, data$alpha2, 
                                 data$nu1, data$nu2, as.vector(data$X2),
                                 H01l, H02l, s, u[jj],  theta.new[j, ], nrow(data$Sig))
-              P2us[ii-1, jj] <- Pk.us(CIF2, data, theta.new[j, ])
-              if (P2us[ii-1, jj] > 1) P2us[ii-1, jj] <- 1
-              allPi2[[j]][i, jj] <- P2us[ii-1, jj]
+              P2us[ii, jj] <- Pk.us(CIF2, data, theta.new[j, ])
+              if (P2us[ii, jj] > 1) P2us[ii, jj] <- 1
+              allPi2[[j]][i, jj] <- P2us[ii, jj]
             }
             theta.old[j, ] <- theta.new[j, ]
           }
@@ -453,11 +436,8 @@ survfit3JMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
             allPi2[[j]][i, jj] <- mean(P2us[, jj])
           }
           
-
-
         }
         ## pass the current sample parameters to the next iteration
-        Psi.init <- psil
         H01.init <- H01l
         H02.init <- H02l
         
