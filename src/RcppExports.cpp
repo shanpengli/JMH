@@ -33,6 +33,18 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// OLS
+Rcpp::List OLS(const Eigen::MatrixXd& X, const Eigen::VectorXd& Y);
+RcppExport SEXP _JMH_OLS(SEXP XSEXP, SEXP YSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type X(XSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type Y(YSEXP);
+    rcpp_result_gen = Rcpp::wrap(OLS(X, Y));
+    return rcpp_result_gen;
+END_RCPP
+}
 // MultVV
 double MultVV(const Eigen::VectorXd& x, const Eigen::VectorXd& y);
 RcppExport SEXP _JMH_MultVV(SEXP xSEXP, SEXP ySEXP) {
@@ -526,6 +538,7 @@ END_RCPP
 static const R_CallMethodDef CallEntries[] = {
     {"_JMH_GetrisksetC", (DL_FUNC) &_JMH_GetrisksetC, 1},
     {"_JMH_GetrisksetCSF", (DL_FUNC) &_JMH_GetrisksetCSF, 1},
+    {"_JMH_OLS", (DL_FUNC) &_JMH_OLS, 2},
     {"_JMH_MultVV", (DL_FUNC) &_JMH_MultVV, 2},
     {"_JMH_MultVVoutprod", (DL_FUNC) &_JMH_MultVVoutprod, 1},
     {"_JMH_MultVV2outprod", (DL_FUNC) &_JMH_MultVV2outprod, 2},

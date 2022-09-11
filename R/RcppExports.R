@@ -9,6 +9,10 @@ GetrisksetCSF <- function(cdata) {
     .Call(`_JMH_GetrisksetCSF`, cdata)
 }
 
+OLS <- function(X, Y) {
+    .Call(`_JMH_OLS`, X, Y)
+}
+
 MultVV <- function(x, y) {
     .Call(`_JMH_MultVV`, x, y)
 }
