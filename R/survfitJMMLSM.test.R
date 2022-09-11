@@ -97,6 +97,7 @@ survfitJMMLSM.test <- function(object, seed = 100, ynewdata = NULL, cnewdata = N
   }
   
   Pred <- list()
+  CompetingRisk <- object$CompetingRisk
   if (object$CompetingRisk) {
     
     beta <- object$beta
