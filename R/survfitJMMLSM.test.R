@@ -246,7 +246,7 @@ survfitJMMLSM.test <- function(object, seed = 100, ynewdata = NULL, cnewdata = N
 
   }
   names(y.obs) <- names(Pred) <- yID
-  Last.time <- data.frame(cnewdata[, cID], Last.time)
+  Last.time <- data.frame(cID, Last.time)
   sum <- list(Pred = Pred, Last.time = Last.time, y.obs = y.obs, method = method, quadpoint = quadpoint,
               CompetingRisk = CompetingRisk)
   class(sum) <- "survfitJMMLSM"
