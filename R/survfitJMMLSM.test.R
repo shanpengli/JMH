@@ -46,10 +46,10 @@ survfitJMMLSM.test <- function(object, seed = 100, ynewdata = NULL, cnewdata = N
   }
   if (is.null(obs.time)) {
     stop("Please specify a vector that represents the time variable from ydatanew.")
-  } else if (!is.null(obs.time) && !obs.time %in% colnames(ynewdata)) {
-    stop(paste0(obs.time, " is not found in ynewdata."))
   } else {
-    next
+    if (!obs.time %in% colnames(ynewdata)) {
+      stop(paste0(obs.time, " is not found in ynewdata."))
+    }
   }
   
   bvar <- all.vars(object$random)
