@@ -22,7 +22,7 @@ print.survfitJMMLSM <- function (x, ...) {
   }
   
   f.CR <- function (d, t) {
-    a <- matrix(1, nrow = 1, ncol = 3)
+    a <- matrix(0, nrow = 1, ncol = 3)
     a[1, 1] <- t 
     a <- as.data.frame(a)
     colnames(a) <- colnames(d)
