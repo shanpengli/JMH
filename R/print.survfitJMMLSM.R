@@ -22,14 +22,11 @@ print.survfitJMMLSM <- function (x, ...) {
   }
   
   f.CR <- function (d, t) {
-    a <- matrix(0, nrow = 1, ncol = 2)
+    a <- matrix(1, nrow = 1, ncol = 3)
     a[1, 1] <- t 
     a <- as.data.frame(a)
-    
-    colnames(a) <- colnames(d[[1]])
-    for (i in 1:2) {
-      d[[i]] <- rbind(a, d[[i]])
-    }
+    colnames(a) <- colnames(d)
+    d <- rbind(a, d)
     d
   }
   if (!is.null(x$quadpoint)) {
