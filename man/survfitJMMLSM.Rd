@@ -10,8 +10,9 @@ survfitJMMLSM(
   ynewdata = NULL,
   cnewdata = NULL,
   u = NULL,
-  M = 200,
-  simulate = TRUE,
+  Last.time = NULL,
+  obs.time = NULL,
+  method = c("Laplace", "GH"),
   quadpoint = NULL,
   ...
 )
@@ -19,7 +20,7 @@ survfitJMMLSM(
 \arguments{
 \item{object}{an object inheriting from class \code{JMMLSM}.}
 
-\item{seed}{a random seed number to proceed Monte Carlo simulation. Default is 100.}
+\item{seed}{a random seed number to proceed non-parametric bootstrap. Default is 100.}
 
 \item{ynewdata}{a data frame that contains the longitudinal and covariate information for the subjects 
 for which prediction of survival probabilities is required.}
@@ -29,13 +30,19 @@ for which prediction of survival probabilities is required.}
 
 \item{u}{a numeric vector of times for which prediction survival probabilities are to be computed.}
 
-\item{M}{the number of Monte Carlo samples to be generated. Default is 200.}
+\item{Last.time}{a numeric vector or character string. This specifies the known time at which each of 
+the subjects in cnewdata was known to be alive. If NULL, then this is automatically taken as the 
+survival time of each subject. If a numeric vector, then it is assumed to be greater than or equals to the 
+last available longitudinal time point for each subject. If a character string, then it should be 
+a variable in cnewdata.}
 
-\item{simulate}{logical; if \code{TRUE}, a Monte Carlo approach is used to estimate conditional probabilities. 
-Otherwise, Gauss-Hermite quadrature rule is used for numerical integration to estimate instead. 
-Default is \code{TRUE}.}
+\item{obs.time}{a character string of specifying a longitudinal time variable in ynewdata.}
 
-\item{quadpoint}{number of quadrature points used for estimating conditional probabilities when \code{simulate = FALSE}. Default is 20.}
+\item{method}{a character string specifying the type of probability approximation; if \code{Laplace}, then a first order estimator is computed.
+If \code{GH}, then the standard Gauss-Hermite quadrature is used instead.}
+
+\item{quadpoint}{number of quadrature points used for estimating conditional probabilities 
+when \code{method = "GH"}. Default is NULL. If \code{method = "GH"}, then 15 is used.}
 
 \item{...}{further arguments passed to or from other methods.}
 }
