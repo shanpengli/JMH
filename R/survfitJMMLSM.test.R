@@ -16,7 +16,7 @@
 ##' survival time of each subject. If a numeric vector, then it is assumed to be greater than or equals to the 
 ##' last available longitudinal time point for each subject. If a character string, then it should be 
 ##' a variable in cnewdata.
-##' @param obs.time a character string of specifying a variable in ynewdata.
+##' @param obs.time a character string of specifying a longitudinal time variable in ynewdata.
 ##' @param method a character string specifying the type of probability approximation; if \code{Laplace}, then a first order estimator is computed.
 ##' If \code{GH}, then the standard Gauss-Hermite quadrature is used instead.
 ##' @param quadpoint number of quadrature points used for estimating conditional probabilities 
@@ -53,10 +53,11 @@ survfitJMMLSM.test <- function(object, seed = 100, ynewdata = NULL, cnewdata = N
   }
   
   bvar <- all.vars(object$random)
-  if (!(bvar[length(bvar)] %in% colnames(ynewdata)))
-    stop(paste("The ID variable", bvar[length(bvar)], "is not found in ynewdata."))
-  if (!(bvar[length(bvar)] %in% colnames(cnewdata)))
-    stop(paste("The ID variable", bvar[length(bvar)], "is not found in cnewdata."))
+  ID <- bvar[length(bvar)]
+  if (!(ID %in% colnames(ynewdata)))
+    stop(paste("The ID variable", ID, "is not found in ynewdata."))
+  if (!(ID %in% colnames(cnewdata)))
+    stop(paste("The ID variable", ID, "is not found in cnewdata."))
   
   ynewdata <- ynewdata[, colnames(object$ydata)]
   cnewdata <- cnewdata[, colnames(object$cdata)]
@@ -101,7 +102,6 @@ survfitJMMLSM.test <- function(object, seed = 100, ynewdata = NULL, cnewdata = N
   cnewdata <- cdata2[c((Nc-nc+1):Nc), ]
   
   if (length(bvar) > 1) bvar1 <- bvar[1:(length(bvar) - 1)]
-  ID <- bvar[length(bvar)]
   yID <- unique(ynewdata.mean[, ID])
   N.ID <- length(yID)
   cID <- cnewdata[, ID]
@@ -144,9 +144,9 @@ survfitJMMLSM.test <- function(object, seed = 100, ynewdata = NULL, cnewdata = N
     y.obs <- list()
     lengthu <- length(u)
     for (j in 1:N.ID) {
-      subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == yID[j], ]
-      subNDy.variance <- ynewdata.variance[ynewdata.variance[, bvar[length(bvar)]] == yID[j], ]
-      subNDc <- cnewdata[cnewdata[, bvar[length(bvar)]] == yID[j], ]
+      subNDy.mean <- ynewdata.mean[ynewdata.mean[, ID] == yID[j], ]
+      subNDy.variance <- ynewdata.variance[ynewdata.variance[, ID] == yID[j], ]
+      subNDc <- cnewdata[cnewdata[, ID] == yID[j], ]
       y.obs[[j]] <- data.frame(subNDy.mean[, c(obs.time, Yvar[1])])
       
       s <-  as.numeric(Last.time[j])
@@ -214,11 +214,13 @@ survfitJMMLSM.test <- function(object, seed = 100, ynewdata = NULL, cnewdata = N
     
     y.obs <- list()
     lengthu <- length(u)
+    
+    
 
     for (j in 1:N.ID) {
-      subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == ID[j], ]
-      subNDy.variance <- ynewdata.variance[ynewdata.variance[, bvar[length(bvar)]] == ID[j], ]
-      subNDc <- cnewdata[cnewdata[, bvar[length(bvar)]] == ID[j], ]
+      subNDy.mean <- ynewdata.mean[ynewdata.mean[, ID] == yID[j], ]
+      subNDy.variance <- ynewdata.variance[ynewdata.variance[, ID] == yID[j], ]
+      subNDc <- cnewdata[cnewdata[, ID] == yID[j], ]
       y.obs[[j]] <- data.frame(subNDy.mean[, c(obs.time, Yvar[1])])
       
       CH0 <- CH(H01, Last.time[j])
@@ -227,7 +229,6 @@ survfitJMMLSM.test <- function(object, seed = 100, ynewdata = NULL, cnewdata = N
       for (jj in 1:lengthu) {
         CH0u[jj] <- CH(H01, u[jj])
       }
-      
       Y <- subNDy.mean[, Yvar[1]]
       X <- subNDy.mean[, Yvar[2:length(Yvar)]]
       X <- as.matrix(X)
@@ -241,8 +242,10 @@ survfitJMMLSM.test <- function(object, seed = 100, ynewdata = NULL, cnewdata = N
       }
       X2 <- as.matrix(subNDc[1, Cvar[3:length(Cvar)]])
       
+      print(subNDy.mean)
       ## find out E(theta_i)
       data <- list(Y, X, Z, W, X2, CH0, beta, tau, gamma, alpha, nu, Sig)
+      print(data)
       names(data) <- c("Y", "X", "Z", "W", "X2", "CH0", "beta", "tau", "gamma", "alpha", "nu", "Sig")
       opt <- optim(rep(0, nsig), logLik, data = data, method = "BFGS", hessian = TRUE)
       meanbw <- opt$par

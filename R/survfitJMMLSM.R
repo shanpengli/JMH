@@ -378,6 +378,7 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         
         ## find out E(theta_i)
         data <- list(Y, X, Z, W, X2, CH0, beta, tau, gamma, alpha, nu, Sig)
+        print(data)
         names(data) <- c("Y", "X", "Z", "W", "X2", "CH0", "beta", "tau", "gamma", "alpha", "nu", "Sig")
         opt <- optim(rep(0, nsig), logLik, data = data, method = "BFGS", hessian = TRUE)
         meanbw <- opt$par

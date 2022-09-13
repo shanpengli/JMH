@@ -36,7 +36,7 @@ survival time of each subject. If a numeric vector, then it is assumed to be gre
 last available longitudinal time point for each subject. If a character string, then it should be 
 a variable in cnewdata.}
 
-\item{obs.time}{a character string of specifying a variable in ynewdata.}
+\item{obs.time}{a character string of specifying a longitudinal time variable in ynewdata.}
 
 \item{method}{a character string specifying the type of probability approximation; if \code{Laplace}, then a first order estimator is computed.
 If \code{GH}, then the standard Gauss-Hermite quadrature is used instead.}
