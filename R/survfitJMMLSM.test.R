@@ -22,7 +22,7 @@
 ##' @export
 ##' 
 survfitJMMLSM.test <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL, 
-                              u = NULL, Last.time = NULL, method = c("Laplace", "GH"), quadpoint = NULL, ...) {
+                              u = NULL, Last.time = NULL, obs.time = NULL, method = c("Laplace", "GH"), quadpoint = NULL, ...) {
   if (!inherits(object, "JMMLSM"))
     stop("Use only with 'JMMLSM' objects.\n")
   if (is.null(ynewdata))
@@ -37,6 +37,13 @@ survfitJMMLSM.test <- function(object, seed = 100, ynewdata = NULL, cnewdata = N
     stop("u must be vector typed.")
   if (is.null(quadpoint)) {
     quadpoint <- object$quadpoint
+  }
+  if (is.null(obs.time)) {
+    stop("Please specify a vector that represents the time variable from ydatanew.")
+  } else if (!is.null(obs.time) && !obs.time %in% colnames(ynewdata)) {
+    stop(paste0(obs.time, " is not found in ynewdata."))
+  } else {
+    next
   }
   
   bvar <- all.vars(object$random)
@@ -127,7 +134,7 @@ survfitJMMLSM.test <- function(object, seed = 100, ynewdata = NULL, cnewdata = N
       subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == yID[j], ]
       subNDy.variance <- ynewdata.variance[ynewdata.variance[, bvar[length(bvar)]] == yID[j], ]
       subNDc <- cnewdata[cnewdata[, bvar[length(bvar)]] == yID[j], ]
-      y.obs[[j]] <- data.frame(subNDy.mean[, c(bvar[1], Yvar[1])])
+      y.obs[[j]] <- data.frame(subNDy.mean[, c(obs.time, Yvar[1])])
       
       s <-  as.numeric(Last.time[j])
       CH01 <- CH(H01, s)
@@ -209,12 +216,15 @@ survfitJMMLSM.test <- function(object, seed = 100, ynewdata = NULL, cnewdata = N
       subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == ID[j], ]
       subNDy.variance <- ynewdata.variance[ynewdata.variance[, bvar[length(bvar)]] == ID[j], ]
       subNDc <- cnewdata[cnewdata[, bvar[length(bvar)]] == ID[j], ]
-      y.obs[[j]] <- data.frame(subNDy.mean[, c(bvar[1], Yvar[1])])
-      CH0 <- CH(H01, subNDc[, Cvar[1]])
+      y.obs[[j]] <- data.frame(subNDy.mean[, c(obs.time, Yvar[1])])
+      
+      CH0 <- CH(H01, Last.time[j])
       CH0u <- vector()
+      
       for (jj in 1:lengthu) {
         CH0u[jj] <- CH(H01, u[jj])
       }
+      
       Y <- subNDy.mean[, Yvar[1]]
       X <- subNDy.mean[, Yvar[2:length(Yvar)]]
       X <- as.matrix(X)
