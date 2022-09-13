@@ -11,6 +11,12 @@
 ##' @param cnewdata a data frame that contains the survival and covariate information for the subjects 
 ##' for which prediction of survival probabilities is required.
 ##' @param u a numeric vector of times for which prediction survival probabilities are to be computed.
+##' @param Last.time a numeric vector or character string. This specifies the known time at which each of 
+##' the subjects in cnewdata was known to be alive. If NULL, then this is automatically taken as the 
+##' survival time of each subject. If a numeric vector, then it is assumed to be greater than or equals to the 
+##' last available longitudinal time point for each subject. If a character string, then it should be 
+##' a variable in cnewdata.
+##' @param obs.time a character string of specifying a variable in ynewdata.
 ##' @param method a character string specifying the type of probability approximation; if \code{Laplace}, then a first order estimator is computed.
 ##' If \code{GH}, then the standard Gauss-Hermite quadrature is used instead.
 ##' @param quadpoint number of quadrature points used for estimating conditional probabilities 
@@ -103,6 +109,20 @@ survfitJMMLSM.test <- function(object, seed = 100, ynewdata = NULL, cnewdata = N
     stop("The order of subjects in ydata doesn't match with cnewdata.")
   }
   
+  if (!is.null(Last.time)) {
+    if (is.character(Last.time)) {
+      if (Last.time %in% colnames(cnewdata)) {
+        Last.time <- cnewdata[, Last.time]
+      } else {
+        stop(paste(Last.time, "is not found in cnewdata."))
+      }
+    }
+    if (is.numeric(Last.time) && (length(Last.time) != nrow(cnewdata)))
+      stop("The last.time vector does not match cnewdata.")
+  } else {
+    Last.time <- cnewdata[, Cvar[1]]
+  }
+  
   Pred <- list()
   CompetingRisk <- object$CompetingRisk
   if (object$CompetingRisk) {
@@ -123,13 +143,6 @@ survfitJMMLSM.test <- function(object, seed = 100, ynewdata = NULL, cnewdata = N
     Predraw2 <- matrix(0, nrow = nrow(cnewdata), ncol = length(u))
     y.obs <- list()
     lengthu <- length(u)
-    if (is.null(Last.time)) {
-      Last.time <- cnewdata[, Cvar[1]]
-    } 
-    if (!is.null(Last.time)) {
-      if (length(Last.time) != nrow(cnewdata))
-        stop("The last.time vector does not match cnewdata.")
-    }
     for (j in 1:N.ID) {
       subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == yID[j], ]
       subNDy.variance <- ynewdata.variance[ynewdata.variance[, bvar[length(bvar)]] == yID[j], ]
@@ -201,17 +214,7 @@ survfitJMMLSM.test <- function(object, seed = 100, ynewdata = NULL, cnewdata = N
     
     y.obs <- list()
     lengthu <- length(u)
-    
-    if (is.null(Last.time)) {
-      Last.time <- cnewdata[, Cvar[1]]
-    } 
-    if (!is.null(Last.time)) {
-      if (length(Last.time) != nrow(cnewdata))
-        stop("The last.time vector does not match cnewdata.")
-    }
 
-    CompetingRisk <- object$CompetingRisk
-    
     for (j in 1:N.ID) {
       subNDy.mean <- ynewdata.mean[ynewdata.mean[, bvar[length(bvar)]] == ID[j], ]
       subNDy.variance <- ynewdata.variance[ynewdata.variance[, bvar[length(bvar)]] == ID[j], ]

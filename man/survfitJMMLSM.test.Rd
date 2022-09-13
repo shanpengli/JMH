@@ -11,6 +11,7 @@ survfitJMMLSM.test(
   cnewdata = NULL,
   u = NULL,
   Last.time = NULL,
+  obs.time = NULL,
   method = c("Laplace", "GH"),
   quadpoint = NULL,
   ...
@@ -28,6 +29,14 @@ for which prediction of survival probabilities is required.}
 for which prediction of survival probabilities is required.}
 
 \item{u}{a numeric vector of times for which prediction survival probabilities are to be computed.}
+
+\item{Last.time}{a numeric vector or character string. This specifies the known time at which each of 
+the subjects in cnewdata was known to be alive. If NULL, then this is automatically taken as the 
+survival time of each subject. If a numeric vector, then it is assumed to be greater than or equals to the 
+last available longitudinal time point for each subject. If a character string, then it should be 
+a variable in cnewdata.}
+
+\item{obs.time}{a character string of specifying a variable in ynewdata.}
 
 \item{method}{a character string specifying the type of probability approximation; if \code{Laplace}, then a first order estimator is computed.
 If \code{GH}, then the standard Gauss-Hermite quadrature is used instead.}
