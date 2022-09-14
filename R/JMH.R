@@ -8,6 +8,5 @@
 #' @importFrom dplyr left_join
 #' @importFrom MASS mvrnorm
 #' @importFrom nlme lme getVarCov lmeControl
-#' @importFrom Hmisc hdquantile
-#' @importFrom utils setTxtProgressBar txtProgressBar
+#' @importFrom caret groupKFold
 NULL
