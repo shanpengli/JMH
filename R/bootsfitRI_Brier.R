@@ -25,7 +25,7 @@ bootsfitRI_Brier <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
                       long.formula = Y ~ Z1 + Z2 + Z3 + time,
                       surv.formula = Surv(survtime, cmprsk) ~ var1 + var2 + var3,
                       variance.formula = ~ Z1 + Z2 + Z3 + time, 
-                      quadpoint = 15, random = ~ 1|ID, print.para = TRUE), silent = TRUE)
+                      quadpoint = 15, random = ~ 1|ID), silent = TRUE)
     
     if ('try-error' %in% class(fit)) {
       Brier.cv[[t]] <- NULL
