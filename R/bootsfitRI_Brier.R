@@ -39,14 +39,15 @@ bootsfitRI_Brier <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
       ## fit a Kalplan-Meier estimator
       fitKM <- survfit(Surv(survtime, cmprsk == 0) ~ 1, data = val.cdata)
       
+      
       val.cdata <- val.cdata[val.cdata$survtime > landmark.time, ]
       val.ydata <- val.ydata[val.ydata$ID %in% val.cdata$ID, ]
       val.ydata <- val.ydata[val.ydata$time <= landmark.time/increment, ]
       
       survfit <- try(survfitJMMLSM(fit, seed = seed, ynewdata = val.ydata, cnewdata = val.cdata, 
-                        u = horizon.time, method = method, 
-                        Last.time = rep(landmark.time, nrow(val.cdata)),
-                        obs.time = "time", quadpoint = quadpoint), silent = TRUE)
+                                   u = horizon.time, method = method, 
+                                   Last.time = rep(landmark.time, nrow(val.cdata)),
+                                   obs.time = "time", quadpoint = quadpoint), silent = TRUE)
       
       if ('try-error' %in% class(survfit)) {
         Brier.cv[[t]] <- NULL
@@ -55,56 +56,62 @@ bootsfitRI_Brier <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
         colnames(CIF) <- c("ID", "CIF1", "CIF2")
         CIF$ID <- val.cdata$ID
         Gs <- summary(fitKM, times = landmark.time)$surv
-        
         mean.Brier <- matrix(NA, nrow = length(horizon.time), ncol = 2)
         for (j in 1:length(horizon.time)) {
-          Gu <- summary(fitKM, times = horizon.time[j])$surv
-          ## true counting process
-          N1 <- vector()
-          N2 <- vector()
-          Gt <- vector()
-          W.IPCW <- vector()
-          for (i in 1:nrow(CIF)) {
-            if (val.cdata$survtime[i] <= horizon.time[j] && val.cdata$cmprsk[i] == 1) {
-              N1[i] <- 1
-            } else {
-              N1[i] <- 0
+          fitKM.horizon <- try(summary(fitKM, times = horizon.time[j]), silent = TRUE)
+          if ('try-error' %in% class(fitKM.horizon)) {
+            mean.Brier[j, 1] <- NA
+            mean.Brier[j, 2] <- NA
+          } else {
+            Gu <- fitKM.horizon$surv
+            ## true counting process
+            N1 <- vector()
+            N2 <- vector()
+            Gt <- vector()
+            W.IPCW <- vector()
+            for (i in 1:nrow(CIF)) {
+              if (val.cdata$survtime[i] <= horizon.time[j] && val.cdata$cmprsk[i] == 1) {
+                N1[i] <- 1
+              } else {
+                N1[i] <- 0
+              }
+              
+              if (val.cdata$survtime[i] <= horizon.time[j] && val.cdata$cmprsk[i] == 2) {
+                N2[i] <- 1
+              } else {
+                N2[i] <- 0
+              }
+              
+              if (val.cdata$survtime[i] <= horizon.time[j] && val.cdata$cmprsk[i] != 0) {
+                Gt[i] <- summary(fitKM, times = val.cdata$survtime[i])$surv
+              } else {
+                Gt[i] <- NA
+              }
+              
+              if (val.cdata$survtime[i] > horizon.time[j]) {
+                W.IPCW[i] <- 1/(Gu/Gs)
+              } else if (val.cdata$survtime[i] <= horizon.time[j] && val.cdata$cmprsk[i] != 0) {
+                W.IPCW[i] <- 1/(Gt[i]/Gs)
+              } else {
+                W.IPCW[i] <- NA
+              }
+            }
+            ## extract estimated CIF
+            for (k in 1:nrow(CIF)) {
+              CIF[k, 2] <- survfit$Pred[[k]][j, 2]
+              CIF[k, 3] <- survfit$Pred[[k]][j, 3]
             }
             
-            if (val.cdata$survtime[i] <= horizon.time[j] && val.cdata$cmprsk[i] == 2) {
-              N2[i] <- 1
-            } else {
-              N2[i] <- 0
-            }
+            RAWData.Brier <- data.frame(CIF, N1, N2, W.IPCW)
+            RAWData.Brier$Brier1 <- RAWData.Brier$W.IPCW*(RAWData.Brier$CIF1 - RAWData.Brier$N1)^2
+            RAWData.Brier$Brier2 <- RAWData.Brier$W.IPCW*(RAWData.Brier$CIF2 - RAWData.Brier$N2)^2
             
-            if (val.cdata$survtime[i] <= horizon.time[j] && val.cdata$cmprsk[i] != 0) {
-              Gt[i] <- summary(fitKM, times = val.cdata$survtime[i])$surv
-            } else {
-              Gt[i] <- NA
-            }
-            
-            if (val.cdata$survtime[i] > horizon.time[j]) {
-              W.IPCW[i] <- 1/(Gu/Gs)
-            } else if (val.cdata$survtime[i] <= horizon.time[j] && val.cdata$cmprsk[i] != 0) {
-              W.IPCW[i] <- 1/(Gt[i]/Gs)
-            } else {
-              W.IPCW[i] <- NA
-            }
-          }
-          ## extract estimated CIF
-          for (k in 1:nrow(CIF)) {
-            CIF[k, 2] <- survfit$Pred[[k]][j, 2]
-            CIF[k, 3] <- survfit$Pred[[k]][j, 3]
+            mean.Brier1 <- sum(RAWData.Brier$Brier1, na.rm = TRUE)/nrow(RAWData.Brier)
+            mean.Brier2 <- sum(RAWData.Brier$Brier2, na.rm = TRUE)/nrow(RAWData.Brier)
+            mean.Brier[j, 1] <- mean.Brier1
+            mean.Brier[j, 2] <- mean.Brier2
           }
           
-          RAWData.Brier <- data.frame(CIF, N1, N2, W.IPCW)
-          RAWData.Brier$Brier1 <- RAWData.Brier$W.IPCW*(RAWData.Brier$CIF1 - RAWData.Brier$N1)^2
-          RAWData.Brier$Brier2 <- RAWData.Brier$W.IPCW*(RAWData.Brier$CIF2 - RAWData.Brier$N2)^2
-          
-          mean.Brier1 <- sum(RAWData.Brier$Brier1, na.rm = TRUE)/nrow(RAWData.Brier)
-          mean.Brier2 <- sum(RAWData.Brier$Brier2, na.rm = TRUE)/nrow(RAWData.Brier)
-          mean.Brier[j, 1] <- mean.Brier1
-          mean.Brier[j, 2] <- mean.Brier2
           
         }
         
@@ -115,6 +122,6 @@ bootsfitRI_Brier <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
     
   }
   
-return(Brier.cv)
-
+  return(Brier.cv)
+  
 }
