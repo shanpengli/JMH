@@ -19,7 +19,7 @@ Rcpp::List getECIF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
                    const double s, const double u){ 
   
   //calculate the square root of random effect covariance matrix 
-  Eigen::JacobiSVD<Eigen::MatrixXd> svd(Sig.inverse(), Eigen::ComputeThinU | Eigen::ComputeThinV);
+  Eigen::JacobiSVD<Eigen::MatrixXd> svd(Sig, Eigen::ComputeThinU | Eigen::ComputeThinV);
   Eigen::VectorXd eigenSQ = svd.singularValues();
   int i,j,q,t,db,uu;
   for (i=0;i<eigenSQ.size();i++) {
