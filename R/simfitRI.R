@@ -4,12 +4,21 @@
 simfitRI <- function(sim = 100, N = 200, lambda1 = 0.05, lambda2 = 0.1,
                    tau = c(0.5, 0.5, -0.2, 0.2, 0.05),
                    CL = 4, CU = 8, seed = 10, maxiter = 1000,
-                   increment = 0.25, quadpoint = 15, ncores = 10) {
+                   increment = 0.25, 
+                   alpha1 = 1,
+                   alpha2 = -1,
+                   vee1 = 0.5,
+                   vee2 = -0.5,
+                   quadpoint = 15, 
+                   covbw = matrix(c(0.5, 0.25, 0.25, 0.5), nrow = 2, ncol = 2),
+                   ncores = 10) {
   
   ParaMatrixRaw <- parallel::mclapply(1:sim, bootsfitRI,
                                       N = N, lambda1 = lambda1, lambda2 = lambda2,
-                                      tau = tau,
-                                      CL = CL, CU = CU, seed = seed, maxiter = maxiter,
+                                      tau = tau, CL = CL, CU = CU, 
+                                      alpha1 = alpha1, alpha2 = alpha2, 
+                                      vee1 = vee1, vee2 = vee2,
+                                      covbw = covbw, seed = seed, maxiter = maxiter,
                                       increment = increment, quadpoint = quadpoint,
                                       mc.cores = ncores)
   
