@@ -85,12 +85,12 @@ GetinitFake <- function(cdata, ydata, long.formula, surv.formula, variance.formu
       tau = c(0.5, 0.5, -0.2, 0.2, 0.05)
       gamma1 = c(1, 0.5, 0.5)
       gamma2 = c(-0.5, 0.5, 0.25)
-      vee1 = 0.5
-      vee2 = -0.5
+      vee1 = 2
+      vee2 = -2
 
       if (model == "intercept") {
-        alpha1 = as.vector(1)
-        alpha2 = as.vector(-1)
+        alpha1 = as.vector(-0.5)
+        alpha2 = as.vector(0.5)
         Sig <- matrix(c(0.5, 0.25, 0.25, 0.5), nrow = 2, ncol = 2)
       } else {
         alpha1 = c(1, 0.7)
