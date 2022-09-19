@@ -102,13 +102,13 @@ JMMLSM <- function(cdata, ydata,
   rawydata <- ydata
   rawcdata <- cdata
   
-  # getinit <- Getinit(cdata = cdata, ydata = ydata, long.formula = long.formula,
-  #                    surv.formula = surv.formula, variance.formula = variance.formula,
-  #                    model = model, ID = ID, RE = RE, random = random, survinitial = survinitial)
+  getinit <- Getinit(cdata = cdata, ydata = ydata, long.formula = long.formula,
+                     surv.formula = surv.formula, variance.formula = variance.formula,
+                     model = model, ID = ID, RE = RE, random = random, survinitial = survinitial)
 
-  getinit <- GetinitFake(cdata = cdata, ydata = ydata, long.formula = long.formula,
-                             surv.formula = surv.formula, variance.formula = variance.formula,
-                             model = model, ID = ID, RE = RE)
+  # getinit <- GetinitFake(cdata = cdata, ydata = ydata, long.formula = long.formula,
+  #                            surv.formula = surv.formula, variance.formula = variance.formula,
+  #                            model = model, ID = ID, RE = RE)
 
   
   cdata <- getinit$cdata
