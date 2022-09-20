@@ -1,7 +1,7 @@
 ##' @export
 ##' 
 
-BrierJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = NULL, 
+PEJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = NULL, 
                   obs.time = NULL, method = c("Laplace", "GH"), 
                   quadpoint = NULL, maxiter = 1000, n.cv = 3, ...) {
   
@@ -38,7 +38,7 @@ BrierJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time =
   
   folds <- caret::groupKFold(c(1:nrow(cdata)), k = n.cv)
   Brier.cv <- list()
-
+  MAE.cv <- list()
   for (t in 1:n.cv) {
     
     train.cdata <- cdata[folds[[t]], ]
@@ -79,14 +79,17 @@ BrierJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time =
       } else { 
         CIF <- as.data.frame(matrix(0, nrow = nrow(val.cdata), ncol = 3))
         colnames(CIF) <- c("ID", "CIF1", "CIF2")
-        CIF$ID <- val.cdata$ID
+        CIF$ID <- val.cdata[, ID]
         Gs <- summary(fitKM, times = landmark.time)$surv
         mean.Brier <- matrix(NA, nrow = length(horizon.time), ncol = 2)
+        mean.MAE <- matrix(NA, nrow = length(horizon.time), ncol = 2)
         for (j in 1:length(horizon.time)) {
           fitKM.horizon <- try(summary(fitKM, times = horizon.time[j]), silent = TRUE)
           if ('try-error' %in% class(fitKM.horizon)) {
             mean.Brier[j, 1] <- NA
             mean.Brier[j, 2] <- NA
+            mean.MAE[j, 1] <- NA
+            mean.MAE[j, 2] <- NA
           } else {
             Gu <- fitKM.horizon$surv
             ## true counting process
@@ -128,28 +131,39 @@ BrierJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time =
             }
             
             RAWData.Brier <- data.frame(CIF, N1, N2, W.IPCW)
-            RAWData.Brier$Brier1 <- RAWData.Brier$W.IPCW*(RAWData.Brier$CIF1 - RAWData.Brier$N1)^2
-            RAWData.Brier$Brier2 <- RAWData.Brier$W.IPCW*(RAWData.Brier$CIF2 - RAWData.Brier$N2)^2
-            
+            colnames(RAWData.Brier)[1:3] <- c("ID", "CIF1", "CIF2")
+            RAWData.Brier$Brier1 <- RAWData.Brier$W.IPCW*
+              abs(RAWData.Brier$CIF1 - RAWData.Brier$N1)^2
+            RAWData.Brier$Brier2 <- RAWData.Brier$W.IPCW*
+              abs(RAWData.Brier$CIF2 - RAWData.Brier$N2)^2
+            RAWData.Brier$MAE1 <- RAWData.Brier$W.IPCW*
+              abs(RAWData.Brier$CIF1 - RAWData.Brier$N1)^1
+            RAWData.Brier$MAE2 <- RAWData.Brier$W.IPCW*
+              abs(RAWData.Brier$CIF2 - RAWData.Brier$N2)^1
+            mean.MAE1  <- sum(RAWData.Brier$MAE1, na.rm = TRUE)/nrow(RAWData.Brier)
+            mean.MAE2  <- sum(RAWData.Brier$MAE2, na.rm = TRUE)/nrow(RAWData.Brier)
             mean.Brier1 <- sum(RAWData.Brier$Brier1, na.rm = TRUE)/nrow(RAWData.Brier)
             mean.Brier2 <- sum(RAWData.Brier$Brier2, na.rm = TRUE)/nrow(RAWData.Brier)
             mean.Brier[j, 1] <- mean.Brier1
             mean.Brier[j, 2] <- mean.Brier2
+            mean.MAE[j, 1] <- mean.MAE1
+            mean.MAE[j, 2] <- mean.MAE2
           }
           
           
         }
         
         Brier.cv[[t]] <- mean.Brier
+        MAE.cv[[t]] <- mean.MAE
       }
       
     }
     writeLines(paste0("The ", t, " th validation is done!"))
     
   }
-  result <- list(n.cv = n.cv, Brier.cv = Brier.cv, landmark.time = landmark.time,
+  result <- list(n.cv = n.cv, Brier.cv = Brier.cv, MAE.cv = MAE.cv, landmark.time = landmark.time,
                  horizon.time = horizon.time, method = method, quadpoint = quadpoint)
-  class(result) <- "BrierJMMLSM"
+  class(result) <- "PEJMMLSM"
   
   return(result)
   

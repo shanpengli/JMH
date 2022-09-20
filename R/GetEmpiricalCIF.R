@@ -5,7 +5,7 @@ GetEmpiricalCIF <- function(data, time, status) {
   
   data$status1 <- ifelse(data[, status] == 1, 1, 0)
   data$status2 <- ifelse(data[, status] == 2, 1, 0)
-  
+  data$time <- data[, time]
   ## Kaplan-Meier estimate S(t) of all-cause failures
   data$status3 <- ifelse(data$status1+data$status2 >= 1, 1, 0)
   fit <- survfit(Surv(time, status3) ~ 1, data = data)

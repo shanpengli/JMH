@@ -16,6 +16,7 @@ bootsfitRI_Brier <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
   
   folds <- caret::groupKFold(c(1:nrow(cdata)), k = n.cv)
   Brier.cv <- list()
+  RAWData <- list()
   
   for (t in 1:n.cv) {
     train.ydata <- ydata[ydata$ID %in% folds[[t]], ]
@@ -103,6 +104,7 @@ bootsfitRI_Brier <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
             }
             
             RAWData.Brier <- data.frame(CIF, N1, N2, W.IPCW)
+            colnames(RAWData.Brier)[1:3] <- c("ID", "CIF1", "CIF2")
             RAWData.Brier$Brier1 <- RAWData.Brier$W.IPCW*(RAWData.Brier$CIF1 - RAWData.Brier$N1)^2
             RAWData.Brier$Brier2 <- RAWData.Brier$W.IPCW*(RAWData.Brier$CIF2 - RAWData.Brier$N2)^2
             
@@ -116,6 +118,7 @@ bootsfitRI_Brier <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
         }
         
         Brier.cv[[t]] <- mean.Brier
+        RAWData[[t]] <- RAWData.Brier
       }
       
     }
