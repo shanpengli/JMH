@@ -3,7 +3,7 @@
 
 MAEQJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = NULL, 
                         obs.time = NULL, method = c("Laplace", "GH"), 
-                        quadpoint = NULL, maxiter = 1000, n.cv = 3, power = 2, 
+                        quadpoint = NULL, maxiter = 1000, n.cv = 3, 
                         quintile.width = 0.25, ...) {
   
   if (!inherits(object, "JMMLSM"))
