@@ -53,15 +53,13 @@ MAEQJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = 
     
     if ('try-error' %in% class(fit)) {
       writeLines(paste0("Error occured in the ", t, " th training!"))
-      Brier.cv[[t]] <- NULL
+      MAEQ.cv[[t]] <- NULL
     } else if (fit$iter == maxiter) {
-      Brier.cv[[t]] <- NULL
+      MAEQ.cv[[t]] <- NULL
     } else {
       
       val.cdata <- cdata[-folds[[t]], ]
       val.ydata <- ydata[ydata[, ID] %in% val.cdata[, ID], ]
-      ## fit a Kalplan-Meier estimator
-      fitKM <- survival::survfit(New.surv.formula, data = val.cdata)
       
       val.cdata <- val.cdata[val.cdata[, surv.var[1]] > landmark.time, ]
       val.ydata <- val.ydata[val.ydata[, ID] %in% val.cdata[, ID], ]
@@ -76,7 +74,7 @@ MAEQJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = 
       
       if ('try-error' %in% class(survfit)) {
         writeLines(paste0("Error occured in the ", t, " th validation!"))
-        Brier.cv[[t]] <- NULL
+        MAEQ.cv[[t]] <- NULL
       } else { 
         AllCIF1 <- list()
         AllCIF2 <- list()
@@ -117,7 +115,13 @@ MAEQJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = 
                 ii <- ii + 1
               }
             }
-            if (is.na(EmpiricalCIF1[i])) EmpiricalCIF1[i] <- quantsubRisk1[nrow(quantsubRisk1), 4]
+            if (is.na(EmpiricalCIF1[i])) {
+              if (nrow(quantsubRisk1) == 0) {
+                EmpiricalCIF1[i] <- 0
+              } else {
+                EmpiricalCIF1[i] <- quantsubRisk1[nrow(quantsubRisk1), 4] 
+              }
+            }
             PredictedCIF1[i] <- mean(subquant$CIF1)
           }
           AllCIF1[[j]] <- data.frame(EmpiricalCIF1, PredictedCIF1)
@@ -125,7 +129,7 @@ MAEQJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = 
           quant2 <- quantile(CIF$CIF2, probs = seq(0, 1, by = quintile.width))
           EmpiricalCIF2 <- rep(NA, groups)
           PredictedCIF2 <- rep(NA, groups)
-          for (i in 1:(1/quant.width)) {
+          for (i in 1:(1/quintile.width)) {
             subquant <- CIF[CIF$CIF2 > quant2[i] &
                                         CIF$CIF2 <= quant2[i+1], c(1, 3)]
             quantsubdata <- cdata[cdata[, ID] %in% subquant$ID, surv.var]
@@ -148,7 +152,13 @@ MAEQJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = 
                 ii <- ii + 1
               }
             }
-            if (is.na(EmpiricalCIF2[i])) EmpiricalCIF2[i] <- quantsubRisk2[nrow(quantsubRisk2), 4]
+            if (is.na(EmpiricalCIF2[i])) {
+              if (nrow(quantsubRisk2) == 0) {
+                EmpiricalCIF2[i] <- 0
+              } else {
+                EmpiricalCIF2[i] <- quantsubRisk2[nrow(quantsubRisk2), 4] 
+              }
+            }
             PredictedCIF2[i] <- mean(subquant$CIF2)
           }
           AllCIF2[[j]] <- data.frame(EmpiricalCIF2, PredictedCIF2)
@@ -159,13 +169,11 @@ MAEQJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = 
     
       }
       result <- list(AllCIF1 = AllCIF1, AllCIF2 = AllCIF2)
-      return(result)
-  
     }
     MAEQ.cv[[t]] <- result
-    
   }
-  
-  class(MAEQ.cv) <- "MAEQJMMLSM"
-  return(MAEQ.cv)
+  result <- list(MAEQ.cv = MAEQ.cv, n.cv = n.cv, landmark.time = landmark.time,
+                 horizon.time = horizon.time, method = method, quadpoint = quadpoint)
+  class(result) <- "MAEQJMMLSM"
+  return(result)
 }
