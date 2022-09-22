@@ -17,9 +17,8 @@ bootsfitRI_MAEQ <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
   cdata <- data$cdata
   
   folds <- caret::groupKFold(c(1:nrow(cdata)), k = n.cv)
-  Brier.cv <- list()
-  RAWData <- list()
-  
+  MAEQ.cv <- list()
+
   for (t in 1:n.cv) {
     train.ydata <- ydata[ydata$ID %in% folds[[t]], ]
     train.cdata <- cdata[cdata$ID %in% folds[[t]], ]
@@ -28,7 +27,7 @@ bootsfitRI_MAEQ <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
                       long.formula = Y ~ Z1 + Z2 + Z3 + time,
                       surv.formula = Surv(survtime, cmprsk) ~ var1 + var2 + var3,
                       variance.formula = ~ Z1 + Z2 + Z3 + time, 
-                      quadpoint = 15, random = ~ 1|ID), silent = TRUE)
+                      quadpoint = quadpoint, random = ~ 1|ID), silent = TRUE)
     
     if ('try-error' %in% class(fit)) {
       MAEQ.cv[[t]] <- NULL
@@ -36,7 +35,7 @@ bootsfitRI_MAEQ <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
       MAEQ.cv[[t]] <- NULL
     } else {
       
-      surv.formula <- object$SurvivalSubmodel
+      surv.formula <- fit$SurvivalSubmodel
       surv.var <- all.vars(surv.formula)
       
       val.ydata <- ydata[!ydata$ID %in% folds[[t]], ]
