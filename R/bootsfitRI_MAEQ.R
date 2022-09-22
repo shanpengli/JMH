@@ -73,7 +73,7 @@ bootsfitRI_MAEQ <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
           for (i in 1:groups) {
             subquant <- CIF[CIF$CIF1 > quant1[i] &
                               CIF$CIF1 <= quant1[i+1], 1:2]
-            quantsubdata <- val.cdata[val.cdata[, ID] %in% subquant$ID, surv.var]
+            quantsubdata <- val.cdata[val.cdata$ID %in% subquant$ID, surv.var]
             
             quantsubCIF <- GetEmpiricalCIF(data = quantsubdata, 
                                            time = surv.var[1],
