@@ -17,6 +17,10 @@ bootsfitRI_MAEQ <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
   cdata <- data$cdata
   
   folds <- caret::groupKFold(c(1:nrow(cdata)), k = n.cv)
+  groups <- 1/quintile.width
+  if (floor(groups) != groups)
+    stop("The reciprocal of quintile.width must be an integer.")
+  
   MAEQ.cv <- list()
 
   for (t in 1:n.cv) {
