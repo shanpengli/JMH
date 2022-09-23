@@ -59,7 +59,7 @@ bootsfitRI_MAEQ <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
         for (j in 1:length(horizon.time)) {
           CIF <- as.data.frame(matrix(0, nrow = nrow(val.cdata), ncol = 3))
           colnames(CIF) <- c("ID", "CIF1", "CIF2")
-          CIF$ID <- val.cdata[, ID]
+          CIF$ID <- val.cdata$ID
           ## extract estimated CIF
           for (k in 1:nrow(CIF)) {
             CIF[k, 2] <- survfit$Pred[[k]][j, 2]
