@@ -69,6 +69,10 @@ getECSF <- function(beta, tau, gamma1, alpha1, vee1, H01, Sig, Z, X1, W, Y, X2, 
     .Call(`_JMH_getECSF`, beta, tau, gamma1, alpha1, vee1, H01, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix, wsmatrix, CUH01, HAZ01)
 }
 
+getES <- function(beta, tau, gamma1, alpha1, nu1, Sig, Z, X1, W, Y, X2, xsmatrix, wsmatrix, CH0s, CH0u) {
+    .Call(`_JMH_getES`, beta, tau, gamma1, alpha1, nu1, Sig, Z, X1, W, Y, X2, xsmatrix, wsmatrix, CH0s, CH0u)
+}
+
 getHazard <- function(CumuH01, CumuH02, survtime, cmprsk, H01, H02, CUH01, CUH02, HAZ01, HAZ02) {
     .Call(`_JMH_getHazard`, CumuH01, CumuH02, survtime, cmprsk, H01, H02, CUH01, CUH02, HAZ01, HAZ02)
 }

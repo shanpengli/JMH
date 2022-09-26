@@ -251,7 +251,10 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         }
         quadpoint <- NULL
       } else {
-        stop("GH TBD.")
+        for (jj in 1:lengthu) {
+          Predraw[j, jj] <- getES(beta, tau, gamma1, alpha1, nu1, Sig, Z, X, W, Y, 
+                                  as.vector(X2), xsmatrix, wsmatrix, CH0, CH0u[jj])
+        }
       }
       
     }

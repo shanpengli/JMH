@@ -353,6 +353,31 @@ BEGIN_RCPP
     return rcpp_result_gen;
 END_RCPP
 }
+// getES
+double getES(const Eigen::VectorXd& beta, const Eigen::VectorXd& tau, const Eigen::VectorXd& gamma1, const Eigen::VectorXd& alpha1, const double nu1, const Eigen::MatrixXd& Sig, const Eigen::MatrixXd& Z, const Eigen::MatrixXd& X1, const Eigen::MatrixXd& W, const Eigen::VectorXd& Y, const Eigen::VectorXd& X2, const Eigen::MatrixXd& xsmatrix, const Eigen::MatrixXd& wsmatrix, const double CH0s, const double CH0u);
+RcppExport SEXP _JMH_getES(SEXP betaSEXP, SEXP tauSEXP, SEXP gamma1SEXP, SEXP alpha1SEXP, SEXP nu1SEXP, SEXP SigSEXP, SEXP ZSEXP, SEXP X1SEXP, SEXP WSEXP, SEXP YSEXP, SEXP X2SEXP, SEXP xsmatrixSEXP, SEXP wsmatrixSEXP, SEXP CH0sSEXP, SEXP CH0uSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type beta(betaSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type tau(tauSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type gamma1(gamma1SEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type alpha1(alpha1SEXP);
+    Rcpp::traits::input_parameter< const double >::type nu1(nu1SEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type Sig(SigSEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type Z(ZSEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type X1(X1SEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type W(WSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type Y(YSEXP);
+    Rcpp::traits::input_parameter< const Eigen::VectorXd& >::type X2(X2SEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type xsmatrix(xsmatrixSEXP);
+    Rcpp::traits::input_parameter< const Eigen::MatrixXd& >::type wsmatrix(wsmatrixSEXP);
+    Rcpp::traits::input_parameter< const double >::type CH0s(CH0sSEXP);
+    Rcpp::traits::input_parameter< const double >::type CH0u(CH0uSEXP);
+    rcpp_result_gen = Rcpp::wrap(getES(beta, tau, gamma1, alpha1, nu1, Sig, Z, X1, W, Y, X2, xsmatrix, wsmatrix, CH0s, CH0u));
+    return rcpp_result_gen;
+END_RCPP
+}
 // getHazard
 int getHazard(const Eigen::VectorXd& CumuH01, const Eigen::VectorXd& CumuH02, const Eigen::VectorXd& survtime, const Eigen::VectorXd& cmprsk, const Eigen::MatrixXd& H01, const Eigen::MatrixXd& H02, Eigen::Map<Eigen::VectorXd>& CUH01, Eigen::Map<Eigen::VectorXd>& CUH02, Eigen::Map<Eigen::VectorXd>& HAZ01, Eigen::Map<Eigen::VectorXd>& HAZ02);
 RcppExport SEXP _JMH_getHazard(SEXP CumuH01SEXP, SEXP CumuH02SEXP, SEXP survtimeSEXP, SEXP cmprskSEXP, SEXP H01SEXP, SEXP H02SEXP, SEXP CUH01SEXP, SEXP CUH02SEXP, SEXP HAZ01SEXP, SEXP HAZ02SEXP) {
@@ -553,6 +578,7 @@ static const R_CallMethodDef CallEntries[] = {
     {"_JMH_getEC", (DL_FUNC) &_JMH_getEC, 26},
     {"_JMH_getECIF", (DL_FUNC) &_JMH_getECIF, 22},
     {"_JMH_getECSF", (DL_FUNC) &_JMH_getECSF, 20},
+    {"_JMH_getES", (DL_FUNC) &_JMH_getES, 15},
     {"_JMH_getHazard", (DL_FUNC) &_JMH_getHazard, 10},
     {"_JMH_getHazardSF", (DL_FUNC) &_JMH_getHazardSF, 6},
     {"_JMH_getMC", (DL_FUNC) &_JMH_getMC, 33},
