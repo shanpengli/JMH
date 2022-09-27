@@ -173,7 +173,7 @@ MAEQJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = 
             Surv <- as.data.frame(matrix(0, nrow = nrow(val.cdata), ncol = 2))
             colnames(Surv) <- c("ID", "Surv")
             Surv$ID <- val.cdata[, ID]
-            ## extract estimated CIF
+            ## extract estimated survival prob
             for (k in 1:nrow(Surv)) {
               Surv[k, 2] <- survfit$Pred[[k]][j, 2]
             }
@@ -183,7 +183,7 @@ MAEQJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = 
             PredictedSurv <- rep(NA, groups)
             for (i in 1:groups) {
               subquant <- Surv[Surv$Surv > quant[i] &
-                                 Surv$Surv <= quant[i+1], c(1, 3)]
+                                 Surv$Surv <= quant[i+1], c(1, 2)]
               quantsubdata <- cdata[cdata[, ID] %in% subquant$ID, surv.var]
               colnames(quantsubdata) <- c("time", "status")
               fitKM <- survfit(Surv(time, status) ~ 1, data = quantsubdata)
