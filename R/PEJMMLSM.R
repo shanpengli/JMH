@@ -54,8 +54,10 @@ PEJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = NU
     if ('try-error' %in% class(fit)) {
       writeLines(paste0("Error occured in the ", t, " th training!"))
       Brier.cv[[t]] <- NULL
+      MAE.cv[[t]] <- NULL
     } else if (fit$iter == maxiter) {
       Brier.cv[[t]] <- NULL
+      MAE.cv[[t]] <- NULL
     } else {
       
       val.cdata <- cdata[-folds[[t]], ]
@@ -77,6 +79,7 @@ PEJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = NU
       if ('try-error' %in% class(survfit)) {
         writeLines(paste0("Error occured in the ", t, " th validation!"))
         Brier.cv[[t]] <- NULL
+        MAE.cv[[t]] <- NULL
       } else {
         if (CompetingRisk) {
           CIF <- as.data.frame(matrix(0, nrow = nrow(val.cdata), ncol = 3))
