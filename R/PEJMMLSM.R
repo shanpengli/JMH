@@ -192,21 +192,19 @@ PEJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = NU
                   W.IPCW[i] <- NA
                 }
               }
-              ## extract estimated CIF
+              ## extract estimated Survival probability
               for (k in 1:nrow(Surv)) {
                 Surv[k, 2] <- survfit$Pred[[k]][j, 2]
               }
               
               RAWData.Brier <- data.frame(Surv, N1, W.IPCW)
-              colnames(RAWData.Brier)[1:1] <- c("ID", "Surv")
+              colnames(RAWData.Brier)[1:2] <- c("ID", "Surv")
               RAWData.Brier$Brier <- RAWData.Brier$W.IPCW*
                 abs(1 - RAWData.Brier$Surv - RAWData.Brier$N1)^2
               RAWData.Brier$MAE <- RAWData.Brier$W.IPCW*
                 abs(1 - RAWData.Brier$Surv - RAWData.Brier$N1)^1
-              mean.MAE  <- sum(RAWData.Brier$MAE, na.rm = TRUE)/nrow(RAWData.Brier)
-              mean.Brier <- sum(RAWData.Brier$Brier, na.rm = TRUE)/nrow(RAWData.Brier)
-              mean.Brier[j, 1] <- mean.Brier
-              mean.MAE[j, 1] <- mean.MAE
+              mean.MAE[j, 1]  <- sum(RAWData.Brier$MAE, na.rm = TRUE)/nrow(RAWData.Brier)
+              mean.Brier[j, 1] <- sum(RAWData.Brier$Brier, na.rm = TRUE)/nrow(RAWData.Brier)
             }
             
             
