@@ -8,12 +8,11 @@ simJMdataRISF <- function(seed = 100, N = 200, increment = 0.7, beta = c(5, 1.5,
                         vee1 = 0.5,
                         lambda1 = 0.05,
                         CL = 5,
-                        CU = 10
+                        CU = 10,
+                        covbw = matrix(c(1, 0.25, 0.25, 1), nrow = 2, ncol = 2)
 ) {
   
   set.seed(seed)
-  
-  covbw <- matrix(c(1, 0.25, 0.25, 1), nrow = 2, ncol = 2)
   
   bwi <- MASS::mvrnorm(n = N, c(0, 0), covbw, tol = 1e-6, empirical = FALSE)
   
@@ -22,9 +21,7 @@ simJMdataRISF <- function(seed = 100, N = 200, increment = 0.7, beta = c(5, 1.5,
   Z2 <- runif(N, min = -1, max = 1)
   Z3 <- rnorm(N, mean = 1, sd = 2)
   Z <- cbind(Z1, Z2, Z3)
-  
-  
-  #hazard rate of risk1 and risk2
+  #hazard rate of risk1
   
   ## non-informative cencoring time 
   C <- runif(N, min = CL, max = CU)
