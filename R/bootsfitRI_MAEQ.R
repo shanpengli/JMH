@@ -147,14 +147,11 @@ bootsfitRI_MAEQ <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
           
         }
         names(AllCIF1) <- names(AllCIF2) <- horizon.time
+        result <- list(AllCIF1 = AllCIF1, AllCIF2 = AllCIF2)
+        MAEQ.cv[[t]] <- result
         writeLines(paste0("The ", t, " th validation is done!"))
-        
-        
-        
       }
-      result <- list(AllCIF1 = AllCIF1, AllCIF2 = AllCIF2)
     }
-    MAEQ.cv[[t]] <- result
   }
   
   return(MAEQ.cv)
