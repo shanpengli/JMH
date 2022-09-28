@@ -130,7 +130,7 @@ MAEQJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = 
             quant2 <- quantile(CIF$CIF2, probs = seq(0, 1, by = quintile.width))
             EmpiricalCIF2 <- rep(NA, groups)
             PredictedCIF2 <- rep(NA, groups)
-            for (i in 1:(1/quintile.width)) {
+            for (i in 1:groups) {
               subquant <- CIF[CIF$CIF2 > quant2[i] &
                                 CIF$CIF2 <= quant2[i+1], c(1, 3)]
               quantsubdata <- cdata[cdata[, ID] %in% subquant$ID, surv.var]
