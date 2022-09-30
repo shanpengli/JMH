@@ -81,12 +81,6 @@ bootsfitRISF <- function(i, N = 200, lambda1 = 0.05,
     coef[count] <- fit$Sig[1, 2]
     coefSE[count] <- fit$seSig[1, 2]
     count <- count + 1
-    coef[count] <- fit$Sig[2, 3]
-    coefSE[count] <- fit$seSig[2, 3]
-    count <- count + 1
-    coef[count] <- fit$Sig[1, 3]
-    coefSE[count] <- fit$seSig[1, 3]
-    count <- count + 1
     coef[count] <- time
     count <- count + 1
     coef[count] <- fit$iter
