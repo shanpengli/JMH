@@ -20,7 +20,7 @@ bootsfitRISF <- function(i, N = 200, lambda1 = 0.05,
   a <- proc.time()
   fit <- JMMLSM(cdata = cdata, ydata = ydata, 
                 long.formula = Y ~ Z1 + Z2 + Z3 + time,
-                surv.formula = Surv(survtime, status) ~ var1 + var2 + var3,
+                surv.formula = Surv(survtime, cmprsk) ~ var1 + var2 + var3,
                 variance.formula = ~ Z1 + Z2 + Z3 + time, maxiter = maxiter, epsilon = 1e-04, 
                 quadpoint = quadpoint, random = ~ 1|ID)
   b <- proc.time()
