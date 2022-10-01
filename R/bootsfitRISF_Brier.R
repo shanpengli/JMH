@@ -36,7 +36,7 @@ bootsfitRISF_Brier <- function(i, seed, N, increment, beta, tau, gamma1,
       val.ydata <- ydata[!ydata$ID %in% folds[[t]], ]
       val.cdata <- cdata[!cdata$ID %in% folds[[t]], ]
       
-      surv.formula <- object$SurvivalSubmodel
+      surv.formula <- fit$SurvivalSubmodel
       surv.var <- all.vars(surv.formula)
       ## fit a Kalplan-Meier estimator
       fitKM <- survfit(Surv(survtime, cmprsk == 0) ~ 1, data = val.cdata)
