@@ -50,7 +50,7 @@ PEJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = NU
                       surv.formula = surv.formula,
                       variance.formula = variance.formula, 
                       quadpoint = quadpoint, random = object$random, 
-                      survinitial = survinitial), silent = TRUE)
+                      survinitial = survinitial, maxiter = 10000), silent = TRUE)
     
     if ('try-error' %in% class(fit)) {
       writeLines(paste0("Error occured in the ", t, " th training!"))
