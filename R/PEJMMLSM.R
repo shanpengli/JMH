@@ -3,7 +3,7 @@
 
 PEJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = NULL, 
                   obs.time = NULL, method = c("Laplace", "GH"), 
-                  quadpoint = NULL, maxiter = 1000, n.cv = 3, ...) {
+                  quadpoint = NULL, maxiter = 1000, n.cv = 3, survinitial = TRUE, ...) {
   
   if (!inherits(object, "JMMLSM"))
     stop("Use only with 'JMMLSM' xs.\n")
@@ -49,7 +49,8 @@ PEJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = NU
                       long.formula = long.formula,
                       surv.formula = surv.formula,
                       variance.formula = variance.formula, 
-                      quadpoint = quadpoint, random = object$random), silent = TRUE)
+                      quadpoint = quadpoint, random = object$random, 
+                      survinitial = survinitial), silent = TRUE)
     
     if ('try-error' %in% class(fit)) {
       writeLines(paste0("Error occured in the ", t, " th training!"))
