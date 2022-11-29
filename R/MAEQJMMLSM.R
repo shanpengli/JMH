@@ -3,7 +3,8 @@
 
 MAEQJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = NULL, 
                         obs.time = NULL, method = c("Laplace", "GH"), 
-                        quadpoint = NULL, maxiter = 1000, n.cv = 3, 
+                        quadpoint = NULL, maxiter = 1000, 
+                        survinitial = TRUE, n.cv = 3, 
                         quintile.width = 0.25, ...) {
   
   if (!inherits(object, "JMMLSM"))
@@ -49,7 +50,8 @@ MAEQJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = 
                       long.formula = long.formula,
                       surv.formula = surv.formula,
                       variance.formula = variance.formula, 
-                      quadpoint = quadpoint, random = object$random), silent = TRUE)
+                      quadpoint = quadpoint, random = object$random,
+                      survinitial = survinitial, maxiter = maxiter), silent = TRUE)
     
     if ('try-error' %in% class(fit)) {
       writeLines(paste0("Error occured in the ", t, " th training!"))
