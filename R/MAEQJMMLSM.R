@@ -209,7 +209,7 @@ MAEQJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = 
   }
   result <- list(MAEQ.cv = MAEQ.cv, n.cv = n.cv, landmark.time = landmark.time,
                  horizon.time = horizon.time, method = method, quadpoint = quadpoint, 
-                 CompetingRisk = CompetingRisk)
+                 CompetingRisk = CompetingRisk, seed = seed)
   class(result) <- "MAEQJMMLSM"
   return(result)
 }

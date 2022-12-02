@@ -4,10 +4,12 @@
 \alias{summary.MAEQJMMLSM}
 \title{Print MAEQJMMLSM}
 \usage{
-\method{summary}{MAEQJMMLSM}(x, ...)
+\method{summary}{MAEQJMMLSM}(x, digits = 3, ...)
 }
 \arguments{
 \item{x}{x of class 'MAEQJMMLSM'.}
+
+\item{digits}{number of decimal points to be rounded.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }

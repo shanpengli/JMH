@@ -225,7 +225,7 @@ PEJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = NU
   }
   result <- list(n.cv = n.cv, Brier.cv = Brier.cv, MAE.cv = MAE.cv, landmark.time = landmark.time,
                  horizon.time = horizon.time, method = method, quadpoint = quadpoint, 
-                 CompetingRisk = CompetingRisk)
+                 CompetingRisk = CompetingRisk, seed = seed)
   class(result) <- "PEJMMLSM"
   
   return(result)
