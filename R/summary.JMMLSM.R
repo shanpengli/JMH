@@ -46,10 +46,12 @@ summary.JMMLSM <- function(object, process = c("longitudinal", "survival"), digi
     Estimate <- object$gamma1
     SE <- object$segamma1
     LowerLimit <- Estimate - 1.96 * SE
+    expLL <- exp(LowerLimit)
     UpperLimit <- Estimate + 1.96 * SE
+    expUL <- exp(UpperLimit)
     zval = (Estimate/SE)
     pval = 2 * pnorm(-abs(zval))
-    out <- data.frame(Estimate, exp(Estimate), SE, LowerLimit, UpperLimit, pval)
+    out <- data.frame(Estimate, exp(Estimate), SE, LowerLimit, UpperLimit, expLL, expUL, pval)
     out <- cbind(rownames(out), out)
     rownames(out) <- NULL
     colnames(out)[1] <- "Parameter"
@@ -57,15 +59,18 @@ summary.JMMLSM <- function(object, process = c("longitudinal", "survival"), digi
     Estimate <- object$gamma2
     SE <- object$segamma2
     LowerLimit <- Estimate - 1.96 * SE
+    expLL <- exp(LowerLimit)
     UpperLimit <- Estimate + 1.96 * SE
+    expUL <- exp(UpperLimit)
     zval = (Estimate/SE)
     pval = 2 * pnorm(-abs(zval))
-    out2 <- data.frame(Estimate, exp(Estimate), SE, LowerLimit, UpperLimit, pval)
+    out2 <- data.frame(Estimate, exp(Estimate), SE, LowerLimit, UpperLimit, expLL, expUL, pval)
     out2 <- cbind(rownames(out2), out2)
     rownames(out2) <- NULL
     colnames(out2)[1] <- "Parameter"
     outgamma <- rbind(out, out2)
-    names(outgamma) <- c("Survival", "coef", "exp(coef)", "SE(coef)", "95%Lower", "95%Upper", "p-values")
+    names(outgamma) <- c("Survival", "coef", "exp(coef)", "SE(coef)", "95%Lower", "95%Upper", 
+                         "95%exp(Lower)", "95%exp(Upper)", "p-values")
     
     ##alpha
     Estimate <- object$alpha1
@@ -73,10 +78,12 @@ summary.JMMLSM <- function(object, process = c("longitudinal", "survival"), digi
     if (length(Estimate) == 1) names(Estimate) <- c("alpha1_1")
     SE <- object$sealpha1
     LowerLimit <- Estimate - 1.96 * SE
+    expLL <- exp(LowerLimit)
     UpperLimit <- Estimate + 1.96 * SE
+    expUL <- exp(UpperLimit)
     zval = (Estimate/SE)
     pval = 2 * pnorm(-abs(zval))
-    out <- data.frame(Estimate, exp(Estimate), SE, LowerLimit, UpperLimit, pval)
+    out <- data.frame(Estimate, exp(Estimate), SE, LowerLimit, UpperLimit, expLL, expUL, pval)
     out <- cbind(rownames(out), out)
     rownames(out) <- NULL
     colnames(out)[1] <- "Parameter"
@@ -86,29 +93,35 @@ summary.JMMLSM <- function(object, process = c("longitudinal", "survival"), digi
     if (length(Estimate) == 1) names(Estimate) <- c("alpha2_1")
     SE <- object$sealpha2
     LowerLimit <- Estimate - 1.96 * SE
+    expLL <- exp(LowerLimit)
     UpperLimit <- Estimate + 1.96 * SE
+    expUL <- exp(UpperLimit)
     zval = (Estimate/SE)
     pval = 2 * pnorm(-abs(zval))
-    out2 <- data.frame(Estimate, exp(Estimate), SE, LowerLimit, UpperLimit, pval)
+    out2 <- data.frame(Estimate, exp(Estimate), SE, LowerLimit, UpperLimit, expLL, expUL, pval)
     out2 <- cbind(rownames(out2), out2)
     rownames(out2) <- NULL
     colnames(out2)[1] <- "Parameter"
     outalpha <- rbind(out, out2)
-    names(outalpha) <- c("Survival", "coef", "exp(coef)", "SE(coef)", "95%Lower", "95%Upper", "p-values")
+    names(outalpha) <- c("Survival", "coef", "exp(coef)", "SE(coef)", "95%Lower", "95%Upper",
+                         "95%exp(Lower)", "95%exp(Upper)", "p-values")
     
     #vee
     Estimate <- c(object$vee1, object$vee2)
     names(Estimate) <- c("vee1", "vee2")
     SE <- c(object$sevee1, object$sevee2)
     LowerLimit <- Estimate - 1.96 * SE
+    expLL <- exp(LowerLimit)
     UpperLimit <- Estimate + 1.96 * SE
+    expUL <- exp(UpperLimit)
     zval = (Estimate/SE)
     pval = 2 * pnorm(-abs(zval))
-    out <- data.frame(Estimate, exp(Estimate), SE, LowerLimit, UpperLimit, pval)
+    out <- data.frame(Estimate, exp(Estimate), SE, LowerLimit, UpperLimit, expLL, expUL, pval)
     out <- cbind(rownames(out), out)
     rownames(out) <- NULL
     colnames(out)[1] <- "Parameter"
-    names(out) <- c("Survival", "coef", "exp(coef)", "SE(coef)", "95%Lower", "95%Upper", "p-values")
+    names(out) <- c("Survival", "coef", "exp(coef)", "SE(coef)", "95%Lower", "95%Upper", 
+                    "95%exp(Lower)", "95%exp(Upper)", "p-values")
     
     out <- rbind(outgamma, outalpha, out)
     
