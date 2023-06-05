@@ -1,6 +1,3 @@
-##' @export
-##'
-
 bootsfitRISF_MAEQ <- function(i, seed, N, increment, beta, tau, gamma1,
                             alpha1, vee1, lambda1, CL, CU, covbw, quadpoint, maxiter, 
                             n.cv, landmark.time, horizon.time, quintile.width,

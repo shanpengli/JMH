@@ -1,6 +1,3 @@
-##' @export
-##'
-
 bootsfitRI <- function(i, N = 200, lambda1 = 0.05, lambda2 = 0.1,
                      tau = c(0.5, 0.5, -0.2, 0.2, 0.05),
                      CL = 4, CU = 8, 

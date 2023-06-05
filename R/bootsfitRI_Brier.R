@@ -1,6 +1,3 @@
-##' @export
-##'
-
 bootsfitRI_Brier <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
                              alpha1, alpha2, vee1, vee2, lambda1, lambda2, CL,
                              CU, covbw, quadpoint, maxiter, 

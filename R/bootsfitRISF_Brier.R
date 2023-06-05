@@ -1,6 +1,3 @@
-##' @export
-##'
-
 bootsfitRISF_Brier <- function(i, seed, N, increment, beta, tau, gamma1,
                              alpha1, vee1, lambda1, CL,
                              CU, covbw, quadpoint, maxiter, 

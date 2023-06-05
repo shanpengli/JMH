@@ -1,7 +1,7 @@
 ##' @export
 ##' 
 
-MAEQJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = NULL, 
+MAEQJMMLSM <- function(seed = 100, object, landmark.time = NULL, horizon.time = NULL, 
                         obs.time = NULL, method = c("Laplace", "GH"), 
                         quadpoint = NULL, maxiter = 1000, 
                         survinitial = TRUE, n.cv = 3, 

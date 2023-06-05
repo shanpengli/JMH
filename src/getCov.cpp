@@ -42,7 +42,7 @@ Rcpp::List getCov(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
   Eigen::MatrixXd SS  = Eigen::MatrixXd::Zero(d,d);
   Eigen::MatrixXd SSinv  = Eigen::MatrixXd::Zero(d,d);
   Eigen::VectorXd S = Eigen::VectorXd::Zero(d);
-  
+  Eigen::MatrixXd ST = Eigen::MatrixXd::Zero(k,d);
   int risk1_index;
   int risk2_index;
   int risk1_index_temp=a-1;
@@ -1219,7 +1219,7 @@ Rcpp::List getCov(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
     {
       for(t=0;t<(p1a+1-q);t++) S(p1+p1b+2*p2+2*p1a+2+p1a+1+t+(q-1)*p1a) = bsw2(t,q+t);
     }
-    
+    ST.row(j) = S;
     SS += MultVVoutprod(S);
   }
   
@@ -1252,7 +1252,8 @@ Rcpp::List getCov(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
     }
   }
   
-  return Rcpp::List::create(Rcpp::Named("vcov")=SSinv,
+  return Rcpp::List::create(Rcpp::Named("ST")=ST,
+                            Rcpp::Named("vcov")=SSinv,
                             Rcpp::Named("sebeta")=sebeta,
                             Rcpp::Named("setau")=setau,
                             Rcpp::Named("segamma1")=segamma1,

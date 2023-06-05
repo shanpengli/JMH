@@ -1,3 +1,0 @@
-"0","load(""~/Desktop/GSR CODES/2020/2020 Fall/PrimaryCareData/Data.RData"")"
-"0","tdept_nmNomissing$White <- ifelse(tdept_nmNomissing$race == ""White"", 1, 0)"
-"0","EUR_g30_cNomissing$White <- ifelse(EUR_g30_cNomissing$race == ""White"", 1, 0)"
