@@ -26,7 +26,7 @@
 ##'               long.formula = Y ~ Z1 + Z2 + Z3 + time,
 ##'               surv.formula = Surv(survtime, cmprsk) ~ var1 + var2 + var3,
 ##'               variance.formula = ~ Z1 + Z2 + Z3 + time, 
-##'               quadpoint = 15, random = ~ 1|ID, print.para = FALSE)
+##'               quadpoint = 5, random = ~ 1|ID, print.para = FALSE)
 ##'               
 ##' ## make dynamic prediction of two subjects
 ##' cnewdata <- cdata[cdata$ID %in% c(122, 152), ]
@@ -37,16 +37,6 @@
 ##' oldpar <- par(mfrow = c(2, 2), mar = c(5, 4, 4, 4))
 ##' plot(survfit, include.y = TRUE)
 ##' 
-##' ## assess the prediction accuracy using the Brier score
-##' PE <- PEJMMLSM(fit, seed = 100, landmark.time = 3, horizon.time = c(4, 5, 6), 
-##' obs.time = "time", method = "GH", n.cv = 3)
-##' summary(PE, error = "Brier")
-##' 
-##' ## assess the prediction accuracy using the mean absolute prediction error 
-##' ## between the empirical and predicted risk
-##' MAEQ <- MAEQJMMLSM(fit, seed = 100, landmark.time = 3, horizon.time = c(4, 5, 6), 
-##' obs.time = "time", method = "GH", n.cv = 3)
-##' summary(MAEQ)
 ##' @export
 ##' 
 

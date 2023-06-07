@@ -6,6 +6,7 @@
 ^\.travis\.yml$
 ^\.github$
 ^README\.Rmd$
-^FastJM.R
+^JMH.R
 ^cran-comments\.md$
 ^CRAN-SUBMISSION$
+^news\.md$
