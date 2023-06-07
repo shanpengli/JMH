@@ -1,3 +1,23 @@
+##' @title A metric of prediction accuracy of joint model by comparing the predicted risk
+##' with the counting process.
+##' @name PEJMMLSM
+##' @aliases PEJMMLSM
+##' @param object object of class 'PEJMMLSM'.
+##' @param seed a numeric value of seed to be specified for cross validation.
+##' @param landmark.time a numeric value of time for which dynamic prediction starts..
+##' @param horizon.time a numeric vector of future times for which predicted probabilities are to be computed.
+##' @param obs.time a character string of specifying a longitudinal time variable.
+##' @param method estimation method for predicted probabilities. If \code{Laplace}, then the empirical empirical
+##' estimates of random effects is used. If \code{GH}, then the pseudo-adaptive Gauss-Hermite quadrature is used.
+##' @param quadpoint the number of pseudo-adaptive Gauss-Hermite quadrature points if \code{method = "GH"}.
+##' @param maxiter the maximum number of iterations of the EM algorithm that the 
+##' function will perform. Default is 10000.
+##' @param n.cv number of folds for cross validation. Default is 3.
+##' @param survinitial Fit a Cox model to obtain initial values of the parameter estimates. Default is TRUE.
+##' @param ... Further arguments passed to or from other methods.
+##' @return a list of matrices with conditional probabilities for subjects.
+##' @author Shanpeng Li \email{lishanpeng0913@ucla.edu}
+##' @seealso \code{\link{JMMLSM}, \link{survfitJMMLSM}}
 ##' @export
 ##' 
 

@@ -1,5 +1,5 @@
 GetEmpiricalCIF <- function(data, time, status) {
-  library(survival)
+
   if (!is.data.frame(data))
     stop("data must be a dataframe format.")
   
@@ -8,7 +8,7 @@ GetEmpiricalCIF <- function(data, time, status) {
   data$time <- data[, time]
   ## Kaplan-Meier estimate S(t) of all-cause failures
   data$status3 <- ifelse(data$status1+data$status2 >= 1, 1, 0)
-  fit <- survfit(Surv(time, status3) ~ 1, data = data)
+  fit <- survival::survfit(survival::Surv(time, status3) ~ 1, data = data)
   table <- summary(fit)
   table1 <- data.frame(table$time, table$surv)
   table1 <- rbind(c(0, 1), table1)
@@ -16,7 +16,7 @@ GetEmpiricalCIF <- function(data, time, status) {
   colnames(table1) <- c("time", "survProb")
   
   ## NA estimate of H1(t)
-  fit <- survfit(Surv(time, status1) ~ 1, data = data)
+  fit <- survival::survfit(Surv(time, status1) ~ 1, data = data)
   tableH1 <- summary(fit)
   h1 <- tableH1$n.event/tableH1$n.risk
   time1 <- tableH1$time

@@ -4,10 +4,10 @@
 \alias{summary.PEJMMLSM}
 \title{Print PEJMMLSM}
 \usage{
-\method{summary}{PEJMMLSM}(x, error = c("MAE", "Brier"), ...)
+\method{summary}{PEJMMLSM}(object, error = c("MAE", "Brier"), ...)
 }
 \arguments{
-\item{x}{x of class 'PEJMMLSM'.}
+\item{object}{object of class 'PEJMMLSM'.}
 
 \item{error}{a character string that specifies the loss function.}
 

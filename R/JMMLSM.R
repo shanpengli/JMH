@@ -1,5 +1,5 @@
 ##' Joint modeling of longitudinal continuous data and competing risks
-##' @title Joint Modelling for Continuous outcomes
+##' @title Joint Modeling for Continuous outcomes
 ##' @param ydata a longitudinal data frame in long format.
 ##' @param cdata a survival data frame with competing risks or single failure.
 ##' Each subject has one data entry.
@@ -7,7 +7,7 @@
 ##' to be included in the longitudinal sub-model.
 ##' @param surv.formula a formula object with the survival time, event indicator, and the covariates
 ##' to be included in the survival sub-model.
-##' @param variance.formula an one-sided formula object with the fixed effects covariates to model the variance of longituidnal sub-model.
+##' @param variance.formula an one-sided formula object with the fixed effects covariates to model the variance of longitudinal sub-model.
 ##' @param random a one-sided formula object describing the random effects part of the longitudinal sub-model.
 ##' For example, fitting a random intercept model takes the form ~ 1|ID.
 ##' Alternatively. Fitting a random intercept and slope model takes the form ~ x1 + ... + xn|ID.
@@ -21,20 +21,32 @@
 ##' require(JMH)
 ##' data(ydata)
 ##' data(cdata)
+##' ## fit a joint model
 ##' fit <- JMMLSM(cdata = cdata, ydata = ydata, 
 ##'               long.formula = Y ~ Z1 + Z2 + Z3 + time,
 ##'               surv.formula = Surv(survtime, cmprsk) ~ var1 + var2 + var3,
 ##'               variance.formula = ~ Z1 + Z2 + Z3 + time, 
-##'               quadpoint = 15, random = ~ 1|ID, print.para = TRUE)
-##' fit    
+##'               quadpoint = 15, random = ~ 1|ID, print.para = FALSE)
+##'               
+##' ## make dynamic prediction of two subjects
 ##' cnewdata <- cdata[cdata$ID %in% c(122, 952), ]
 ##' ynewdata <- ydata[ydata$ID %in% c(122, 952), ]
-##' survfit <- survfit2JMMLSM(fit, seed = 100, ynewdata = ynewdata, cnewdata = cnewdata, 
-##'                      u = seq(5.2, 7.2, by = 0.5), M = 100, simulate = TRUE, quadpoint = 10)
+##' survfit <- survfitJMMLSM(fit, seed = 100, ynewdata = ynewdata, cnewdata = cnewdata, 
+##'                          u = seq(5.2, 7.2, by = 0.5), Last.time = "survtime",
+##'                          obs.time = "time", method = "GH")
 ##' oldpar <- par(mfrow = c(2, 2), mar = c(5, 4, 4, 4))
-##' plot(survfit, estimator = "both", include.y = TRUE)
-##' par(oldpar)
-##' par(oldpar)
+##' plot(survfit, include.y = TRUE)
+##' 
+##' ## assess the prediction accuracy using the Brier score
+##' PE <- PEJMMLSM(fit, seed = 100, landmark.time = 3, horizon.time = c(4, 5, 6), 
+##' obs.time = "time", method = "GH", n.cv = 3)
+##' summary(PE, error = "Brier")
+##' 
+##' ## assess the prediction accuracy using the mean absolute prediction error 
+##' ## between the empirical and predicted risk
+##' MAEQ <- MAEQJMMLSM(fit, seed = 100, landmark.time = 3, horizon.time = c(4, 5, 6), 
+##' obs.time = "time", method = "GH", n.cv = 3)
+##' summary(MAEQ)
 ##' @export
 ##' 
 
@@ -373,7 +385,7 @@ JMMLSM <- function(cdata, ydata,
       
       PropComp <- as.data.frame(table(cdata[, survival[2]]))
       
-      ## return the joint modelling result
+      ## return the joint modeling result
       mycall <- match.call()
       
       result <- list(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, H01, 
@@ -540,7 +552,7 @@ JMMLSM <- function(cdata, ydata,
       
       PropComp <- as.data.frame(table(cdata[, survival[2]]))
       
-      ## return the joint modelling result
+      ## return the joint modeling result
       mycall <- match.call()
       
       result <- list(beta, tau, gamma1, alpha1, vee1, H01, Sig, iter, convergence, 

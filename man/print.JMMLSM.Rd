@@ -9,6 +9,8 @@
 \arguments{
 \item{x}{Object of class 'JMMLSM'.}
 
+\item{digits}{number of digits of decimal to be printed.}
+
 \item{...}{Further arguments passed to or from other methods.}
 }
 \description{

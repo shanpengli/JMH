@@ -85,7 +85,7 @@ Rcpp::List GetrisksetCSF(const Eigen::MatrixXd & cdata) {
   
   if(a==0)
   {
-    printf("No failure time information for risk 1; Program exits\n");
+    Rprintf("No failure time information for risk 1; Program exits\n");
     return ( -1.0 );
   } 
   

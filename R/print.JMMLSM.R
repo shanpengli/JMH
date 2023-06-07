@@ -1,6 +1,7 @@
 ##' Print contents of JMMLSM object.
 ##' @title Print JMMLSM
 ##' @param x Object of class 'JMMLSM'.
+##' @param digits number of digits of decimal to be printed.
 ##' @param ... Further arguments passed to or from other methods.
 ##' @seealso \code{\link{JMMLSM}}
 ##' @author Shanpeng Li

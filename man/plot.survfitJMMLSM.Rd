@@ -6,8 +6,6 @@
 \usage{
 \method{plot}{survfitJMMLSM}(
   x,
-  estimator = c("both", "mean", "median"),
-  conf.int = TRUE,
   include.y = FALSE,
   xlab = NULL,
   ylab = NULL,
@@ -19,13 +17,6 @@
 }
 \arguments{
 \item{x}{x of class \code{survfitJMMLSM}.}
-
-\item{estimator}{character string specifying, whether to include in the plot 
-the mean of the conditional probabilities of survival, the median or both. 
-The mean and median are taken as estimates of these conditional probabilities 
-over the M replications of the Monte Carlo scheme described in \code{survfitJMMLSM}.}
-
-\item{conf.int}{logical; if TRUE, then a pointwise confidence interval is included in the plot. Default is TRUE.}
 
 \item{include.y}{include longitudinal responses of this subject versus time. Default is FALSE.}
 
@@ -50,30 +41,6 @@ Otherwise, cumulative incidence probabilities for each failure type will be retu
 Plot conditional probabilities for new subjects. 
 If \code{CompetingRisk = FALSE}, print the survival probabilities. 
 Otherwise, print the cumulative incidence probabilities for each failure type.
-}
-\examples{
-\donttest{
-# a joint model fit
-fit <- jmcs(ydata = ydata, cdata = cdata, 
-            long.formula = response ~ time + gender + x1 + race, 
-            surv.formula = Surv(surv, failure_type) ~ x1 + gender + x2 + race, 
-           random =  ~ time| ID)
-
-# Prediction of cumulative incidence for competing risks data
-ND <- ydata[ydata$ID \%in\% c(419, 218), ]
-ID <- unique(ND$ID)
-NDc <- cdata[cdata$ID  \%in\% ID, ]
-survfit <- survfitJMMLSM(fit, 
-                       ynewdata = ND, 
-                       cnewdata = NDc, 
-                       u = seq(3, 4.8, by = 0.2), 
-                       M = 100,
-                       seed = 100)
-                       
-oldpar <- par(mfrow = c(2, 2), mar = c(5, 4, 4, 4))
-plot(survfit, estimator = "both", include.y = TRUE)
-par(oldpar)
-}
 }
 \seealso{
 \code{\link{survfitJMMLSM}}

@@ -4,10 +4,10 @@
 \alias{summary.MAEQJMMLSM}
 \title{Print MAEQJMMLSM}
 \usage{
-\method{summary}{MAEQJMMLSM}(x, digits = 3, ...)
+\method{summary}{MAEQJMMLSM}(object, digits = 3, ...)
 }
 \arguments{
-\item{x}{x of class 'MAEQJMMLSM'.}
+\item{object}{object of class 'MAEQJMMLSM'.}
 
 \item{digits}{number of decimal points to be rounded.}
 

@@ -1,7 +1,7 @@
 ##' @export
 ##' 
 
-summary.JMMLSM <- function(object, process = c("longitudinal", "survival"), digits = 4) {
+summary.JMMLSM <- function(object, process = c("longitudinal", "survival"), digits = 4, ...) {
   
   if (!inherits(object, "JMMLSM"))
     stop("Use only with 'JMMLSM' objects.\n")

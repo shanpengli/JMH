@@ -1,10 +1,7 @@
-##' @export
-##'
-
 bootsfitRI_MAEQ2 <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
                              alpha1, alpha2, vee1, vee2, lambda1, lambda2, CL,
                             CU, covbw, quadpoint, maxiter, 
-                            n.cv, landmark.time, horizon.time, quintile.width,
+                            n.cv, landmark.time, horizon.time, quantile.width,
                             method = "GH", silent = TRUE) {
   
   
@@ -18,9 +15,9 @@ bootsfitRI_MAEQ2 <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
   
   set.seed(seed + i)
   folds <- caret::groupKFold(c(1:nrow(cdata)), k = n.cv)
-  groups <- 1/quintile.width
+  groups <- 1/quantile.width
   if (floor(groups) != groups)
-    stop("The reciprocal of quintile.width must be an integer.")
+    stop("The reciprocal of quantile.width must be an integer.")
   
   MAEQ.cv <- list()
   
@@ -71,7 +68,7 @@ bootsfitRI_MAEQ2 <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
             CIF[k, 3] <- survfit$Pred[[k]][j, 3]
           }
           ## group subjects based on CIF
-          quant1 <- quantile(CIF$CIF1, probs = seq(0, 1, by = quintile.width))
+          quant1 <- quantile(CIF$CIF1, probs = seq(0, 1, by = quantile.width))
           EmpiricalCIF1 <- rep(NA, groups)
           PredictedCIF1 <- rep(NA, groups)
           
@@ -109,10 +106,10 @@ bootsfitRI_MAEQ2 <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
           }
           AllCIF1[[j]] <- data.frame(EmpiricalCIF1, PredictedCIF1)
           
-          quant2 <- quantile(CIF$CIF2, probs = seq(0, 1, by = quintile.width))
+          quant2 <- quantile(CIF$CIF2, probs = seq(0, 1, by = quantile.width))
           EmpiricalCIF2 <- rep(NA, groups)
           PredictedCIF2 <- rep(NA, groups)
-          for (i in 1:(1/quintile.width)) {
+          for (i in 1:(1/quantile.width)) {
             subquant <- CIF[CIF$CIF2 > quant2[i] &
                               CIF$CIF2 <= quant2[i+1], c(1, 3)]
             quantsubdata <- cdata[cdata$ID %in% subquant$ID, surv.var]
