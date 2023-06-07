@@ -62,8 +62,8 @@ fit <- JMMLSM(cdata = cdata, ydata = ydata,
               quadpoint = 15, random = ~ 1|ID, print.para = FALSE)
               
 ## make dynamic prediction of two subjects
-cnewdata <- cdata[cdata$ID \%in\% c(122, 952), ]
-ynewdata <- ydata[ydata$ID \%in\% c(122, 952), ]
+cnewdata <- cdata[cdata$ID \%in\% c(122, 152), ]
+ynewdata <- ydata[ydata$ID \%in\% c(122, 152), ]
 survfit <- survfitJMMLSM(fit, seed = 100, ynewdata = ynewdata, cnewdata = cnewdata, 
                          u = seq(5.2, 7.2, by = 0.5), Last.time = "survtime",
                          obs.time = "time", method = "GH")
