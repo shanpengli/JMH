@@ -3,6 +3,7 @@
 ##' @param x Object of class 'JMMLSM'.
 ##' @param digits number of digits of decimal to be printed.
 ##' @param ... Further arguments passed to or from other methods.
+##' @return a summary of data, joint model, log likelihood, and parameter estimates.
 ##' @seealso \code{\link{JMMLSM}}
 ##' @author Shanpeng Li
 ##' @export

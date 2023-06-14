@@ -47,6 +47,52 @@ to be chosen for numerical integration. Default is 6 which produces stable estim
 
 \item{survinitial}{Fit a Cox model to obtain initial values of the parameter estimates. Default is TRUE.}
 }
+\value{
+Object of class \code{JMMLSM} with elements
+\item{ydata}{the input longitudinal dataset for fitting a joint model.
+It has been re-ordered in accordance with descending observation times in \code{cdata}.}
+\item{cdata}{the input survival dataset for fitting a joint model.
+It has been re-ordered in accordance with descending observation times.}
+\item{PropEventType}{a frequency table of number of events.}
+\item{beta}{the vector of fixed effects for the mean trajectory in the mixed effects location and scale model.} 
+\item{tau}{the vector of fixed effects for the within-subject variability in the mixed effects location and scale model.} 
+\item{gamma1}{the vector of fixed effects for type 1 failure for the survival model.}
+\item{gamma2}{the vector of fixed effects for type 2 failure for the survival model. 
+Valid only if \code{CompetingRisk = TRUE}.}
+\item{alpha1}{the vector of association parameter(s) for the mean trajectory for type 1 failure.}
+\item{alpha2}{the vector of association parameter(s) for the mean trajectory for type 2 failure. Valid only if \code{CompetingRisk = TRUE}.}
+\item{vee1}{the vector of association parameter(s) for the within-subject variability for type 1 failure.}
+\item{vee2}{the vector of association parameter(s) for the within-subject variability for type 2 failure. Valid only if \code{CompetingRisk = TRUE}.}
+\item{H01}{the matrix that collects baseline hazards evaluated at each uncensored event time for type 1 failure. 
+The first column denotes uncensored event times, the second column the number of events, and the third columns 
+the hazards obtained by Breslow estimator.}
+\item{H02}{the matrix that collects baseline hazards evaluated at each uncensored event time for type 2 failure. 
+The data structure is the same as \code{H01}. Valid only if \code{CompetingRisk = TRUE}.}
+\item{Sig}{the variance-covariance matrix of the random effects.}
+\item{iter}{the total number of iterations until convergence.}
+\item{convergence}{convergence identifier: 1 corresponds to successful convergence, 
+whereas 0 to a problem (i.e., when 0, usually more iterations are required).}
+\item{vcov}{the variance-covariance matrix of all the fixed effects for both models.}
+\item{sebeta}{the standard error of \code{beta}.}
+\item{setau}{the standard error of \code{tau}.}
+\item{segamma1}{the standard error of \code{gamma1}.}
+\item{segamma2}{the standard error of \code{gamma2}. 
+Valid only if \code{CompetingRisk = TRUE}.}
+\item{sealpha1}{the standard error of \code{alpha1}.}
+\item{sealpha2}{the standard error of \code{alpha2}. Valid only if \code{CompetingRisk = TRUE}.}
+\item{sevee1}{the standard error of \code{vee1}.}
+\item{sevee2}{the standard error of \code{vee2}. Valid only if \code{CompetingRisk = TRUE}.}
+\item{seSig}{the vector of standard errors of covariance of random effects.}
+\item{loglike}{the log-likelihood value.}
+\item{EFuntheta}{a list with the expected values of all the functions of random effects.}
+\item{CompetingRisk}{logical value; TRUE if a competing event are accounted for.}
+\item{quadpoint}{the number of Gauss Hermite quadrature points used for numerical integration.}
+\item{LongitudinalSubmodelmean}{the component of the \code{long.formula}.}
+\item{LongitudinalSubmodelvariance}{the component of the \code{variance.formula}.}
+\item{SurvivalSubmodel}{the component of the \code{surv.formula}.}
+\item{random}{the component of the \code{random}.}
+\item{call}{the matched call.}
+}
 \description{
 Joint modeling of longitudinal continuous data and competing risks
 }
@@ -69,5 +115,5 @@ survfit <- survfitJMMLSM(fit, seed = 100, ynewdata = ynewdata, cnewdata = cnewda
                          obs.time = "time", method = "GH")
 oldpar <- par(mfrow = c(2, 2), mar = c(5, 4, 4, 4))
 plot(survfit, include.y = TRUE)
-
+par(oldpar)
 }

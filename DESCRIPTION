@@ -1,7 +1,7 @@
 Package: JMH
 Type: Package
-Title: A Joint Model of Longitudinal and Competing Risks Data in the Presence of Heterogeneous Within-Subject Variability
-Version: 1.0.1
+Title: Joint Model of Heterogeneous Repeated Measures and survival Data 
+Version: 1.0.2
 Date: 2023-06-07
 Authors@R: c(
     person("Shanpeng", "Li", email = "lishanpeng0913@ucla.edu", 

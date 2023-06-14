@@ -13,6 +13,9 @@
 
 \item{...}{Further arguments passed to or from other methods.}
 }
+\value{
+a summary of data, joint model, log likelihood, and parameter estimates.
+}
 \description{
 Print contents of JMMLSM object.
 }
