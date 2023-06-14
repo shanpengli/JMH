@@ -1,6 +1,6 @@
 Package: JMH
 Type: Package
-Title: Joint Model of Heterogeneous Repeated Measures and survival Data 
+Title: Joint Model of Heterogeneous Repeated Measures and Survival Data 
 Version: 1.0.2
 Date: 2023-06-07
 Authors@R: c(
