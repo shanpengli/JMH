@@ -122,8 +122,8 @@ Conditional cumulative incidence probabilities for each failure will be
 presented.
 
 ``` r
-cnewdata <- cdata[cdata$ID %in% c(122, 952), ]
-ynewdata <- ydata[ydata$ID %in% c(122, 952), ]
+cnewdata <- cdata[cdata$ID %in% c(122, 152), ]
+ynewdata <- ydata[ydata$ID %in% c(122, 152), ]
 survfit <- survfitJMMLSM(fit, seed = 100, ynewdata = ynewdata, cnewdata = cnewdata, 
                          u = seq(5.2, 7.2, by = 0.5), Last.time = "survtime",
                          obs.time = "time", method = "GH")
@@ -139,12 +139,24 @@ survfit
 #> 4 6.200000 0.33890999 0.0000000
 #> 5 6.700000 0.33890999 0.0000000
 #> 6 7.200000 0.33890999 0.2174255
+#> 
+#> $`152`
+#>      times      CIF1       CIF2
+#> 1 5.133665 0.0000000 0.00000000
+#> 2 5.200000 0.0523020 0.00000000
+#> 3 5.700000 0.1370218 0.00000000
+#> 4 6.200000 0.3219894 0.00000000
+#> 5 6.700000 0.3219894 0.00000000
+#> 6 7.200000 0.3219894 0.05990336
 oldpar <- par(mfrow = c(2, 2), mar = c(5, 4, 4, 4))
 plot(survfit, include.y = TRUE)
-par(oldpar)
 ```
 
 <img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+
+``` r
+par(oldpar)
+```
 
 To assess the prediction accuracy of the fitted joint model, we may run
 `PEJMMLSM` to calculate the Brier score.
