@@ -1,0 +1,86 @@
+---
+output: github_document
+---
+
+<!-- README.md is generated from README.Rmd. Please edit that file -->
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  fig.path = "man/figures/README-",
+  out.width = "100%"
+)
+```
+
+# JMH
+
+<!-- badges: start -->
+[![R-CMD-check](https://github.com/shanpengli/JMH/workflows/R-CMD-check/badge.svg)](https://github.com/shanpengli/JMH/actions)
+[![metacran downloads](https://cranlogs.r-pkg.org/badges/JMH)](https://cran.r-project.org/package=JMH)
+[![](https://cranlogs.r-pkg.org/badges/grand-total/JMH)](https://cran.r-project.org/package=JMH)
+[![CRAN_time_from_release](https://www.r-pkg.org/badges/ago/JMH)](https://cran.r-project.org/package=JMH)
+[![CRAN_Status_Badge_version_last_release](https://www.r-pkg.org/badges/version-last-release/JMH)](https://cran.r-project.org/package=JMH)
+<!-- badges: end -->
+
+The `JMH` package jointly models both mean trajectory and within-subject variability of the longitudinal biomarker together with the (competing risks) survival outcome.
+
+## Installation
+
+You can install the development version of JMH from [GitHub](https://github.com/) with:
+
+``` r
+# install.packages("devtools")
+devtools::install_github("shanpengli/JMH")
+```
+
+# Example
+
+The `JMH` package comes with several simulated datasets. To fit a joint model, we use `JMMLSM` function. 
+
+```{r example}
+library(JMH)
+data(ydata)
+data(cdata)
+## fit a joint model
+fit <- JMMLSM(cdata = cdata, ydata = ydata, 
+              long.formula = Y ~ Z1 + Z2 + Z3 + time,
+              surv.formula = Surv(survtime, cmprsk) ~ var1 + var2 + var3,
+              variance.formula = ~ Z1 + Z2 + Z3 + time, 
+              quadpoint = 10, random = ~ 1|ID, print.para = FALSE)
+fit
+```
+
+
+The `JMH` package can make dynamic prediction given the longitudinal history information. Below is a toy example for competing risks data. Conditional cumulative incidence probabilities for each failure will be presented.
+
+```{r, eval=TRUE}
+cnewdata <- cdata[cdata$ID %in% c(122, 952), ]
+ynewdata <- ydata[ydata$ID %in% c(122, 952), ]
+survfit <- survfitJMMLSM(fit, seed = 100, ynewdata = ynewdata, cnewdata = cnewdata, 
+                         u = seq(5.2, 7.2, by = 0.5), Last.time = "survtime",
+                         obs.time = "time", method = "GH")
+survfit
+oldpar <- par(mfrow = c(2, 2), mar = c(5, 4, 4, 4))
+plot(survfit, include.y = TRUE)
+par(oldpar)
+```
+
+To assess the prediction accuracy of the fitted joint model, we may run `PEJMMLSM` to calculate the Brier score. 
+
+```{r, eval=TRUE}
+PE <- PEJMMLSM(fit, seed = 100, landmark.time = 3, horizon.time = c(4:6),
+               obs.time = "time", method = "GH", 
+               n.cv = 3)
+summary(PE, error = "Brier")
+```
+
+An alternative to assess the prediction accuracy is to run `MAEQJMMLSM` to calculate the prediction error by comparing the predicted and empirical risks stratified on different risk groups based on quantile of the predicted risks.
+
+```{r, eval=TRUE}
+## evaluate prediction accuracy of fitted joint model using cross-validated mean absolute prediction error
+MAEQ <- MAEQJMMLSM(fit, seed = 100, landmark.time = 3, 
+                   horizon.time = c(4:6), 
+                   obs.time = "time", method = "GH", n.cv = 3)
+summary(MAEQ)
+```

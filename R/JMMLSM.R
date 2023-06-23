@@ -13,8 +13,8 @@
 ##' Alternatively. Fitting a random intercept and slope model takes the form ~ x1 + ... + xn|ID.
 ##' @param maxiter the maximum number of iterations of the EM algorithm that the function will perform. Default is 10000.
 ##' @param epsilon Tolerance parameter. Default is 0.0001.
-##' @param quadpoint the number of pseudo-adaptive Gauss-Hermite quadrature points
-##' to be chosen for numerical integration. Default is 6 which produces stable estimates in most dataframes.
+##' @param quadpoint the number of Gauss-Hermite quadrature points
+##' to be chosen for numerical integration. Default is 15 which produces stable estimates in most dataframes.
 ##' @param print.para Print detailed information of each iteration. Default is FALSE, i.e., not to print the iteration details.
 ##' @param survinitial Fit a Cox model to obtain initial values of the parameter estimates. Default is TRUE.
 ##' @return  Object of class \code{JMMLSM} with elements
