@@ -5,13 +5,12 @@
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/shanpengli/JMH/workflows/R-CMD-check/badge.svg)](https://github.com/shanpengli/JMH/actions)
+[![R-CMD-check](https://github.com/shanpengli/JMH/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/shanpengli/JMH/actions/workflows/R-CMD-check.yaml)
 [![metacran
 downloads](https://cranlogs.r-pkg.org/badges/JMH)](https://cran.r-project.org/package=JMH)
 [![](https://cranlogs.r-pkg.org/badges/grand-total/JMH)](https://cran.r-project.org/package=JMH)
 [![CRAN_time_from_release](https://www.r-pkg.org/badges/ago/JMH)](https://cran.r-project.org/package=JMH)
 [![CRAN_Status_Badge_version_last_release](https://www.r-pkg.org/badges/version-last-release/JMH)](https://cran.r-project.org/package=JMH)
-[![R-CMD-check](https://github.com/shanpengli/JMH/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/shanpengli/JMH/actions/workflows/R-CMD-check.yaml)
 <!-- badges: end -->
 
 The `JMH` package jointly models both mean trajectory and within-subject
