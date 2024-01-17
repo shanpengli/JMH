@@ -17,13 +17,14 @@ MAEQJMMLSM(
   survinitial = TRUE,
   n.cv = 3,
   quantile.width = 0.25,
+  opt = "nlminb",
   ...
 )
 }
 \arguments{
 \item{seed}{a numeric value of seed to be specified for cross validation.}
 
-\item{object}{object of class 'MAEQJMMLSM'.}
+\item{object}{object of class 'JMMLSM'.}
 
 \item{landmark.time}{a numeric value of time for which dynamic prediction starts..}
 
@@ -32,9 +33,9 @@ MAEQJMMLSM(
 \item{obs.time}{a character string of specifying a longitudinal time variable.}
 
 \item{method}{estimation method for predicted probabilities. If \code{Laplace}, then the empirical empirical
-estimates of random effects is used. If \code{GH}, then the pseudo-adaptive Gauss-Hermite quadrature is used.}
+estimates of random effects is used. If \code{GH}, then the standard Gauss-Hermite quadrature is used.}
 
-\item{quadpoint}{the number of pseudo-adaptive Gauss-Hermite quadrature points if \code{method = "GH"}.}
+\item{quadpoint}{the number of standard Gauss-Hermite quadrature points if \code{method = "GH"}.}
 
 \item{maxiter}{the maximum number of iterations of the EM algorithm that the 
 function will perform. Default is 10000.}
@@ -44,6 +45,8 @@ function will perform. Default is 10000.}
 \item{n.cv}{number of folds for cross validation. Default is 3.}
 
 \item{quantile.width}{a numeric value of width of quantile to be specified. Default is 0.25.}
+
+\item{opt}{Optimization method to fit a linear mixed effects model, either nlminb (default) or optim.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }

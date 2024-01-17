@@ -20,6 +20,16 @@
 // returning a matrix
 //
 // [[Rcpp::export]]
+double getdeterminant(const Eigen::MatrixXd & H) {
+  Eigen::JacobiSVD<Eigen::MatrixXd> svd(H, Eigen::ComputeThinU | Eigen::ComputeThinV);
+  Eigen::VectorXd eigenSQ = svd.singularValues();
+  double v=1;
+  int i;
+  for (i=0;i<eigenSQ.size();i++) v*=eigenSQ(i);
+  return v;
+}
+
+// [[Rcpp::export]]
 double  MultVV(const Eigen::VectorXd & x, const Eigen::VectorXd & y) {
     double v = x.transpose() * y;
     return v;

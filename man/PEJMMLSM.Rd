@@ -6,8 +6,8 @@
 with the counting process.}
 \usage{
 PEJMMLSM(
-  object,
   seed = 100,
+  object,
   landmark.time = NULL,
   horizon.time = NULL,
   obs.time = NULL,
@@ -20,9 +20,9 @@ PEJMMLSM(
 )
 }
 \arguments{
-\item{object}{object of class 'PEJMMLSM'.}
-
 \item{seed}{a numeric value of seed to be specified for cross validation.}
+
+\item{object}{object of class 'JMMLSM'.}
 
 \item{landmark.time}{a numeric value of time for which dynamic prediction starts..}
 

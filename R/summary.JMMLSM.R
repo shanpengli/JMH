@@ -81,8 +81,7 @@ summary.JMMLSM <- function(object, process = c("longitudinal", "survival"), digi
 
     ##alpha
     Estimate <- object$alpha1
-    if (length(Estimate) == 2) names(Estimate) <- c("alpha1_b0", "alpha1_b1")
-    if (length(Estimate) == 1) names(Estimate) <- c("alpha1_b0")
+    for (i in 1:length(Estimate)) names(Estimate)[i] <- paste0("alpha1_b", i-1)
     SE <- object$sealpha1
     LowerLimit <- Estimate - 1.96 * SE
     expLL <- exp(LowerLimit)
@@ -97,8 +96,7 @@ summary.JMMLSM <- function(object, process = c("longitudinal", "survival"), digi
     
     if (object$CompetingRisk) {
       Estimate <- object$alpha2
-      if (length(Estimate) == 2) names(Estimate) <- c("alpha2_b0", "alpha2_b1")
-      if (length(Estimate) == 1) names(Estimate) <- c("alpha2_b0")
+      for (i in 1:length(Estimate)) names(Estimate)[i] <- paste0("alpha2_b", i-1)
       SE <- object$sealpha2
       LowerLimit <- Estimate - 1.96 * SE
       expLL <- exp(LowerLimit)

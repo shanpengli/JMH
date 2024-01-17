@@ -131,7 +131,7 @@ Rcpp::List getEC(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
         FUNBSENW(i,j)+=temp*exp(-wi)*pow(bi(i),2);
         }
       
-      if (p1a == 2) {
+      if (p1a > 1) {
         for(i=1;i<p1a;i++)
         {
           for(t=0;t<p1a-i;t++) {

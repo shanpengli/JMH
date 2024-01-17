@@ -2,8 +2,8 @@
 ##' with the counting process.
 ##' @name PEJMMLSM
 ##' @aliases PEJMMLSM
-##' @param object object of class 'PEJMMLSM'.
 ##' @param seed a numeric value of seed to be specified for cross validation.
+##' @param object object of class 'JMMLSM'.
 ##' @param landmark.time a numeric value of time for which dynamic prediction starts..
 ##' @param horizon.time a numeric vector of future times for which predicted probabilities are to be computed.
 ##' @param obs.time a character string of specifying a longitudinal time variable.
@@ -21,7 +21,7 @@
 ##' @export
 ##' 
 
-PEJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = NULL, 
+PEJMMLSM <- function(seed = 100, object, landmark.time = NULL, horizon.time = NULL, 
                   obs.time = NULL, method = c("Laplace", "GH"), 
                   quadpoint = NULL, maxiter = 1000, n.cv = 3, survinitial = TRUE, ...) {
   

@@ -1,26 +1,48 @@
 bootsfitRI <- function(i, N = 200, lambda1 = 0.05, lambda2 = 0.1,
-                     tau = c(0.5, 0.5, -0.2, 0.2, 0.05),
-                     CL = 4, CU = 8, 
-                     alpha1 = -0.5, alpha2 = 0.5, 
-                     vee1 = 2, vee2 = -2,
-                     covbw = matrix(c(0.5, 0.25, 0.25, 0.5), nrow = 2, ncol = 2),
-                     seed = 10, maxiter = 1000,
-                     increment = 0.25, quadpoint = 15) {
+                       beta = c(5, 1.5, 2, 1, 2),
+                       tau = c(0.5, 0.5, -0.2, 0.2, 0.05),
+                       gamma1 = c(1, 0.5, 0.5),
+                       gamma2 = c(-0.5, 0.5, 0.25),
+                       alpha1 = 1,
+                       alpha2 = -1,
+                       vee1 = 0.5,
+                       vee2 = -0.5,
+                       CL = 4, CU = 8, 
+                       covbw = matrix(c(0.5, 0.25, 0.25, 0.5), nrow = 2, ncol = 2),
+                       seed = 10, maxiter = 1000,
+                       increment = 0.25, quadpoint = 15) {
   
-  data <- simJMdataRI(N = N, lambda1 = lambda1, lambda2 = lambda2,
-                     tau = tau, alpha1 = alpha1, alpha2 = alpha2,
-                     vee1 = vee1, vee2 = vee2, covbw = covbw,
-                     CL = CL, CU = CU, seed = seed + i,
-                     increment = increment)
+  data <- simJMdataRI(seed = seed + i, N = N, increment = increment, beta = beta,
+                      tau = tau,
+                      gamma1 = gamma1,
+                      gamma2 = gamma2,
+                      alpha1 = alpha1,
+                      alpha2 = alpha2,
+                      vee1 = vee1,
+                      vee2 = vee2,
+                      lambda1 = lambda1,
+                      lambda2 = lambda2,
+                      CL = CL,
+                      CU = CU,
+                      covbw = covbw)
   ydata <- data$ydata
   cdata <- data$cdata
+  rate <- data$rate
   
   a <- proc.time()
   fit <- JMMLSM(cdata = cdata, ydata = ydata, 
                 long.formula = Y ~ Z1 + Z2 + Z3 + time,
                 surv.formula = Surv(survtime, cmprsk) ~ var1 + var2 + var3,
                 variance.formula = ~ Z1 + Z2 + Z3 + time, maxiter = maxiter, epsilon = 1e-04, 
-                quadpoint = quadpoint, random = ~ 1|ID)
+                quadpoint = quadpoint, random = ~ 1|ID, initial.para = list(beta = beta,
+                                                                           tau = tau,
+                                                                           gamma1 = gamma1,
+                                                                           gamma2 = gamma2,
+                                                                           alpha1 = alpha1,
+                                                                           alpha2 = alpha2,
+                                                                           vee1 = vee1,
+                                                                           vee2 = vee2,
+                                                                           Sig = covbw))
   b <- proc.time()
   time <- (b - a)[3]
   
@@ -101,8 +123,8 @@ bootsfitRI <- function(i, N = 200, lambda1 = 0.05, lambda2 = 0.1,
     count <- count + 1
     coef[count] <- fit$iter
     
-    coef <- list(coef, coefSE)
-    names(coef) <- c("coef", "coefSE")
+    coef <- list(coef, coefSE, rate)
+    names(coef) <- c("coef", "coefSE", "rate")
     
     return(coef)
   }

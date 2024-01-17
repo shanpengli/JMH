@@ -87,10 +87,8 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
   
   Sig <- object$Sig
   p1a <- ncol(Sig) - 1
-  if (p1a == 2) Sigb <- Sig[1:2, 1:2]
-  if (p1a == 1) Sigb <- as.matrix(Sig[1, 1])
-  
-  getGH <- GetGHmatrix(quadpoint = quadpoint, Sigb = Sigb)
+  quadmethod <- object$method
+  getGH <- GetGHmatrix(quadpoint = quadpoint, p1a = p1a)
   
   xsmatrix <- getGH$xsmatrix
   wsmatrix <- getGH$wsmatrix
@@ -147,7 +145,7 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       subNDy.mean <- ynewdata.mean[ynewdata.mean[, ID] == yID[j], ]
       subNDy.variance <- ynewdata.variance[ynewdata.variance[, ID] == yID[j], ]
       subNDc <- cnewdata[cnewdata[, ID] == yID[j], ]
-      y.obs[[j]] <- data.frame(subNDy.mean[, c(obs.time, Yvar[1])])
+      y.obs[[j]] <- data.frame(ynewdata[ynewdata[, ID] == yID[j], c(obs.time, Yvar[1])])
       
       s <-  as.numeric(Last.time[j])
       CH01 <- CH(H01, s)
@@ -168,9 +166,26 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       if (method == "GH") {
         for (jj in 1:lengthu) {
           ## calculate the CIF
-          CIF <- getECIF(beta, tau, gamma1, gamma2, alpha1, alpha2, nu1,
-                         nu2, Sig, Z, X, W, Y, as.vector(X2), H01, H02,
-                         xsmatrix, wsmatrix, CH01, CH02, s, u[jj])
+          
+          if (quadmethod == "standard") {
+            CIF <- getECIF(beta, tau, gamma1, gamma2, alpha1, alpha2, nu1,
+                           nu2, Sig, Z, X, W, Y, as.vector(X2), H01, H02,
+                           xsmatrix, wsmatrix, CH01, CH02, s, u[jj])
+          } else {
+            
+            data <- list(Y, X, Z, W, X2, CH01, CH02, beta, tau, gamma1, gamma2, alpha1, alpha2, nu1, nu2, Sig)
+            names(data) <- c("Y", "X", "Z", "W", "X2", "CH01", "CH02", "beta", "tau",
+                             "gamma1", "gamma2", "alpha1", "alpha2", "nu1", "nu2", "Sig")
+            opt <- optim(rep(0, nsig), logLikCR, data = data, method = "BFGS", hessian = TRUE)
+            Posmean <- opt$par
+            PosCov <- solve(opt$hessian)
+            
+            CIF <- getECIFad(beta, tau, gamma1, gamma2, alpha1, alpha2, nu1,
+                             nu2, Sig, Z, X, W, Y, as.vector(X2), H01, H02,
+                             xsmatrix, wsmatrix, CH01, CH02, s, u[jj], Posmean, PosCov)
+            
+          }
+          
           P1us <- CIF$CIF1
           P2us <- CIF$CIF2
           
@@ -218,7 +233,7 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       subNDy.mean <- ynewdata.mean[ynewdata.mean[, ID] == yID[j], ]
       subNDy.variance <- ynewdata.variance[ynewdata.variance[, ID] == yID[j], ]
       subNDc <- cnewdata[cnewdata[, ID] == yID[j], ]
-      y.obs[[j]] <- data.frame(subNDy.mean[, c(obs.time, Yvar[1])])
+      y.obs[[j]] <- data.frame(ynewdata[ynewdata[, ID] == yID[j], c(obs.time, Yvar[1])])
       
       CH0 <- CH(H01, Last.time[j])
       CH0u <- vector()
@@ -252,8 +267,23 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
         quadpoint <- NULL
       } else {
         for (jj in 1:lengthu) {
-          Predraw[j, jj] <- getES(beta, tau, gamma, alpha, nu, Sig, Z, X, W, Y, 
-                                  as.vector(X2), xsmatrix, wsmatrix, CH0, CH0u[jj])
+          
+          if (quadmethod == "standard") {
+            Predraw[j, jj] <- getES(beta, tau, gamma, alpha, nu, Sig, Z, X, W, Y, 
+                                    as.vector(X2), xsmatrix, wsmatrix, CH0, CH0u[jj])
+          } else {
+            
+            data <- list(Y, X, Z, W, X2, CH0, beta, tau, gamma, alpha, nu, Sig)
+            names(data) <- c("Y", "X", "Z", "W", "X2", "CH0", "beta", "tau",
+                             "gamma1", "alpha1", "nu1", "Sig")
+            opt <- optim(rep(0, nsig), logLik, data = data, method = "BFGS", hessian = TRUE)
+            Posmean <- opt$par
+            PosCov <- solve(opt$hessian)
+            
+            Predraw[j, jj] <- getESad(beta, tau, gamma, alpha, nu, Sig, Z, X, W, Y, 
+                                    as.vector(X2), xsmatrix, wsmatrix, CH0, CH0u[jj], Posmean, PosCov)
+            
+          }
         }
       }
       
@@ -268,7 +298,7 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
   Last.time <- data.frame(cID, Last.time)
   colnames(Last.time)[1] <- ID
   sum <- list(Pred = Pred, Last.time = Last.time, y.obs = y.obs, method = method, quadpoint = quadpoint,
-              CompetingRisk = CompetingRisk)
+              CompetingRisk = CompetingRisk, quadmethod = quadmethod)
   class(sum) <- "survfitJMMLSM"
   sum
   

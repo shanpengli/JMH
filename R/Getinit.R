@@ -1,5 +1,5 @@
 Getinit <- function(cdata, ydata, long.formula, surv.formula, variance.formula,
-                    model, ID, RE, random, survinitial) {
+                    model, ID, RE, random, survinitial, initial.para, opt) {
   
   long <- all.vars(long.formula)
   survival <- all.vars(surv.formula)
@@ -37,10 +37,12 @@ Getinit <- function(cdata, ydata, long.formula, surv.formula, variance.formula,
       stop(paste0("The variable ", RE[Fakename], " not found in the long.formula argument. 
                   Please include this variable in the random argument.\n"))
     } else {
+      
       p1a <- 1 + length(RE)
       Z <- ydata[, RE]
       Z <- cbind(1, Z)
       Z <- as.matrix(Z)
+      
     }
   } else if (model == "intercept") {
     if (!is.null(RE)) {
@@ -74,22 +76,39 @@ Getinit <- function(cdata, ydata, long.formula, surv.formula, variance.formula,
   X2 <- as.matrix(cdata[, -c(1:3)])
   survtime <- as.vector(cdata[, survival[1]])
   cmprsk <- as.vector(cdata[, survival[2]])
+  
+  if (!is.null(initial.para)) {
+    beta <- initial.para$beta
+    tau <- initial.para$tau
+  } else {
+    ## get initial estimates of fixed effects in mixed effect location scale model
+    longfit <- nlme::lme(fixed = long.formula, random = random, data = ydata, method = "REML", 
+                         control = nlme::lmeControl(opt = opt))
+    beta <- longfit$coefficients$fixed
+    D <- as.matrix(nlme::getVarCov(longfit))
+    resid <- Y - as.vector(fitted(longfit))
+    
+    ## get initial estimates of fixed effects in WS variance
+    logResidsquare <- as.vector(log(resid^2))
+    Tau <- OLS(W, logResidsquare)
+    tau <- Tau$betahat
+    names(tau) <- colnames(W)
+  }
 
-  ## get initial estimates of fixed effects in mixed effect location scale model
-  longfit <- nlme::lme(fixed = long.formula, random = random, data = ydata, method = "REML", 
-                       control = nlme::lmeControl(opt = "opt"))
-  beta <- longfit$coefficients$fixed
-  D <- as.matrix(nlme::getVarCov(longfit))
-  resid <- Y - as.vector(fitted(longfit))
-
-  ## get initial estimates of fixed effects in WS variance
-  logResidsquare <- as.vector(log(resid^2))
-  Tau <- OLS(W, logResidsquare)
-  tau <- Tau$betahat
-  names(tau) <- colnames(W)
 
   if (sum(unique(cmprsk)) <= 3) {
     if (prod(c(0, 1, 2) %in% unique(cmprsk))) {
+      
+      if (!is.null(initial.para)) {
+        gamma1 <- initial.para$gamma1
+        gamma2 <- initial.para$gamma2
+        alpha1 <- initial.para$alpha1
+        alpha2 <- initial.para$alpha2
+        Sig <- initial.para$Sig
+        vee1 <- initial.para$vee1
+        vee2 <- initial.para$vee2
+        
+      } else {
         ## get initial estimates of fixed effects in competing risks model
         survfmla.fixed <- surv.formula[3]
         survfmla.out1 <- paste0("survival::Surv(", survival[1], ", ", survival[2], "==1)")
@@ -102,39 +121,27 @@ Getinit <- function(cdata, ydata, long.formula, surv.formula, variance.formula,
         if (survinitial) {
           gamma1 <- fitSURV1$coefficients
           gamma2 <- fitSURV2$coefficients
-      } else {
-        gamma1 = as.vector(rep(0, ncol(X2)))
-        names(gamma1) <- names(fitSURV1$coefficients)
-        gamma2 = as.vector(rep(0, ncol(X2)))
-        names(gamma2) <- names(fitSURV1$coefficients)
-      }
-      
-      
-      vee1 = 0
-      vee2 = 0
-      
-      if (model == "intercept") {
-        alpha1 = as.vector(0)
-        alpha2 = as.vector(0)
+        } else {
+          gamma1 = as.vector(rep(0, ncol(X2)))
+          names(gamma1) <- names(fitSURV1$coefficients)
+          gamma2 = as.vector(rep(0, ncol(X2)))
+          names(gamma2) <- names(fitSURV1$coefficients)
+        }
         
-        Sig <- matrix(0, nrow = 2, ncol = 2)
-        Sig[1, 1] <- D
-        Sig[2, 2] <- 1
-        Sig[1, 2] <- 0.5*D
-        Sig[2, 1] <- Sig[1, 2]
         
-      } else {
-        alpha1 = c(0, 0)
-        alpha2 = c(0, 0)
-        Sig <- matrix(0, nrow = 3, ncol = 3)
-        Sig[1:2, 1:2] <- D
-        Sig[3, 3] <- 1
-        Sig[1:2, 3] <- c(Sig[1, 1], Sig[2, 2])*0.5
-        Sig[3, 1:2] <- Sig[1:2, 3] 
+        vee1 = 0
+        vee2 = 0
+        
+        alpha1 = rep(0, p1a)
+        alpha2 = rep(0, p1a)
+        Sig <- matrix(0, nrow = p1a+1, ncol = p1a+1)
+        Sig[1:p1a, 1:p1a] <- D
+        Sig[(p1a+1), (p1a+1)] <- 1
+        Sig[1:p1a, (p1a+1)] <- rep(0, p1a)
+        Sig[(p1a+1), 1:p1a] <- Sig[1:p1a, (p1a+1)]
       }
-      
 
-      
+    
       a <- list(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, Sig, 
                 Z, X, W, Y, X2, survtime, cmprsk, RAWydata, RAWcdata, mdata)
       
@@ -148,36 +155,35 @@ Getinit <- function(cdata, ydata, long.formula, surv.formula, variance.formula,
     
     if (prod(c(0, 1) %in% unique(cmprsk))) {
 
-      ## get initial estimates of fixed effects in survival model
-      survfmla.fixed <- surv.formula[3]
-      survfmla.out1 <- paste0("survival::Surv(", survival[1], ", ", survival[2], "==1)")
-      survfmla <- as.formula(paste(survfmla.out1, survfmla.fixed, sep = "~"))
-      fitSURV1 <- survival::coxph(formula = survfmla, data = cdata, x = TRUE)
-      
-      if (survinitial) {
-        gamma1 <- fitSURV1$coefficients
+      if (!is.null(initial.para)) {
+        gamma1 <- initial.para$gamma1
+        alpha1 <- initial.para$alpha1
+        Sig <- initial.para$Sig
+        vee1 <- initial.para$vee1
       } else {
-        gamma1 = as.vector(rep(0, ncol(X2)))
-        names(gamma1) <- names(fitSURV1$coefficients)
+        ## get initial estimates of fixed effects in survival model
+        survfmla.fixed <- surv.formula[3]
+        survfmla.out1 <- paste0("survival::Surv(", survival[1], ", ", survival[2], "==1)")
+        survfmla <- as.formula(paste(survfmla.out1, survfmla.fixed, sep = "~"))
+        fitSURV1 <- survival::coxph(formula = survfmla, data = cdata, x = TRUE)
+        
+        if (survinitial) {
+          gamma1 <- fitSURV1$coefficients
+        } else {
+          gamma1 = as.vector(rep(0, ncol(X2)))
+          names(gamma1) <- names(fitSURV1$coefficients)
+        }
+        
+        vee1 = 0
+        
+        alpha1 = rep(0, p1a)
+        Sig <- matrix(0, nrow = p1a+1, ncol = p1a+1)
+        Sig[1:p1a, 1:p1a] <- D
+        Sig[(p1a+1), (p1a+1)] <- 1
+        Sig[1:p1a, (p1a+1)] <- rep(0, p1a)
+        Sig[(p1a+1), 1:p1a] <- Sig[1:p1a, (p1a+1)]
       }
-      
-      vee1 = 0
-      
-      if (model == "intercept") {
-        alpha1 = as.vector(0)
-        Sig <- matrix(0, nrow = 2, ncol = 2)
-        Sig[1, 1] <- D
-        Sig[2, 2] <- 1
-        Sig[1, 2] <- 0.5*D
-        Sig[2, 1] <- Sig[1, 2]
-      } else {
-        alpha1 = c(0, 0)
-        Sig <- matrix(0, nrow = 3, ncol = 3)
-        Sig[1:2, 1:2] <- D
-        Sig[3, 3] <- 1
-        Sig[1:2, 3] <- c(Sig[1, 1], Sig[2, 2])*0.5
-        Sig[3, 1:2] <- Sig[1:2, 3] 
-      }
+
       
       a <- list(beta, tau, gamma1, alpha1, vee1, Sig, 
                 Z, X, W, Y, X2, survtime, cmprsk, RAWydata, RAWcdata, mdata)

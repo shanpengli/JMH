@@ -13,9 +13,13 @@ JMMLSM(
   random,
   maxiter = 1000,
   epsilon = 1e-04,
-  quadpoint = 10,
+  quadpoint = NULL,
   print.para = FALSE,
-  survinitial = TRUE
+  survinitial = TRUE,
+  initial.para = NULL,
+  method = "adaptive",
+  opt = "nlminb",
+  initial.optimizer = "BFGS"
 )
 }
 \arguments{
@@ -40,12 +44,20 @@ Alternatively. Fitting a random intercept and slope model takes the form ~ x1 + 
 
 \item{epsilon}{Tolerance parameter. Default is 0.0001.}
 
-\item{quadpoint}{the number of pseudo-adaptive Gauss-Hermite quadrature points
-to be chosen for numerical integration. Default is 6 which produces stable estimates in most dataframes.}
+\item{quadpoint}{the number of Gauss-Hermite quadrature points
+to be chosen for numerical integration. Default is 15 which produces stable estimates in most dataframes.}
 
 \item{print.para}{Print detailed information of each iteration. Default is FALSE, i.e., not to print the iteration details.}
 
 \item{survinitial}{Fit a Cox model to obtain initial values of the parameter estimates. Default is TRUE.}
+
+\item{initial.para}{a list of initialized parameters for EM iteration. Default is NULL.}
+
+\item{method}{Method for proceeding numerical integration in the E-step. Default is adaptive.}
+
+\item{opt}{Optimization method to fit a linear mixed effects model, either nlminb (default) or optim.}
+
+\item{initial.optimizer}{Method for numerical optimization to be used. Default is \code{BFGS}.}
 }
 \value{
 Object of class \code{JMMLSM} with elements

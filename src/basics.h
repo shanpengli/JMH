@@ -12,6 +12,8 @@ double CH(const Eigen::MatrixXd & H, double t);
 
 double HAZ(const Eigen::MatrixXd & H, double t);
 
+double getdeterminant(const Eigen::MatrixXd & H);
+
 Eigen::MatrixXd MultVV2outprod(const Eigen::VectorXd & x, const Eigen::VectorXd & y);
 
 double GetCIF1CR(const Eigen::VectorXd & gamma1, const Eigen::VectorXd & gamma2, 

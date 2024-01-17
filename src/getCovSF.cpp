@@ -681,10 +681,13 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
     bsw2 = Sig.inverse()*bsw*Sig.inverse() - Sig.inverse();
     
     for (t=0;t<(p1a+1);t++) S(p1+p1b+p2+p1a+1+t) = 0.5*bsw2(t,t);
-    
+    u=0;
     for(q=1;q<(p1a+1);q++)
     {
-      for(t=0;t<(p1a+1-q);t++) S(p1+p1b+p2+p1a+1+p1a+1+t+(q-1)*p1a) = bsw2(t,q+t);
+      for(t=0;t<(p1a+1-q);t++) {
+        S(p1+p1b+p2+p1a+1+p1a+1+u) = bsw2(t,q+t);
+        u++;
+      }
     }
   
     SS += MultVVoutprod(S);
@@ -705,11 +708,13 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
   for (t=0;t<p1a;t++) sealpha1(t) = sqrt(SSinv(p1+p1b+p2+t,p1+p1b+p2+t));
   sevee1 = sqrt(SSinv(p1+p1b+p2+p1a,p1+p1b+p2+p1a));
   for (t=0;t<(p1a+1);t++) seSig(t,t) = sqrt(SSinv(p1+p1b+p2+p1a+1+t,p1+p1b+p2+p1a+1+t));
+  u=0;
   for(q=1;q<(p1a+1);q++)
   {
     for(t=0;t<(p1a+1-q);t++) {
-      seSig(t,q+t) = sqrt(SSinv(p1+p1b+p2+p1a+1+p1a+1+t+(q-1)*p1a,p1+p1b+p2+p1a+1+p1a+1+t+(q-1)*p1a));
+      seSig(t,q+t) = sqrt(SSinv(p1+p1b+p2+p1a+1+p1a+1+u,p1+p1b+p2+p1a+1+p1a+1+u));
       seSig(q+t,t) = seSig(t,q+t);
+      u++;
     }
   }
   

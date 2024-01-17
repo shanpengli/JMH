@@ -23,7 +23,7 @@ print.JMMLSM <- function(x, digits = 4, ...) {
       cat("Risk", i, ":", round(x$PropEventType[i+1, 2]/nrow(x$cdata)*100, 2), "%\n")
     }
     cat("\nNumerical intergration:\n")
-    cat("Method: Standard Guass-Hermite quadrature\n")
+    cat("Method: ", x$method, "Guass-Hermite quadrature\n")
     cat("Number of quadrature points: ", x$quadpoint, "\n")
     cat("\nModel Type: joint modeling of longitudinal continuous and competing risks data with the presence of intra-individual variability", "\n\n")
     cat("Model summary:\n")
@@ -74,13 +74,14 @@ print.JMMLSM <- function(x, digits = 4, ...) {
     random <- all.vars(x$random)
     if (length(x$alpha1) == 1) rownames(dat) <- c("(Intercept)_1", "(Intercept)_2")
     if (length(x$alpha1) == 2) rownames(dat) <- c("(Intercept)_1", paste0(random[1], "_1"), "(Intercept)_2", paste0(random[1], "_2"))
+    if (length(x$alpha1) == 3) rownames(dat) <- c("(Intercept)_1", paste0(random[1], "_1"), paste0(random[2], "_1"), "(Intercept)_2", paste0(random[1], "_2"), paste0(random[2], "_2"))
 
     datnu <- matrix(0, nrow = 2, ncol = 4)
     datnu[1, ] <- c(x$vee1, x$sevee1, x$vee1/x$sevee1, 2 * pnorm(-abs(x$vee1/x$sevee1)))
     datnu[2, ] <- c(x$vee2, x$sevee2, x$vee2/x$sevee2, 2 * pnorm(-abs(x$vee2/x$sevee2)))
     datnu <- as.data.frame(datnu)
     colnames(datnu) <- c("Estimate", "SE", "Z value", "p-val")
-    rownames(datnu) <- c("Residual_1", "Residual_2")
+    rownames(datnu) <- c("var_(Intercept)_1", "var_(Intercept)_2")
     dat <- rbind(dat, datnu)
     dat[, 1:3] <- round(dat[, 1:3], digits+1)
     dat[, 4] <- sprintf(paste("%.", digits, "f", sep = ""), dat[, 4])
@@ -90,37 +91,42 @@ print.JMMLSM <- function(x, digits = 4, ...) {
     cat("\nRandom effects:                 \n")
     cat("  Formula:", format(as.formula(x$random)), "\n")
     
-    if (nrow(x$Sig) == 2) {
+     if (nrow(x$Sig) == 2) {
       
       dat <- matrix(0, nrow = 3, ncol = 4)
       dat[1, ] <- c(x$Sig[1,1], x$seSig[1,1], x$Sig[1,1]/x$seSig[1,1], 2 * pnorm(-abs(x$Sig[1,1]/x$seSig[1,1])))
-      dat[2, ] <- c(x$Sig[1,2], x$seSig[1,2], x$Sig[1,2]/x$seSig[1,2], 2 * pnorm(-abs(x$Sig[1,2]/x$seSig[1,2])))
-      dat[3, ] <- c(x$Sig[2,2], x$seSig[2,2], x$Sig[2,2]/x$seSig[2,2], 2 * pnorm(-abs(x$Sig[2,2]/x$seSig[2,2])))
+      dat[2, ] <- c(x$Sig[2,2], x$seSig[2,2], x$Sig[2,2]/x$seSig[2,2], 2 * pnorm(-abs(x$Sig[2,2]/x$seSig[2,2])))
+      dat[3, ] <- c(x$Sig[1,2], x$seSig[1,2], x$Sig[1,2]/x$seSig[1,2], 2 * pnorm(-abs(x$Sig[1,2]/x$seSig[1,2])))
       dat <- as.data.frame(dat)
       colnames(dat) <- c("Estimate", "SE", "Z value", "p-val")
-      rownames(dat) <- c("(Intercept)", "(Intercept):Residual", "Residual")
+      rownames(dat) <- c("(Intercept)", "var_(Intercept)", "(Intercept):var_(Intercept)")
       dat[, 1:3] <- round(dat[, 1:3], digits+1)
       dat[, 4] <- sprintf(paste("%.", digits, "f", sep = ""), dat[, 4])
       print(dat)
     
     } else {
-      
-      dat <- matrix(0, nrow = 6, ncol = 4)
-      dat[1, ] <- c(x$Sig[1,1], x$seSig[1,1], x$Sig[1,1]/x$seSig[1,1], 2 * pnorm(-abs(x$Sig[1,1]/x$seSig[1,1])))
-      dat[2, ] <- c(x$Sig[1,2], x$seSig[1,2], x$Sig[1,2]/x$seSig[1,2], 2 * pnorm(-abs(x$Sig[1,2]/x$seSig[1,2])))
-      dat[3, ] <- c(x$Sig[2,2], x$seSig[2,2], x$Sig[2,2]/x$seSig[2,2], 2 * pnorm(-abs(x$Sig[2,2]/x$seSig[2,2])))
-      for (i in 1:nrow(x$Sig)) dat[3+i, ] <- c(x$Sig[i,3], x$seSig[i,3], x$Sig[i,3]/x$seSig[i,3], 
-                                             2 * pnorm(-abs(x$Sig[i,3]/x$seSig[i,3])))
+      random.var <- all.vars(x$random)[-length(all.vars(x$random))]
+      dat <- matrix(0, nrow = (1+nrow(x$Sig))*nrow(x$Sig)/2, ncol = 4)
       dat <- as.data.frame(dat)
-      slope <- all.vars(x$random)[1]
-      interslope <- paste0("(Intercept):", slope)
-      residslope <- paste0(slope, ":Residual")
+      colnames(x$Sig) <- rownames(x$Sig) <- c("(Intercept)", random.var, "var_(Intercept)")
+      for (i in 1:nrow(x$Sig)) {
+        dat[i, ] <- c(x$Sig[i,i], x$seSig[i,i], x$Sig[i,i]/x$seSig[i,i], 2 * pnorm(-abs(x$Sig[i,i]/x$seSig[i,i])))
+        rownames(dat)[i] <- colnames(x$Sig)[i]
+      }
+      count <- 1
+      for (i in 1:(nrow(x$Sig)-1)) {
+        for (j in 0:(nrow(x$Sig)-i-1)) {
+          dat[nrow(x$Sig) + count, ] <- c(x$Sig[j+1,i+j+1], x$seSig[j+1,i+j+1], x$Sig[j+1,i+j+1]/x$seSig[j+1,i+j+1], 
+                                        2 * pnorm(-abs(x$Sig[j+1,i+j+1]/x$seSig[j+1,i+j+1])))
+          rownames(dat)[nrow(x$Sig) + count] <- paste(rownames(x$Sig)[j+1], colnames(x$Sig)[i+j+1], sep = ":")
+          count <- count + 1
+        }
+      }
+
       colnames(dat) <- c("Estimate", "SE", "Z value", "p-val")
-      rownames(dat) <- c("(Intercept)", interslope, slope, "(Intercept):Residual", residslope, "Residual")
       dat[, 1:3] <- round(dat[, 1:3], digits+1)
       dat[, 4] <- sprintf(paste("%.", digits, "f", sep = ""), dat[, 4])
       print(dat)
-      
       
     }
 
@@ -131,7 +137,7 @@ print.JMMLSM <- function(x, digits = 4, ...) {
     cat("Number of groups:", nrow(x$cdata), "\n\n")
     cat("Proportion of events:", round(x$PropEventType[2, 2]/nrow(x$cdata)*100, 2), "%\n")
     cat("\nNumerical intergration:\n")
-    cat("Method: Standard Guass-Hermite quadrature\n")
+    cat("Method: ", x$method, "Guass-Hermite quadrature\n")
     cat("Number of quadrature points: ", x$quadpoint, "\n")
     cat("\nModel Type: joint modeling of longitudinal continuous and survival data with the presence of intra-individual variability", "\n\n")
     cat("Model summary:\n")
@@ -176,7 +182,7 @@ print.JMMLSM <- function(x, digits = 4, ...) {
     datnu[1, ] <- c(x$vee1, x$sevee1, x$vee1/x$sevee1, 2 * pnorm(-abs(x$vee1/x$sevee1)))
     datnu <- as.data.frame(datnu)
     colnames(datnu) <- c("Estimate", "SE", "Z value", "p-val")
-    rownames(datnu) <- c("Residual_1")
+    rownames(datnu) <- c("var_(Intercept)_1")
     dat <- rbind(dat, datnu)
     dat[, 1:3] <- round(dat[, 1:3], digits+1)
     dat[, 4] <- sprintf(paste("%.", digits, "f", sep = ""), dat[, 4])
@@ -191,33 +197,38 @@ print.JMMLSM <- function(x, digits = 4, ...) {
       
       dat <- matrix(0, nrow = 3, ncol = 4)
       dat[1, ] <- c(x$Sig[1,1], x$seSig[1,1], x$Sig[1,1]/x$seSig[1,1], 2 * pnorm(-abs(x$Sig[1,1]/x$seSig[1,1])))
-      dat[2, ] <- c(x$Sig[1,2], x$seSig[1,2], x$Sig[1,2]/x$seSig[1,2], 2 * pnorm(-abs(x$Sig[1,2]/x$seSig[1,2])))
-      dat[3, ] <- c(x$Sig[2,2], x$seSig[2,2], x$Sig[2,2]/x$seSig[2,2], 2 * pnorm(-abs(x$Sig[2,2]/x$seSig[2,2])))
+      dat[2, ] <- c(x$Sig[2,2], x$seSig[2,2], x$Sig[2,2]/x$seSig[2,2], 2 * pnorm(-abs(x$Sig[2,2]/x$seSig[2,2])))
+      dat[3, ] <- c(x$Sig[1,2], x$seSig[1,2], x$Sig[1,2]/x$seSig[1,2], 2 * pnorm(-abs(x$Sig[1,2]/x$seSig[1,2])))
       dat <- as.data.frame(dat)
       colnames(dat) <- c("Estimate", "SE", "Z value", "p-val")
-      rownames(dat) <- c("(Intercept)", "(Intercept):Residual", "Residual")
+      rownames(dat) <- c("(Intercept)", "var_(Intercept)", "(Intercept):var_(Intercept)")
       dat[, 1:3] <- round(dat[, 1:3], digits+1)
       dat[, 4] <- sprintf(paste("%.", digits, "f", sep = ""), dat[, 4])
       print(dat)
       
     } else {
-      
-      dat <- matrix(0, nrow = 6, ncol = 4)
-      dat[1, ] <- c(x$Sig[1,1], x$seSig[1,1], x$Sig[1,1]/x$seSig[1,1], 2 * pnorm(-abs(x$Sig[1,1]/x$seSig[1,1])))
-      dat[2, ] <- c(x$Sig[1,2], x$seSig[1,2], x$Sig[1,2]/x$seSig[1,2], 2 * pnorm(-abs(x$Sig[1,2]/x$seSig[1,2])))
-      dat[3, ] <- c(x$Sig[2,2], x$seSig[2,2], x$Sig[2,2]/x$seSig[2,2], 2 * pnorm(-abs(x$Sig[2,2]/x$seSig[2,2])))
-      for (i in 1:nrow(x$Sig)) dat[3+i, ] <- c(x$Sig[i,3], x$seSig[i,3], x$Sig[i,3]/x$seSig[i,3], 
-                                               2 * pnorm(-abs(x$Sig[i,3]/x$seSig[i,3])))
+      random.var <- all.vars(x$random)[-length(all.vars(x$random))]
+      dat <- matrix(0, nrow = (1+nrow(x$Sig))*nrow(x$Sig)/2, ncol = 4)
       dat <- as.data.frame(dat)
-      slope <- all.vars(x$random)[1]
-      interslope <- paste0("(Intercept):", slope)
-      residslope <- paste0(slope, ":Residual")
+      colnames(x$Sig) <- rownames(x$Sig) <- c("(Intercept)", random.var, "var_(Intercept)")
+      for (i in 1:nrow(x$Sig)) {
+        dat[i, ] <- c(x$Sig[i,i], x$seSig[i,i], x$Sig[i,i]/x$seSig[i,i], 2 * pnorm(-abs(x$Sig[i,i]/x$seSig[i,i])))
+        rownames(dat)[i] <- colnames(x$Sig)[i]
+      }
+      count <- 1
+      for (i in 1:(nrow(x$Sig)-1)) {
+        for (j in 0:(nrow(x$Sig)-i-1)) {
+          dat[nrow(x$Sig) + count, ] <- c(x$Sig[j+1,i+j+1], x$seSig[j+1,i+j+1], x$Sig[j+1,i+j+1]/x$seSig[j+1,i+j+1], 
+                                          2 * pnorm(-abs(x$Sig[j+1,i+j+1]/x$seSig[j+1,i+j+1])))
+          rownames(dat)[nrow(x$Sig) + count] <- paste(rownames(x$Sig)[j+1], colnames(x$Sig)[i+j+1], sep = ":")
+          count <- count + 1
+        }
+      }
+      
       colnames(dat) <- c("Estimate", "SE", "Z value", "p-val")
-      rownames(dat) <- c("(Intercept)", interslope, slope, "(Intercept):Residual", residslope, "Residual")
       dat[, 1:3] <- round(dat[, 1:3], digits+1)
       dat[, 4] <- sprintf(paste("%.", digits, "f", sep = ""), dat[, 4])
       print(dat)
-      
       
     }
     

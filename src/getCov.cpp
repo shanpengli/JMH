@@ -1215,9 +1215,13 @@ Rcpp::List getCov(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
     
     for (t=0;t<(p1a+1);t++) S(p1+p1b+2*p2+2*p1a+2+t) = 0.5*bsw2(t,t);
     
+    u=0;
     for(q=1;q<(p1a+1);q++)
     {
-      for(t=0;t<(p1a+1-q);t++) S(p1+p1b+2*p2+2*p1a+2+p1a+1+t+(q-1)*p1a) = bsw2(t,q+t);
+      for(t=0;t<(p1a+1-q);t++) {
+        S(p1+p1b+2*p2+2*p1a+2+p1a+1+u) = bsw2(t,q+t); 
+        u++;
+      }
     }
     ST.row(j) = S;
     SS += MultVVoutprod(S);
@@ -1244,11 +1248,13 @@ Rcpp::List getCov(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
   sevee1 = sqrt(SSinv(p1+p1b+2*p2+2*p1a,p1+p1b+2*p2+2*p1a));
   sevee2 = sqrt(SSinv(p1+p1b+2*p2+2*p1a+1,p1+p1b+2*p2+2*p1a+1));
   for (t=0;t<(p1a+1);t++) seSig(t,t) = sqrt(SSinv(p1+p1b+2*p2+2*p1a+2+t,p1+p1b+2*p2+2*p1a+2+t));
+  u=0;
   for(q=1;q<(p1a+1);q++)
   {
     for(t=0;t<(p1a+1-q);t++) {
-      seSig(t,q+t) = sqrt(SSinv(p1+p1b+2*p2+2*p1a+2+p1a+1+t+(q-1)*p1a,p1+p1b+2*p2+2*p1a+2+p1a+1+t+(q-1)*p1a));
+      seSig(t,q+t) = sqrt(SSinv(p1+p1b+2*p2+2*p1a+2+p1a+1+u,p1+p1b+2*p2+2*p1a+2+p1a+1+u));
       seSig(q+t,t) = seSig(t,q+t);
+      u++;
     }
   }
   

@@ -1,3 +1,6 @@
+##' @export
+##' 
+
 simJMdataRI <- function(seed = 100, N = 200, increment = 0.7, beta = c(5, 1.5, 2, 1, 2),
                       tau = c(0.5, 0.5, -0.2, 0.2, 0.05),
                       gamma1 = c(1, 0.5, 0.5),
@@ -88,8 +91,8 @@ simJMdataRI <- function(seed = 100, N = 200, increment = 0.7, beta = c(5, 1.5, 2
   colnames(YdataRaw) <- c("ID", "Y", "time")
   ydata <- dplyr::left_join(YdataRaw, Z, by = "ID")
   cdata <- as.data.frame(cdata)
-  a <- list(cdata, ydata)
-  names(a) <- c("cdata", "ydata")
+  a <- list(cdata, ydata, table)
+  names(a) <- c("cdata", "ydata", "rate")
   return(a)
 }
 

@@ -15,18 +15,24 @@ bootsfitRISF <- function(i, N = 200, lambda1 = 0.05,
   cdata <- data$cdata
   
   a <- proc.time()
-  fit <- JMMLSM(cdata = cdata, ydata = ydata, 
-                long.formula = Y ~ Z1 + Z2 + Z3 + time,
-                surv.formula = Surv(survtime, cmprsk) ~ var1 + var2 + var3,
-                variance.formula = ~ Z1 + Z2 + Z3 + time, maxiter = maxiter, epsilon = 1e-04, 
-                quadpoint = quadpoint, random = ~ 1|ID)
+  fit <- try(JMMLSM(cdata = cdata, ydata = ydata, 
+                    long.formula = Y ~ Z1 + Z2 + Z3 + time,
+                    surv.formula = Surv(survtime, cmprsk) ~ var1 + var2 + var3,
+                    variance.formula = ~ Z1 + Z2 + Z3 + time, maxiter = maxiter, epsilon = 1e-04, 
+                    quadpoint = quadpoint, random = ~ 1|ID), silent = FALSE)
   b <- proc.time()
   time <- (b - a)[3]
   
   coef <- vector()
   coefSE <- vector()
   count <- 1
-  if (is.null(fit$beta)) {
+  if ('try-error' %in% class(fit)) {
+    coef <- rep(NA, 20)
+    coefSE <- rep(NA, 18)
+    coef <- list(coef, coefSE)
+    names(coef) <- c("coef", "coefSE")
+    return(coef)
+  } else if (is.null(fit$beta)) {
     coef <- rep(NA, 20)
     coefSE <- rep(NA, 18)
     coef <- list(coef, coefSE)
