@@ -18,6 +18,7 @@ MAEQJMMLSM(
   n.cv = 3,
   quantile.width = 0.25,
   opt = "nlminb",
+  initial.para = FALSE,
   ...
 )
 }
@@ -47,6 +48,8 @@ function will perform. Default is 10000.}
 \item{quantile.width}{a numeric value of width of quantile to be specified. Default is 0.25.}
 
 \item{opt}{Optimization method to fit a linear mixed effects model, either nlminb (default) or optim.}
+
+\item{initial.para}{Initial guess of parameters for cross validation. Default is FALSE.}
 
 \item{...}{Further arguments passed to or from other methods.}
 }

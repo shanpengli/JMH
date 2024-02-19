@@ -1,5 +1,3 @@
-##' @export
-
 simfitRI <- function(sim = 100, N = 200, lambda1 = 0.05, lambda2 = 0.1,
                      beta = c(5, 1.5, 2, 1, 2),
                      tau = c(0.5, 0.5, -0.2, 0.2, 0.05),

@@ -1,5 +1,3 @@
-##' @export
-
 simfitMESA <- function(sim = 100, N = 200, beta = c(80, -3, -3, 0.5, 5),
                        tau = c(2, 1, 1, 0.05, 0.3),
                        gamma1 = c(0.1, -0.3),

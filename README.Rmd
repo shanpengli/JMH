@@ -47,7 +47,7 @@ fit <- JMMLSM(cdata = cdata, ydata = ydata,
               long.formula = Y ~ Z1 + Z2 + Z3 + time,
               surv.formula = Surv(survtime, cmprsk) ~ var1 + var2 + var3,
               variance.formula = ~ Z1 + Z2 + Z3 + time, 
-              quadpoint = 10, random = ~ 1|ID, print.para = FALSE)
+              quadpoint = 6, random = ~ 1|ID, print.para = FALSE)
 fit
 ```
 
@@ -66,7 +66,7 @@ plot(survfit, include.y = TRUE)
 par(oldpar)
 ```
 
-To assess the prediction accuracy of the fitted joint model, we may run `PEJMMLSM` to calculate the Brier score. 
+If we assess the prediction accuracy of the fitted joint model using Brier score as a calibration measure, we may run `PEJMMLSM` to calculate the Brier score. 
 
 ```{r, eval=TRUE}
 PE <- PEJMMLSM(fit, seed = 100, landmark.time = 3, horizon.time = c(4:6),
@@ -75,7 +75,7 @@ PE <- PEJMMLSM(fit, seed = 100, landmark.time = 3, horizon.time = c(4:6),
 summary(PE, error = "Brier")
 ```
 
-An alternative to assess the prediction accuracy is to run `MAEQJMMLSM` to calculate the prediction error by comparing the predicted and empirical risks stratified on different risk groups based on quantile of the predicted risks.
+An alternative tool is to run `MAEQJMMLSM` to calculate the prediction error by comparing the predicted and empirical risks stratified on different risk groups based on quantile of the predicted risks.
 
 ```{r, eval=TRUE}
 ## evaluate prediction accuracy of fitted joint model using cross-validated mean absolute prediction error
@@ -83,4 +83,13 @@ MAEQ <- MAEQJMMLSM(fit, seed = 100, landmark.time = 3,
                    horizon.time = c(4:6), 
                    obs.time = "time", method = "GH", n.cv = 3)
 summary(MAEQ)
+```
+
+Using area under the ROC curve (AUC) as a discrimination measure, we may run `AUCJMMLSM` to calculate the AUC score. 
+
+```{r, eval=TRUE}
+AUC <- AUCJMMLSM(fit, seed = 100, landmark.time = 3, horizon.time = c(4:6),
+               obs.time = "time", method = "GH", 
+               n.cv = 3)
+summary(AUC)
 ```
