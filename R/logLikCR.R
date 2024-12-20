@@ -6,7 +6,7 @@ logLikCR <- function(data, bw) {
   sum((data$Y - data$X%*%data$beta - data$Z%*%b)^2/(2*sigma) + 0.5*log(sigma)) + 
     data$CH01*exp(data$X2%*%data$gamma1 + data$alpha1%*%b + data$nu1*w) +
     data$CH02*exp(data$X2%*%data$gamma2 + data$alpha2%*%b + data$nu2*w) +
-    t(bw)%*%solve(data$Sig)%*%bw/2
+    t(bw)%*%solve(data$Sig)%*%bw/2 + 0.5*log(det(data$Sig))
 }
 
 logLikCR.learn <- function(data, bw) {
@@ -17,7 +17,7 @@ logLikCR.learn <- function(data, bw) {
   total <- sum((data$Y - data$X%*%data$beta - data$Z%*%b)^2/(2*sigma) + 0.5*log(sigma)) + 
     data$CH01*exp(data$X2%*%data$gamma1 + data$alpha1%*%b + data$nu1*w) +
     data$CH02*exp(data$X2%*%data$gamma2 + data$alpha2%*%b + data$nu2*w) +
-    t(bw)%*%solve(data$Sig)%*%bw/2
+    t(bw)%*%solve(data$Sig)%*%bw/2 + 0.5*log(det(data$Sig))
   if (data$D == 1) {
     total <- total - log(data$HAZ01) - (data$X2%*%data$gamma1 + data$alpha1%*%b + data$nu1*w)
     total

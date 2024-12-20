@@ -17,6 +17,11 @@
 ##' @param quantile.width a numeric value of width of quantile to be specified. Default is 0.25.
 ##' @param opt Optimization method to fit a linear mixed effects model, either nlminb (default) or optim.
 ##' @param initial.para Initial guess of parameters for cross validation. Default is FALSE.
+##' @param LOCF a logical value to indicate whether the last-observation-carried-forward approach applies to prediction. 
+##' If \code{TRUE}, then \code{LOCFcovariate} and \code{clongdata} must be specified to indicate 
+##' which time-dependent survival covariates are included for dynamic prediction. Default is FALSE.
+##' @param LOCFcovariate a vector of string with time-dependent survival covariates if \code{LOCF = TRUE}. Default is NULL.
+##' @param clongdata a long format data frame where time-dependent survival covariates are incorporated. Default is NULL.
 ##' @param ... Further arguments passed to or from other methods.
 ##' @return a list of matrices with conditional probabilities for subjects.
 ##' @author Shanpeng Li \email{lishanpeng0913@ucla.edu}
@@ -28,7 +33,8 @@ MAEQJMMLSM <- function(seed = 100, object, landmark.time = NULL, horizon.time = 
                         obs.time = NULL, method = c("Laplace", "GH"), 
                         quadpoint = NULL, maxiter = 1000, 
                         survinitial = TRUE, n.cv = 3, 
-                        quantile.width = 0.25, opt = "nlminb", initial.para = FALSE, ...) {
+                        quantile.width = 0.25, opt = "nlminb", initial.para = FALSE, 
+                        LOCF = FALSE, LOCFcovariate = NULL, clongdata = NULL,...) {
   
   if (!inherits(object, "JMMLSM"))
     stop("Use only with 'JMMLSM' xs.\n")
@@ -107,10 +113,17 @@ MAEQJMMLSM <- function(seed = 100, object, landmark.time = NULL, horizon.time = 
       NewyID <- unique(val.ydata[, ID])
       val.cdata <- val.cdata[val.cdata[, ID] %in% NewyID, ]
       
+      if (LOCF) {
+        val.clongdata <- clongdata[clongdata[, ID] %in% val.cdata[, ID], ]
+      } else {
+        val.clongdata <- NULL
+      }
+      
       survfit <- try(survfitJMMLSM(fit, ynewdata = val.ydata, cnewdata = val.cdata, 
                                    u = horizon.time, method = method, 
-                                   Last.time = rep(landmark.time, nrow(val.cdata)),
-                                   obs.time = obs.time, quadpoint = quadpoint), silent = TRUE)
+                                   Last.time = landmark.time,
+                                   obs.time = obs.time, quadpoint = quadpoint,
+                                   LOCF = LOCF, LOCFcovariate = LOCFcovariate, clongdata = val.clongdata), silent = TRUE)
       
       if ('try-error' %in% class(survfit)) {
         writeLines(paste0("Error occured in the ", t, " th validation!"))

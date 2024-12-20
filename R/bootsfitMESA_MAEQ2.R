@@ -1,17 +1,48 @@
-bootsfitRI_MAEQ2 <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
-                             alpha1, alpha2, vee1, vee2, lambda1, lambda2, CL,
-                            CU, covbw, quadpoint, maxiter, 
-                            n.cv, landmark.time, horizon.time, quantile.width,
-                            method = "GH", silent = TRUE, model = c("JMH", "FastJM")) {
+bootsfitMESA_MAEQ2 <- function(i, seed = 100, N = 200,
+                               beta = c(80, -3, -3, 0.5, 5),
+                               tau = c(2, 1, 1, 0.05, 0.3),
+                               gamma1 = c(0.1, -0.3),
+                               gamma2 = c(0.1, -0.3),
+                               alpha1 = c(0, -0.03, 0),
+                               alpha2 = c(-0.02, 0, 0.02),
+                               vee1 = 0.7,
+                               vee2 = 0.8,
+                               covbw = matrix(c(200, -70, -70, 10, 
+                                                -70, 150, 70, -2, 
+                                                -70, 70, 150, -2, 
+                                                10, -2, -2, 0.7), 
+                                              nrow = 4, 
+                                              ncol = 4),
+                               lambda1 = 1e-5,
+                               lambda2 = 3e-5, 
+                               lambdaC = 1e-2, 
+                               incremin = 1, 
+                               incremax = 2.5,
+                               Cmax = 18,
+                               maxiter = 1000,
+                               quadpoint = 6,
+                               n.cv, landmark.time, horizon.time, quantile.width = 0.25,
+                               method = "GH", silent = TRUE, model = c("JMH", "FastJM")) {
   
   
-  data <- simJMdataRI(seed = seed, N = N, increment = increment,
-                      beta = beta, tau = tau, gamma1 = gamma1, gamma2 = gamma2,
-                      alpha1 = alpha1, alpha2 = alpha2, vee1 = vee1, vee2 = vee2,
-                      lambda1 = lambda1, lambda2 = lambda2,
-                      CL = CL, CU = CU, covbw = covbw)
+  data <- simJMMESA(seed = seed + i, N = N, beta = beta,
+                    tau = tau,
+                    gamma1 = gamma1,
+                    gamma2 = gamma2,
+                    alpha1 = alpha1,
+                    alpha2 = alpha2,
+                    vee1 = vee1,
+                    vee2 = vee2,
+                    lambda1 = lambda1,
+                    lambda2 = lambda2,
+                    lambdaC = lambdaC,
+                    incremin = incremin,
+                    incremax = incremax,
+                    Cmax = Cmax,
+                    covbw = covbw)
   ydata <- data$ydata
   cdata <- data$cdata
+  rate <- data$rate
   
   set.seed(seed + i)
   folds <- caret::groupKFold(c(1:nrow(cdata)), k = n.cv)
@@ -29,15 +60,28 @@ bootsfitRI_MAEQ2 <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
     
     if (model == "JMH") {
       fit <- try(JMH::JMMLSM(cdata = train.cdata, ydata = train.ydata, 
-                        long.formula = Y ~ Z1 + Z2 + Z3 + time,
-                        surv.formula = Surv(survtime, cmprsk) ~ var1 + var2 + var3,
-                        variance.formula = ~ Z1 + Z2 + Z3 + time, 
-                        quadpoint = quadpoint, random = ~ 1|ID), silent = silent)
+                             long.formula = Y ~ timens1 + timens2 + Z1 + Z2,
+                             surv.formula = Surv(survtime, cmprsk) ~ var1 + var2,
+                             variance.formula = ~ timens1 + timens2 + Z1 + Z2, 
+                             quadpoint = quadpoint, random = ~ timens1 + timens2|ID,
+                             maxiter = maxiter,
+                             epsilon = 5e-3,
+                             initial.para = list(beta = beta,
+                                                 tau = tau,
+                                                 gamma1 = gamma1,
+                                                 gamma2 = gamma2,
+                                                 alpha1 = alpha1,
+                                                 alpha2 = alpha2,
+                                                 vee1 = vee1,
+                                                 vee2 = vee2,
+                                                 Sig = covbw)), silent = silent)
     } else {
       fit <- try(FastJM::jmcs(cdata = train.cdata, ydata = train.ydata, 
-                              long.formula = Y ~ Z1 + Z2 + Z3 + time,
-                              surv.formula = Surv(survtime, cmprsk) ~ var1 + var2 + var3,
-                              quadpoint = quadpoint, random = ~ 1|ID, opt = "optim"), silent = silent)
+                              long.formula = Y ~ timens1 + timens2 + Z1 + Z2,
+                              surv.formula = Surv(survtime, cmprsk) ~ var1 + var2,
+                              quadpoint = quadpoint, random = ~ timens1 + timens2|ID,
+                              maxiter = maxiter,
+                              tol = 5e-3), silent = silent)
     }
     
     
@@ -55,13 +99,13 @@ bootsfitRI_MAEQ2 <- function(i, seed, N, increment, beta, tau, gamma1, gamma2,
       
       val.cdata <- val.cdata[val.cdata$survtime > landmark.time, ]
       val.ydata <- val.ydata[val.ydata$ID %in% val.cdata$ID, ]
-      val.ydata <- val.ydata[val.ydata$time <= landmark.time/increment, ]
+      val.ydata <- val.ydata[val.ydata$time <= landmark.time, ]
       
       if (model == "JMH") {
         survfit <- try(JMH::survfitJMMLSM(fit, ynewdata = val.ydata, cnewdata = val.cdata, 
-                                     u = horizon.time, method = method, 
-                                     Last.time = landmark.time,
-                                     obs.time = "time", quadpoint = quadpoint), silent = silent)
+                                          u = horizon.time, method = method, 
+                                          Last.time = landmark.time,
+                                          obs.time = "time", quadpoint = quadpoint), silent = silent)
       } else {
         survfit <- try(FastJM::survfitjmcs(fit, ynewdata = val.ydata, cnewdata = val.cdata, 
                                            u = horizon.time, method = method, 

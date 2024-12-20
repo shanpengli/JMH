@@ -86,14 +86,7 @@ Rcpp::List getECad(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
     haz01=HAZ01(j);
     haz02=HAZ02(j);
     
-    // Rprintf("%d th subject cuh01 is: %f\n", j, cuh01);
-    // 
-    // cuh01=CH(H01, survtime(j));
-    // cuh02=CH(H02, survtime(j));
-    // haz01=HAZ(H01, survtime(j));
-    // haz02=HAZ(H02, survtime(j));
-    // 
-    // Rprintf("%d th subject cuh01 is: %f\n", j, cuh01);
+
     // 
     xgamma1=MultVV(X2.row(j),gamma1);
     

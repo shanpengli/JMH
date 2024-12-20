@@ -14,6 +14,13 @@
 ##' function will perform. Default is 10000.
 ##' @param n.cv number of folds for cross validation. Default is 3.
 ##' @param survinitial Fit a Cox model to obtain initial values of the parameter estimates. Default is TRUE.
+##' @param opt Optimization method to fit a linear mixed effects model, either nlminb (default) or optim.
+##' @param initial.para Initial guess of parameters for cross validation. Default is FALSE.
+##' @param LOCF a logical value to indicate whether the last-observation-carried-forward approach applies to prediction. 
+##' If \code{TRUE}, then \code{LOCFcovariate} and \code{clongdata} must be specified to indicate 
+##' which time-dependent survival covariates are included for dynamic prediction. Default is FALSE.
+##' @param LOCFcovariate a vector of string with time-dependent survival covariates if \code{LOCF = TRUE}. Default is NULL.
+##' @param clongdata a long format data frame where time-dependent survival covariates are incorporated. Default is NULL.
 ##' @param ... Further arguments passed to or from other methods.
 ##' @return a list of matrices with conditional probabilities for subjects.
 ##' @author Shanpeng Li \email{lishanpeng0913@ucla.edu}
@@ -23,7 +30,9 @@
 
 PEJMMLSM <- function(seed = 100, object, landmark.time = NULL, horizon.time = NULL, 
                   obs.time = NULL, method = c("Laplace", "GH"), 
-                  quadpoint = NULL, maxiter = 1000, n.cv = 3, survinitial = TRUE, ...) {
+                  quadpoint = NULL, maxiter = 1000, n.cv = 3, survinitial = TRUE, 
+                  opt = "nlminb", initial.para = FALSE, 
+                  LOCF = FALSE, LOCFcovariate = NULL, clongdata = NULL, ...) {
   
   if (!inherits(object, "JMMLSM"))
     stop("Use only with 'JMMLSM' xs.\n")
@@ -57,6 +66,20 @@ PEJMMLSM <- function(seed = 100, object, landmark.time = NULL, horizon.time = NU
   random <- all.vars(object$random) 
   ID <- random[length(random)]
   
+  if (initial.para) {
+    initial.para <- list(beta = object$beta,
+                         tau = object$tau, 
+                         gamma1 = object$gamma1,
+                         gamma2 = object$gamma2,
+                         alpha1 = object$alpha1,
+                         alpha2 = object$alpha2,
+                         vee1 = object$vee1,
+                         vee2 = object$vee2,
+                         Sig = object$Sig)
+  } else {
+    initial.para <- NULL
+  }
+  
   folds <- caret::groupKFold(c(1:nrow(cdata)), k = n.cv)
   Brier.cv <- list()
   MAE.cv <- list()
@@ -70,7 +93,9 @@ PEJMMLSM <- function(seed = 100, object, landmark.time = NULL, horizon.time = NU
                       surv.formula = surv.formula,
                       variance.formula = variance.formula, 
                       quadpoint = quadpoint, random = object$random, 
-                      survinitial = survinitial, maxiter = 10000), silent = TRUE)
+                      survinitial = survinitial, maxiter = maxiter, opt = opt, 
+                      epsilon = object$epsilon,
+                      initial.para = initial.para), silent = TRUE)
     
     if ('try-error' %in% class(fit)) {
       writeLines(paste0("Error occured in the ", t, " th training!"))
@@ -92,10 +117,17 @@ PEJMMLSM <- function(seed = 100, object, landmark.time = NULL, horizon.time = NU
       NewyID <- unique(val.ydata[, ID])
       val.cdata <- val.cdata[val.cdata[, ID] %in% NewyID, ]
       
+      if (LOCF) {
+        val.clongdata <- clongdata[clongdata[, ID] %in% val.cdata[, ID], ]
+      } else {
+        val.clongdata <- NULL
+      }
+      
       survfit <- try(survfitJMMLSM(fit, ynewdata = val.ydata, cnewdata = val.cdata, 
                                    u = horizon.time, method = method, 
-                                   Last.time = rep(landmark.time, nrow(val.cdata)),
-                                   obs.time = obs.time, quadpoint = quadpoint), silent = TRUE)
+                                   Last.time = landmark.time,
+                                   obs.time = obs.time, quadpoint = quadpoint,
+                                   LOCF = LOCF, LOCFcovariate = LOCFcovariate, clongdata = val.clongdata), silent = TRUE)
       
       if ('try-error' %in% class(survfit)) {
         writeLines(paste0("Error occured in the ", t, " th validation!"))

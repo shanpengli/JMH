@@ -53,6 +53,14 @@ GetCIF2CR <- function(gamma1, gamma2, alpha1, alpha2, nu1, nu2, X2, H01, H02, s,
     .Call(`_JMH_GetCIF2CR`, gamma1, gamma2, alpha1, alpha2, nu1, nu2, X2, H01, H02, s, u, bwi, q)
 }
 
+GetCIF1CRall <- function(gamma1, gamma2, alpha1, alpha2, nu1, nu2, X2, H01, H02, s, timecif, bwi, q) {
+    .Call(`_JMH_GetCIF1CRall`, gamma1, gamma2, alpha1, alpha2, nu1, nu2, X2, H01, H02, s, timecif, bwi, q)
+}
+
+GetCIF2CRall <- function(gamma1, gamma2, alpha1, alpha2, nu1, nu2, X2, H01, H02, s, timecif, bwi, q) {
+    .Call(`_JMH_GetCIF2CRall`, gamma1, gamma2, alpha1, alpha2, nu1, nu2, X2, H01, H02, s, timecif, bwi, q)
+}
+
 getCov <- function(beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, H01, H02, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, FUNENW, FUNBENW, FUNBS, FUNBW, FUNWS, FUNBSENW, FUNEC, FUNBEC, FUNBSEC, FUNWEC, FUNWSEC, FUNB, FUNW) {
     .Call(`_JMH_getCov`, beta, tau, gamma1, gamma2, alpha1, alpha2, vee1, vee2, H01, H02, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, FUNENW, FUNBENW, FUNBS, FUNBW, FUNWS, FUNBSENW, FUNEC, FUNBEC, FUNBSEC, FUNWEC, FUNWSEC, FUNB, FUNW)
 }
@@ -71,6 +79,10 @@ getECIF <- function(beta, tau, gamma1, gamma2, alpha1, alpha2, nu1, nu2, Sig, Z,
 
 getECIFad <- function(beta, tau, gamma1, gamma2, alpha1, alpha2, nu1, nu2, Sig, Z, X1, W, Y, X2, H01, H02, xsmatrix, wsmatrix, CH01, CH02, s, u, Posmean, Poscov) {
     .Call(`_JMH_getECIFad`, beta, tau, gamma1, gamma2, alpha1, alpha2, nu1, nu2, Sig, Z, X1, W, Y, X2, H01, H02, xsmatrix, wsmatrix, CH01, CH02, s, u, Posmean, Poscov)
+}
+
+getECIFall <- function(beta, tau, gamma1, gamma2, alpha1, alpha2, nu1, nu2, Sig, Z, X1, W, Y, X2, H01, H02, xsmatrix, wsmatrix, CH01, CH02, s, timecif1, timecif2, Posmean, Poscov) {
+    .Call(`_JMH_getECIFall`, beta, tau, gamma1, gamma2, alpha1, alpha2, nu1, nu2, Sig, Z, X1, W, Y, X2, H01, H02, xsmatrix, wsmatrix, CH01, CH02, s, timecif1, timecif2, Posmean, Poscov)
 }
 
 getECSF <- function(beta, tau, gamma1, alpha1, vee1, H01, Sig, Z, X1, W, Y, X2, survtime, cmprsk, mdata, mdataS, xsmatrix, wsmatrix, CUH01, HAZ01) {

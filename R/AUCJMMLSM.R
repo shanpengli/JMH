@@ -1,8 +1,8 @@
-##' @title Time-dependent AUC  for joint models
+##' @title Time-dependent AUC for joint models
 ##' @name AUCJMMLSM
 ##' @aliases AUCJMMLSM
-##' @param object object of class 'JMMLSM'.
 ##' @param seed a numeric value of seed to be specified for cross validation.
+##' @param object object of class 'JMMLSM'.
 ##' @param landmark.time a numeric value of time for which dynamic prediction starts..
 ##' @param horizon.time a numeric vector of future times for which predicted probabilities are to be computed.
 ##' @param obs.time a character string of specifying a longitudinal time variable.
@@ -13,6 +13,14 @@
 ##' function will perform. Default is 10000.
 ##' @param n.cv number of folds for cross validation. Default is 3.
 ##' @param survinitial Fit a Cox model to obtain initial values of the parameter estimates. Default is TRUE.
+##' @param opt Optimization method to fit a linear mixed effects model, either nlminb (default) or optim.
+##' @param initial.para Initial guess of parameters for cross validation. Default is FALSE.
+##' @param LOCF a logical value to indicate whether the last-observation-carried-forward approach applies to prediction. 
+##' If \code{TRUE}, then \code{LOCFcovariate} and \code{clongdata} must be specified to indicate 
+##' which time-dependent survival covariates are included for dynamic prediction. Default is FALSE.
+##' @param LOCFcovariate a vector of string with time-dependent survival covariates if \code{LOCF = TRUE}. Default is NULL.
+##' @param clongdata a long format data frame where time-dependent survival covariates are incorporated. Default is NULL.
+##' @param metric a string to indicate which metric is used. 
 ##' @param ... Further arguments passed to or from other methods.
 ##' @return a list of matrices with conditional probabilities for subjects.
 ##' @author Shanpeng Li \email{lishanpeng0913@ucla.edu}
@@ -20,9 +28,11 @@
 ##' @export
 ##' 
 
-AUCJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = NULL, 
+AUCJMMLSM <- function(seed = 100, object, landmark.time = NULL, horizon.time = NULL, 
                      obs.time = NULL, method = c("Laplace", "GH"), 
-                     quadpoint = NULL, maxiter = 1000, n.cv = 3, survinitial = TRUE, ...) {
+                     quadpoint = NULL, maxiter = 1000, n.cv = 3, survinitial = TRUE, 
+                     opt = "nlminb", initial.para = FALSE, 
+                     LOCF = FALSE, LOCFcovariate = NULL, clongdata = NULL, metric = c("AUC", "Cindex"), ...) {
   
   if (!inherits(object, "JMMLSM"))
     stop("Use only with 'JMMLSM' xs.\n")
@@ -30,6 +40,8 @@ AUCJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = N
     stop("Please specify the landmark.time for dynamic prediction.")   
   if (!method %in% c("Laplace", "GH"))
     stop("Please specify a method for probability approximation: Laplace or GH.")
+  if (!metric %in% c("AUC", "Cindex"))
+    stop("Please specify a metric for prediction accuracy assessment: AUC or Cindex.")
   if (!is.vector(horizon.time)) 
     stop("horizon.time must be vector typed.")
   if (is.null(quadpoint)) {
@@ -56,6 +68,20 @@ AUCJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = N
   random <- all.vars(object$random) 
   ID <- random[length(random)]
   
+  if (initial.para) {
+    initial.para <- list(beta = object$beta,
+                         tau = object$tau, 
+                         gamma1 = object$gamma1,
+                         gamma2 = object$gamma2,
+                         alpha1 = object$alpha1,
+                         alpha2 = object$alpha2,
+                         vee1 = object$vee1,
+                         vee2 = object$vee2,
+                         Sig = object$Sig)
+  } else {
+    initial.para <- NULL
+  }
+  
   folds <- caret::groupKFold(c(1:nrow(cdata)), k = n.cv)
   AUC.cv <- list()
   for (t in 1:n.cv) {
@@ -68,7 +94,10 @@ AUCJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = N
                       surv.formula = surv.formula,
                       variance.formula = variance.formula, 
                       quadpoint = quadpoint, random = object$random, 
-                      survinitial = survinitial, maxiter = maxiter), silent = TRUE)
+                      survinitial = survinitial,
+                      maxiter = maxiter, opt = opt, 
+                      epsilon = object$epsilon,
+                      initial.para = initial.para), silent = TRUE)
     
     if ('try-error' %in% class(fit)) {
       writeLines(paste0("Error occured in the ", t, " th training!"))
@@ -86,10 +115,17 @@ AUCJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = N
       NewyID <- unique(val.ydata[, ID])
       val.cdata <- val.cdata[val.cdata[, ID] %in% NewyID, ]
       
+      if (LOCF) {
+        val.clongdata <- clongdata[clongdata[, ID] %in% val.cdata[, ID], ]
+      } else {
+        val.clongdata <- NULL
+      }
+      
       survfit <- try(survfitJMMLSM(fit, ynewdata = val.ydata, cnewdata = val.cdata, 
                                    u = horizon.time, method = method, 
-                                   Last.time = rep(landmark.time, nrow(val.cdata)),
-                                   obs.time = obs.time, quadpoint = quadpoint), silent = TRUE)
+                                   Last.time = landmark.time,
+                                   obs.time = obs.time, quadpoint = quadpoint,
+                                   LOCF = LOCF, LOCFcovariate = LOCFcovariate, clongdata = val.clongdata), silent = TRUE)
       
       if ('try-error' %in% class(survfit)) {
         writeLines(paste0("Error occured in the ", t, " th validation!"))
@@ -110,24 +146,31 @@ AUCJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = N
               CIF[k, 3] <- survfit$Pred[[k]][j, 3]
             }
             
-            ROC <- timeROC::timeROC(T = CIF$time, delta = CIF$status,
-                                    weighting = "marginal",
-                                    marker = CIF$CIF1, cause = 1,
-                                    times = horizon.time[j])
-            
-            mean.AUC[j, 1] <- ROC$AUC_1[2]
-            
-            CIF$status2 <- ifelse(CIF$status == 2, 1,
-                                  ifelse(CIF$status == 1, 2, 0)
-                                  )
-            
-            ROC <- timeROC::timeROC(T = CIF$time, delta = CIF$status2,
-                                    weighting = "marginal",
-                                    marker = CIF$CIF2, cause = 1,
-                                    times = horizon.time[j])
-            
-            mean.AUC[j, 2] <- ROC$AUC_1[2]
-            
+            if (metric == "AUC") {
+              ROC <- timeROC::timeROC(T = CIF$time, delta = CIF$status,
+                                      weighting = "marginal",
+                                      marker = CIF$CIF1, cause = 1,
+                                      times = horizon.time[j])
+              
+              mean.AUC[j, 1] <- ROC$AUC_1[2]
+              
+              CIF$status2 <- ifelse(CIF$status == 2, 1,
+                                    ifelse(CIF$status == 1, 2, 0)
+              )
+              
+              ROC <- timeROC::timeROC(T = CIF$time, delta = CIF$status2,
+                                      weighting = "marginal",
+                                      marker = CIF$CIF2, cause = 1,
+                                      times = horizon.time[j])
+              
+              mean.AUC[j, 2] <- ROC$AUC_1[2]
+            } else {
+              
+              mean.AUC[j, 1] <- CindexCR(CIF$time, CIF$status, CIF$CIF1, 1)
+              mean.AUC[j, 2] <- CindexCR(CIF$time, CIF$status, CIF$CIF2, 2)
+              
+            }
+
             
           }
           
@@ -146,12 +189,18 @@ AUCJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = N
               Surv[k, 2] <- survfit$Pred[[k]][j, 2]
             }
             
-            ROC <- timeROC::timeROC(T = Surv$time, delta = Surv$status,
-                                    weighting = "marginal",
-                                    marker = -Surv$Surv, cause = 1,
-                                    times = horizon.time[j])
+            if (metric == "AUC") {
+              ROC <- timeROC::timeROC(T = Surv$time, delta = Surv$status,
+                                      weighting = "marginal",
+                                      marker = -Surv$Surv, cause = 1,
+                                      times = horizon.time[j])
+              
+              mean.AUC[j, 1] <- ROC$AUC[2]
+            } else {
+              mean.AUC[j, 1] <- CindexCR(Surv$time, Surv$status, -Surv$Surv, 1)
+            }
             
-            mean.AUC[j, 1] <- ROC$AUC[2]
+
           }
           
           
@@ -165,7 +214,7 @@ AUCJMMLSM <- function(object, seed = 100, landmark.time = NULL, horizon.time = N
   }
   result <- list(n.cv = n.cv, AUC.cv = AUC.cv, landmark.time = landmark.time,
                  horizon.time = horizon.time, method = method, quadpoint = quadpoint, 
-                 CompetingRisk = CompetingRisk, seed = seed)
+                 CompetingRisk = CompetingRisk, seed = seed, metric = metric)
   class(result) <- "AUCJMMLSM"
   
   return(result)

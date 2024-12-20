@@ -202,8 +202,6 @@ JMMLSM <- function(cdata, ydata,
     Sig <- getinit$Sig
     p1a <- ncol(Sig) - 1
     
-    if (p1a > 3) stop("\nThe maximum number of random effects cannot exceed 4.")
-    
     CompetingRisk <- TRUE
   } else {
     ## initialize parameters
@@ -225,10 +223,10 @@ JMMLSM <- function(cdata, ydata,
     Sig <- getinit$Sig
     p1a <- ncol(Sig) - 1
     
-    if (p1a > 3) stop("\nThe maximum number of random effects cannot exceed 4.")
-    
     CompetingRisk <- FALSE
   }
+  
+  if (p1a > 4) stop("\nThe maximum number of random effects cannot exceed 5.")
   
   getGH <- GetGHmatrix(quadpoint = quadpoint, p1a = p1a)
   

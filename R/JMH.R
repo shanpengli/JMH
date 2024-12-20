@@ -5,10 +5,12 @@
 #' @importFrom utils  read.table
 #' @importFrom survival coxph Surv survfit
 #' @importFrom parallel mclapply parLapply makeCluster stopCluster
-#' @importFrom dplyr left_join
+#' @importFrom dplyr left_join n across group_by row_number
 #' @importFrom MASS mvrnorm
 #' @importFrom nlme lme getVarCov lmeControl
 #' @importFrom caret groupKFold
 #' @importFrom graphics axis mtext par segments title
 #' @importFrom timeROC timeROC
+#' @import PAmeasures
+#' @importFrom magrittr %>%
 NULL
