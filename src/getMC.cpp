@@ -74,11 +74,13 @@ Rcpp::List getMC(Eigen::VectorXd & beta, Eigen::VectorXd & tau,
     
     for(t=0;t<p1a;t++) Sig(t,t)+=FUNBS(t,j);
     if (p1a>1) {
+      u=0;
       for(q=1;q<p1a;q++)
       {
         for(t=0;t<p1a-q;t++) {
-          Sig(t,q+t)+=FUNBS(p1a+t+(q-1)*(p1a-1),j);
-          Sig(q+t,t)+=FUNBS(p1a+t+(q-1)*(p1a-1),j);
+          Sig(t,q+t)+=FUNBS(p1a+u,j);
+          Sig(q+t,t)+=FUNBS(p1a+u,j);
+          u++;
           }
       }
     }
@@ -202,11 +204,13 @@ Rcpp::List getMC(Eigen::VectorXd & beta, Eigen::VectorXd & tau,
     for(t=0;t<p1a;t++)   bbT(t,t) = FUNBSENW(t,j);
     if(p1a>1)
     {
+      u=0;
       for(i=1;i<p1a;i++)
       {
         for(t=0;t<p1a-i;t++) {
-          bbT(t,i+t) = FUNBSENW(p1a+t+(i-1)*(p1a-1),j);
+          bbT(t,i+t) = FUNBSENW(p1a+u,j);
           bbT(i+t,t) = bbT(t,i+t);
+          u++;
           }
       }
     }
@@ -439,11 +443,13 @@ Rcpp::List getMC(Eigen::VectorXd & beta, Eigen::VectorXd & tau,
     
     if(p1a>1)
     {
+      u=0;
       for(i=1;i<p1a;i++)
       {
         for(t=0;t<p1a-i;t++)   {
-          bbT(t,i+t) = FUNBSEC(p1a+t+(i-1)*(p1a-1),j);
+          bbT(t,i+t) = FUNBSEC(p1a+u,j);
           bbT(i+t,t) = bbT(t,i+t);
+          u++;
           }
       }
     }
@@ -487,11 +493,13 @@ Rcpp::List getMC(Eigen::VectorXd & beta, Eigen::VectorXd & tau,
           
           if(p1a>1)
           {
+            u=0;
             for(i=1;i<p1a;i++)
             {
               for(t=0;t<p1a-i;t++)   {
-                bbT(t,i+t) = FUNBSEC(p1a+t+(i-1)*(p1a-1),j);
+                bbT(t,i+t) = FUNBSEC(p1a+u,j);
                 bbT(i+t,t) = bbT(t,i+t);
+                u++;
               }
             }
           }
@@ -558,11 +566,13 @@ Rcpp::List getMC(Eigen::VectorXd & beta, Eigen::VectorXd & tau,
     
     if(p1a>1)
     {
+      u=0;
       for(i=1;i<p1a;i++)
       {
         for(t=0;t<p1a-i;t++)   {
-          bbT(t,i+t) = FUNBSEC(p1a*(p1a+1)/2+p1a+t+(i-1)*(p1a-1),j);
+          bbT(t,i+t) = FUNBSEC(p1a*(p1a+1)/2+p1a+u,j);
           bbT(i+t,t) = bbT(t,i+t);
+          u++;
         }
       }
     }
@@ -606,11 +616,13 @@ Rcpp::List getMC(Eigen::VectorXd & beta, Eigen::VectorXd & tau,
           
           if(p1a>1)
           {
+            u=0;
             for(i=1;i<p1a;i++)
             {
               for(t=0;t<p1a-i;t++)   {
-                bbT(t,i+t) = FUNBSEC(p1a*(p1a+1)/2+p1a+t+(i-1)*(p1a-1),j);
+                bbT(t,i+t) = FUNBSEC(p1a*(p1a+1)/2+p1a+u,j);
                 bbT(i+t,t) = bbT(t,i+t);
+                u++;
               }
             }
           }

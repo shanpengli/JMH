@@ -130,11 +130,13 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
     for(t=0;t<p1a;t++)   bbT(t,t) = FUNBSENW(t,j);
     if(p1a>1)
     {
+      u=0;
       for(i=1;i<p1a;i++)
       {
         for(t=0;t<p1a-i;t++) {
-          bbT(t,i+t) = FUNBSENW(p1a+t+(i-1)*(p1a-1),j);
+          bbT(t,i+t) = FUNBSENW(p1a+u,j);
           bbT(i+t,t) = bbT(t,i+t);
+          u++;
         }
       }
     }
@@ -662,11 +664,13 @@ Rcpp::List getCovSF(const Eigen::VectorXd & beta, const Eigen::VectorXd & tau,
     
     if(p1a>1)
     {
+      u=0;
       for(i=1;i<p1a;i++)
       {
         for(t=0;t<p1a-i;t++) {
-          bsw(t,i+t) = FUNBS(p1a+t+(i-1)*(p1a-1),j);
+          bsw(t,i+t) = FUNBS(p1a+u,j);
           bsw(i+t,t) = bsw(t,i+t);
+          u++;
         }
       }
     }
