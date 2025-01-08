@@ -66,6 +66,17 @@ bootPredNLheter <- function(i = 1, seed = 10, N = 200, lambda1 = 0.05, lambda2 =
     Pred.FastJM <- FastJM::AUCjmcs(seed = seed + i, object = fit.FastJM, landmark.time = landmark.time, 
                                    horizon.time = horizon.time, obs.time = "time", 
                                    method = "GH", n.cv = n.cv, initial.para = TRUE, opt = "optim", metric = "Cindex")
+  } else if (metric == "pseudoR2") {
+    
+    Pred <- JMH::PAJMMLSM(seed = seed + i, object = fit, landmark.time = landmark.time, 
+                          horizon.time = horizon.time, obs.time = "time", method = "GH", 
+                          n.cv = n.cv, initial.para = TRUE)
+    
+    Pred.FastJM <- FastJM::PAjmcs(seed = seed + i, object = fit.FastJM, landmark.time = landmark.time, 
+                                  horizon.time = horizon.time, obs.time = "time", 
+                                  method = "GH", n.cv = n.cv, initial.para = TRUE)
+    
+    
   } else {
     Pred <- Pred.FastJM <- NULL
   }

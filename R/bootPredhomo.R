@@ -9,7 +9,7 @@ bootPredhomo <- function(i = 1, seed = 10, N = 3000, lambda1 = 0.05, lambda2 = 0
                         sigb = matrix(c(10, 3, 2, 3, 4, 2, 2, 2, 4), nrow = 3),
                         increment = 0.25,
                         landmark.time = 3, horizon.time = 4:7, n.cv = 4, 
-                        metric = c("MAEQ", "Brier", "Cindex")) {
+                        metric = c("MAEQ", "Brier", "Cindex", "pseudoR2")) {
   
   
   data <- simJMdatahomo(N = N, lambda1 = lambda1, lambda2 = lambda2,
@@ -61,6 +61,17 @@ bootPredhomo <- function(i = 1, seed = 10, N = 3000, lambda1 = 0.05, lambda2 = 0
     Pred.FastJM <- FastJM::AUCjmcs(seed = seed + i, object = fit.FastJM, landmark.time = landmark.time, 
                                   horizon.time = horizon.time, obs.time = "time", 
                                   method = "GH", n.cv = n.cv, initial.para = TRUE, metric = "Cindex")
+  } else if (metric == "pseudoR2") {
+    
+    Pred <- JMH::PAJMMLSM(seed = seed + i, object = fit, landmark.time = landmark.time, 
+                           horizon.time = horizon.time, obs.time = "time", method = "GH", 
+                           n.cv = n.cv, initial.para = TRUE)
+    
+    Pred.FastJM <- FastJM::PAjmcs(seed = seed + i, object = fit.FastJM, landmark.time = landmark.time, 
+                                   horizon.time = horizon.time, obs.time = "time", 
+                                   method = "GH", n.cv = n.cv, initial.para = TRUE)
+    
+    
   } else {
     Pred <- Pred.FastJM <- NULL
   }
