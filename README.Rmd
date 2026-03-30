@@ -34,7 +34,11 @@ You can install the development version of JMH from [GitHub](https://github.com/
 devtools::install_github("shanpengli/JMH")
 ```
 
-# Example
+## Declaration
+
+This is the final release of the `JMH` package. Active development has been moved to the `FastJM` package, which provides improved functionality and ongoing support. Users are strongly encouraged to transition to `FastJM`.
+
+## Example
 
 The `JMH` package comes with several simulated datasets. To fit a joint model, we use `JMMLSM` function. 
 
@@ -85,11 +89,17 @@ MAEQ <- MAEQJMMLSM(fit, seed = 100, landmark.time = 3,
 summary(MAEQ)
 ```
 
-Using area under the ROC curve (AUC) as a discrimination measure, we may run `AUCJMMLSM` to calculate the AUC score. 
+Using area under the ROC curve (AUC)/concordance index (C-index) as a discrimination measure, we may run `AUCJMMLSM` to calculate the AUC/C-index score. 
 
 ```{r, eval=TRUE}
 AUC <- AUCJMMLSM(fit, seed = 100, landmark.time = 3, horizon.time = c(4:6),
-               obs.time = "time", method = "GH", 
+               obs.time = "time", method = "GH", metric = "AUC",
                n.cv = 3)
 summary(AUC)
+
+Cindex <- AUCJMMLSM(fit, seed = 100, landmark.time = 3, horizon.time = c(4:6),
+               obs.time = "time", method = "GH", metric = "Cindex",
+               n.cv = 3)
+summary(Cindex)
 ```
+

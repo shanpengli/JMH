@@ -27,17 +27,20 @@ You can install the development version of JMH from
 devtools::install_github("shanpengli/JMH")
 ```
 
-# Example
+## Declaration
+
+This is the final release of the `JMH` package. Active development has
+been moved to the `FastJM` package, which provides improved
+functionality and ongoing support. Users are strongly encouraged to
+transition to `FastJM`.
+
+## Example
 
 The `JMH` package comes with several simulated datasets. To fit a joint
 model, we use `JMMLSM` function.
 
 ``` r
 library(JMH)
-#> Loading required package: survival
-#> Loading required package: nlme
-#> Loading required package: MASS
-#> Loading required package: statmod
 data(ydata)
 data(cdata)
 ## fit a joint model
@@ -201,12 +204,13 @@ summary(MAEQ)
 #> 3            6 0.456 0.430
 ```
 
-Using area under the ROC curve (AUC) as a discrimination measure, we may
-run `AUCJMMLSM` to calculate the AUC score.
+Using area under the ROC curve (AUC)/concordance index (C-index) as a
+discrimination measure, we may run `AUCJMMLSM` to calculate the
+AUC/C-index score.
 
 ``` r
 AUC <- AUCJMMLSM(fit, seed = 100, landmark.time = 3, horizon.time = c(4:6),
-               obs.time = "time", method = "GH", 
+               obs.time = "time", method = "GH", metric = "AUC",
                n.cv = 3)
 #> The 1 th validation is done!
 #> The 2 th validation is done!
@@ -219,4 +223,19 @@ summary(AUC)
 #> 1            4 0.5502137 0.6839226
 #> 2            5 0.6182312 0.6523506
 #> 3            6 0.6103724 0.7065657
+
+Cindex <- AUCJMMLSM(fit, seed = 100, landmark.time = 3, horizon.time = c(4:6),
+               obs.time = "time", method = "GH", metric = "Cindex",
+               n.cv = 3)
+#> The 1 th validation is done!
+#> The 2 th validation is done!
+#> The 3 th validation is done!
+summary(Cindex)
+#> 
+#> Expected Cindex at the landmark time of 3 
+#> based on 3 fold cross validation
+#>   Horizon Time   Cindex1   Cindex2
+#> 1            4 0.6154102 0.6509733
+#> 2            5 0.6132650 0.6463436
+#> 3            6 0.6125965 0.6463436
 ```

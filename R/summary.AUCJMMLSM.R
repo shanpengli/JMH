@@ -1,5 +1,5 @@
-##' @title Print AUCJMMLSM
-##' @name summary.AUCJMMLSM
+##' @title Summaries of evaluation metrics for joint models
+##' @name summary
 ##' @aliases summary.AUCJMMLSM
 ##' @param object object of class 'AUCJMMLSM'.
 ##' @param digits number of digits of decimal to be printed. 
@@ -29,13 +29,27 @@ summary.AUCJMMLSM <- function (object, digits = 4, ...) {
         AUC1 <- sum[, 1]
         AUC2 <- sum[, 2]
         ExpectedAUC <- data.frame(object$horizon.time, AUC1, AUC2)
-        colnames(ExpectedAUC) <- c("Horizon Time", "AUC1", "AUC2")
+        
+        if (object$metric == "AUC") {
+          colnames(ExpectedAUC) <- c("Horizon Time", "AUC1", "AUC2")
+        } else {
+          colnames(ExpectedAUC) <- c("Horizon Time", "Cindex1", "Cindex2")
+        }
       } else {
         AUC <- sum[, 1]
         ExpectedAUC <- data.frame(object$horizon.time, AUC)
-        colnames(ExpectedAUC) <- c("Horizon Time", "AUC")
+        
+        if (object$metric == "AUC") {
+          colnames(ExpectedAUC) <- c("Horizon Time", "AUC")
+        } else {
+          colnames(ExpectedAUC) <- c("Horizon Time", "Cindex")
+        }
       }
-      cat("\nExpected AUC at the landmark time of", object$landmark.time, "\nbased on", object$n.cv, "fold cross validation\n")
+      if (object$metric == "AUC") {
+        cat("\nExpected AUC at the landmark time of", object$landmark.time, "\nbased on", object$n.cv, "fold cross validation\n")
+      } else {
+        cat("\nExpected Cindex at the landmark time of", object$landmark.time, "\nbased on", object$n.cv, "fold cross validation\n")
+      }
       return(ExpectedAUC)
     } else {
       stop("The cross validation fails. Please try using a different seed number.")

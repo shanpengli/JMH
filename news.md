@@ -1,3 +1,6 @@
+# JMH 1.0.4
+* Fix small bugs.
+
 # JMH 1.0.3
 * Use adaptive Gauss-Hermite quadrature rule to perform numerical integration to enable fast fitting of joint model. Develop ```AUCJMMLSM``` to assess the dynamic prediction accuracy by calculating the area under the ROC curve (AUC).  
 
