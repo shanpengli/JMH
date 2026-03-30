@@ -16,7 +16,7 @@ Description: Maximum likelihood estimation for the semi-parametric joint modelin
              is estimated using an Expectation Maximization algorithm. This is the final release of the JMH package. Active development has been moved to the FastJM package, which provides improved functionality and ongoing support. Users are strongly encouraged to transition to FastJM.
 License: GPL (>= 3)
 NeedsCompilation: yes
-Imports: Rcpp (>= 1.0.7), parallel, dplyr, stats, caret,
+Imports: Rcpp (>= 1.0.7), parallel, dplyr, stats, caret, pec
 LinkingTo: Rcpp, RcppEigen
 Depends: R (>= 3.5.0), survival, nlme, utils, MASS, statmod, magrittr
 RoxygenNote: 7.3.2

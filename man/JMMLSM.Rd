@@ -113,7 +113,7 @@ require(JMH)
 data(ydata)
 data(cdata)
 ## fit a joint model
-\dontest{
+\donttest{
 fit <- JMMLSM(cdata = cdata, ydata = ydata, 
               long.formula = Y ~ Z1 + Z2 + Z3 + time,
               surv.formula = Surv(survtime, cmprsk) ~ var1 + var2 + var3,
@@ -130,7 +130,7 @@ oldpar <- par(mfrow = c(2, 2), mar = c(5, 4, 4, 4))
 plot(survfit, include.y = TRUE)
 par(oldpar)
 
-## We can calculate the overall, time-independent Cindex over the entire time period, evaluated by the linear predictor of the (cause-specific) Cox model.
+## Overall, time-independent concordance index (C-index)
 Concord <- ConcordanceJMMLSM(seed = 100, fit, n.cv = 3)
 summary(Concord)
 }

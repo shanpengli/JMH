@@ -10,5 +10,6 @@
 #' @importFrom nlme lme getVarCov lmeControl
 #' @importFrom caret groupKFold
 #' @importFrom graphics axis mtext par segments title
+#' @importFrom pec ipcw
 #' @importFrom magrittr %>%
 NULL
