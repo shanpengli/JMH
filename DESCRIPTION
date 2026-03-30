@@ -2,7 +2,7 @@ Package: JMH
 Type: Package
 Title: Joint Model of Heterogeneous Repeated Measures and Survival Data 
 Version: 1.0.4
-Date: 2025-03-29
+Date: 2026-03-29
 Authors@R: c(
     person("Shanpeng", "Li", email = "lishanpeng0913@ucla.edu", 
         role = c("aut", "cre")),
