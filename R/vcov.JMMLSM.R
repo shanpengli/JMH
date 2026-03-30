@@ -13,49 +13,61 @@ vcov.JMMLSM <- function(object, ...) {
   if (!inherits(object, "JMMLSM"))
     stop("Use only with 'JMMLSM' objects.\n")
   
-  variance.formula <- as.formula(paste("", object$LongitudinalSubmodelvariance[3], sep = "~"))
-  
-  getdum <- getdummy(long.formula = object$LongitudinalSubmodelmean,
-                     surv.formula = object$SurvivalSubmodel, 
-                     variance.formula = variance.formula,
-                     random = object$random, ydata = object$ydata, cdata = object$cdata)
-  
-  random <- all.vars(object$random)
-  vcov <- as.data.frame(object$vcov)
-  long <- names(object$beta)
-  tau <- names(object$tau)
-  survival <- names(object$gamma1)
-  survival1 <- paste0("T.", survival)
-  long <- paste0("Ymean.", long)
-  tau <- paste0("Yvariance.", tau)
-  p1a <- length(object$alpha1) + 1
-  alpha1 <- rep("T.asso:", p1a-1)
-  nu1 <- "T.asso.Residual_1:"
-  sig <- "Sig"
-  sig <- rep(sig, p1a*(p1a+1)/2)
-  for (i in 1:p1a) sig[i] <- paste0(sig[i], i, i)
-  if (p1a == 2) {
-    sig[p1a+1] <- paste0(sig[p1a+1], "12")
-    alpha1 <- paste0(alpha1, "(Intercept)_1")
-  } else {
-    sig[p1a+1] <- paste0(sig[p1a+1], "12")
-    sig[p1a+2] <- paste0(sig[p1a+2], "23")
-    sig[p1a+3] <- paste0(sig[p1a+3], "13")
-    alpha1[1] <- paste0(alpha1[1], "(Intercept)_1")
-    alpha1[2] <- paste0(alpha1[2], random[1], "_1")
+  # ----- helpers -------------------------------------------------------------
+  make_sig_names_ordered <- function(p, prefix = "Sig") {
+    # Diagonals first: Sig11, Sig22, ..., Sigpp
+    out <- sprintf("%s%d%d", prefix, seq_len(p), seq_len(p))
+    # Then off-diagonals by increasing distance d = j - i
+    for (d in 1:(p - 1)) {
+      for (i in 1:(p - d)) {
+        j <- i + d
+        out <- c(out, sprintf("%s%d%d", prefix, i, j))
+      }
+    }
+    out
   }
   
-  if (object$CompetingRisk) {
-    survival <- names(object$gamma2)
-    survival2 <- paste0("T.", survival)
-    alpha2 <- rep("T.asso:", p1a-1)
-    nu2 <- "T.asso.Residual_2:"
-    if (p1a == 2) {
-      alpha2 <- paste0(alpha2, "(Intercept)_2")
-    } else {
-      alpha2[1] <- paste0(alpha2[1], "(Intercept)_2")
-      alpha2[2] <- paste0(alpha2[2], random[1], "_2")
+  make_alpha_labels <- function(p1a, random, suffix) {
+    base <- c("(Intercept)", random)
+    if (length(base) < (p1a - 1)) {
+      base <- c(base, paste0("RE", seq_len((p1a - 1) - length(base))))
     }
+    base <- base[seq_len(p1a - 1)]
+    paste0("T.asso:", base, suffix)
+  }
+  # --------------------------------------------------------------------------
+  
+  variance.formula <- as.formula(paste("", object$LongitudinalSubmodelvariance[3], sep = "~"))
+  
+  getdum <- getdummy(
+    long.formula = object$LongitudinalSubmodelmean,
+    surv.formula = object$SurvivalSubmodel,
+    variance.formula = variance.formula,
+    random = object$random, ydata = object$ydata, cdata = object$cdata
+  )
+  
+  random <- all.vars(object$random)
+  vcov   <- as.data.frame(object$vcov)
+  
+  long <- paste0("Ymean.", names(object$beta))
+  tau  <- paste0("Yvariance.", names(object$tau))
+  
+  survival1 <- paste0("T.", names(object$gamma1))
+  
+  # p1a = number of association terms + intercept
+  p1a <- length(object$alpha1) + 1L
+  
+  # Association labels (event 1)
+  alpha1 <- make_alpha_labels(p1a, random, "_1")
+  nu1    <- "T.asso.Var_(Intercept)_1:"
+  
+  # Sig names in your requested order
+  sig <- make_sig_names_ordered(p1a, prefix = "Sig")
+  
+  if (isTRUE(object$CompetingRisk)) {
+    survival2 <- paste0("T.", names(object$gamma2))
+    alpha2    <- make_alpha_labels(p1a, random, "_2")
+    nu2       <- "T.asso.Var_(Intercept)_2:"
     
     colnames(vcov) <- c(long, tau, survival1, survival2, alpha1, alpha2, nu1, nu2, sig)
     rownames(vcov) <- c(long, tau, survival1, survival2, alpha1, alpha2, nu1, nu2, sig)

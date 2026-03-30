@@ -23,7 +23,7 @@ NeedsCompilation: yes
 Imports: Rcpp (>= 1.0.7), parallel, dplyr, stats, caret, timeROC, PAmeasures
 LinkingTo: Rcpp, RcppEigen
 Depends: R (>= 3.5.0), survival, nlme, utils, MASS, statmod, magrittr
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Suggests: 
     testthat (>= 3.0.0),
     spelling

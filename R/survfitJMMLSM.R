@@ -155,7 +155,6 @@ survfitJMMLSM <- function(object, seed = 100, ynewdata = NULL, cnewdata = NULL,
       } else if (length(Last.time) < nrow(cnewdata)) {
         stop("The last.time vector does not match cnewdata.")
       } else {
-        next
       }
     }
   } else {

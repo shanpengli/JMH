@@ -1,13 +1,13 @@
 
-sortdata <- function(cdata, ydata, ID, surv.formula, long.formula) {
+sortdata <- function(cdata, ydata, ID, surv.formula, long.formula, variance.formula) {
   
   colnames(cdata)[-which(colnames(cdata) == ID)] <- paste0(colnames(cdata)[-which(colnames(cdata) == ID)], ".sur")
   colnames(ydata)[-which(colnames(ydata) == ID)] <- paste0(colnames(ydata)[-which(colnames(ydata) == ID)], ".long")
   
   Tdata <- dplyr::left_join(ydata, cdata, by = ID)
-  Truelong <- all.vars(long.formula)
+  Truelong <- unique(c(all.vars(long.formula), all.vars(variance.formula)))
   Truesurvival <- all.vars(surv.formula)
-  long <- all.vars(long.formula)
+  long <- unique(c(all.vars(long.formula), all.vars(variance.formula)))
   long <- paste0(long, ".long")
   survival <- all.vars(surv.formula)
   survival <- paste0(survival, ".sur")

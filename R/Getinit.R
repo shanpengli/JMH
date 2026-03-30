@@ -19,7 +19,7 @@ Getinit <- function(cdata, ydata, long.formula, surv.formula, variance.formula,
   ydim = dim(ydata)
   cdim = dim(cdata)
   
-  orderdata <- sortdata(cdata, ydata, ID, surv.formula, long.formula)
+  orderdata <- sortdata(cdata, ydata, ID, surv.formula, long.formula, variance.formula)
   
   ydata <- orderdata$ydata
   cdata <- orderdata$cdata

@@ -244,7 +244,12 @@ MAEQJMMLSM <- function(seed = 100, object, landmark.time = NULL, horizon.time = 
               if ('try-error' %in% class(fitKM.horizon)) {
                 EmpiricalSurv[i] <- summary(fitKM, times = max(quantsubdata$time))$surv
               } else {
-                EmpiricalSurv[i] <- summary(fitKM, times = horizon.time[j])$surv
+                tempSurv <- summary(fitKM, times = horizon.time[j])$surv
+                if (is.null(tempSurv)) {
+                  EmpiricalSurv[i] <- 0
+                } else {
+                  EmpiricalSurv[i] <- tempSurv 
+                }
               }
               PredictedSurv[i] <-mean(subquant$Surv)
             }

@@ -12,6 +12,21 @@ print.JMMLSM <- function(x, digits = 4, ...) {
   if (!inherits(x, "JMMLSM"))
     stop("Use only with 'JMMLSM' objects.\n")
   
+  # k = length(x$alpha1)
+  # random = all.vars(x$random)  (vector of RE names, no intercept)
+  # events = 2 for competing risks; use 1 if single event
+  make_assoc_rownames <- function(k, random, events = 2) {
+    # Base names: Intercept + random effects
+    base <- c("(Intercept)", random)
+    # If k exceeds available names, pad with generic RE labels
+    if (k > length(base)) {
+      base <- c(base, paste0("RE", seq_len(k - length(base))))
+    }
+    base <- base[seq_len(k)]
+    # Attach event suffixes: _1, _2, ...
+    unlist(lapply(seq_len(events), function(e) paste0(base, "_", e)))
+  }
+  
   cat("\nCall:\n", sprintf(format(paste(deparse(x$call, width.cutoff = 500), collapse = ""))), "\n\n")
   
   if (x$CompetingRisk) {
@@ -72,10 +87,10 @@ print.JMMLSM <- function(x, digits = 4, ...) {
     colnames(subdat) <- c("Estimate", "SE", "Z value", "p-val")
     dat <- rbind(dat, subdat)
     random <- all.vars(x$random)
-    if (length(x$alpha1) == 1) rownames(dat) <- c("(Intercept)_1", "(Intercept)_2")
-    if (length(x$alpha1) == 2) rownames(dat) <- c("(Intercept)_1", paste0(random[1], "_1"), "(Intercept)_2", paste0(random[1], "_2"))
-    if (length(x$alpha1) == 3) rownames(dat) <- c("(Intercept)_1", paste0(random[1], "_1"), paste0(random[2], "_1"), "(Intercept)_2", paste0(random[1], "_2"), paste0(random[2], "_2"))
-
+    # Usage:
+    k <- length(x$alpha1)
+    rownames(dat) <- make_assoc_rownames(k, random, events = if (isTRUE(x$CompetingRisk)) 2 else 1)
+    
     datnu <- matrix(0, nrow = 2, ncol = 4)
     datnu[1, ] <- c(x$vee1, x$sevee1, x$vee1/x$sevee1, 2 * pnorm(-abs(x$vee1/x$sevee1)))
     datnu[2, ] <- c(x$vee2, x$sevee2, x$vee2/x$sevee2, 2 * pnorm(-abs(x$vee2/x$sevee2)))
@@ -175,8 +190,9 @@ print.JMMLSM <- function(x, digits = 4, ...) {
     cat("\n Association parameters:                 \n")
     dat <- data.frame(x$alpha1, x$sealpha1, x$alpha1/x$sealpha1, 2 * pnorm(-abs(x$alpha1/x$sealpha1)))
     colnames(dat) <- c("Estimate", "SE", "Z value", "p-val")
-    if (length(x$alpha1) == 1) rownames(dat) <- c("(Intercept)_1")
-    if (length(x$alpha1) == 2) rownames(dat) <- c("(Intercept)_1", paste0(random[1], "_1"))
+    random <- all.vars(x$random)
+    k <- length(x$alpha1)
+    rownames(dat) <- make_assoc_rownames(k, random, events = if (isTRUE(x$CompetingRisk)) 2 else 1)
     
     datnu <- matrix(0, nrow = 1, ncol = 4)
     datnu[1, ] <- c(x$vee1, x$sevee1, x$vee1/x$sevee1, 2 * pnorm(-abs(x$vee1/x$sevee1)))
