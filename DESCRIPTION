@@ -13,7 +13,7 @@ Maintainer: Shanpeng Li <lishanpeng0913@ucla.edu>
 Description: Maximum likelihood estimation for the semi-parametric joint modeling of competing risks and longitudinal data in the presence of heterogeneous within-subject variability, proposed by Li and colleagues (2023) <doi:10.48550/arXiv.2506.12741>.
              The proposed method models the within-subject variability of the biomarker and associates it with the risk of the competing risks event. The time-to-event data is modeled using a (cause-specific) Cox proportional hazards regression model with time-fixed covariates. 
              The longitudinal outcome is modeled using a mixed-effects location and scale model. The association is captured by shared random effects. The model 
-             is estimated using an Expectation Maximization algorithm. This is the final release of the JMH package. Active development has been moved to the FastJM package, which provides improved functionality and ongoing support. Users are strongly encouraged to transition to FastJM.
+             is estimated using an Expectation Maximization algorithm. This is the final release of the 'JMH' package. Active development has been moved to the 'FastJM' package, which provides improved functionality and ongoing support. Users are strongly encouraged to transition to 'FastJM'.
 License: GPL (>= 3)
 NeedsCompilation: yes
 Imports: Rcpp (>= 1.0.7), parallel, dplyr, stats, caret, pec
